@@ -40,6 +40,12 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex overflow-hidden">
 
+    <!-- OVERLAY DE CARREGAMENTO (NUVEM) -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center transition-opacity">
+        <i class="ph ph-spinner animate-spin text-5xl text-brand-cyan mb-2"></i>
+        <p class="text-sm font-bold text-brand-navy">A sincronizar com a nuvem...</p>
+    </div>
+
     <aside class="w-64 bg-brand-navy text-white flex flex-col h-full shadow-2xl z-10 shrink-0">
         <div class="p-5 text-center border-b border-white/10 bg-brand-navy-dark">
             <h1 class="text-xl font-bold text-white flex items-center justify-center gap-2">
@@ -104,7 +110,8 @@
             </div>
             
             <div id="area-print" class="space-y-3 bg-slate-50 p-2 rounded-lg">
-                <div class="bg-white p-3 rounded-lg shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center mb-2 border-t-2 border-t-brand-cyan">
+                <!-- AQUI ESTÁ A CORREÇÃO: data-html2canvas-ignore="true" -->
+                <div data-html2canvas-ignore="true" class="bg-white p-3 rounded-lg shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center mb-2 border-t-2 border-t-brand-cyan">
                     <div class="flex items-center gap-2 text-brand-navy mr-2 border-r border-slate-100 pr-4">
                         <i class="ph ph-funnel text-xl text-brand-cyan"></i> <span class="text-xs font-bold uppercase tracking-wider">Filtros</span>
                     </div>
@@ -401,12 +408,12 @@
     </div>
 
     <!-- ===================================== -->
-    <!-- LÓGICA SUPABASE E OFFLINE-FIRST (NOVO) -->
+    <!-- LÓGICA SUPABASE E OFFLINE-FIRST       -->
     <!-- ===================================== -->
     <script>
         // CONFIGURAÇÕES SUPABASE - COLOQUE AS SUAS CHAVES AQUI
-        const supabaseUrl = 'https://heyydxkxclbxcdbttjbf.supabase.co'; // COLE O SEU AQUI
-        const supabaseKey = 'sb_publishable_cvQh4-2E_Sx5cvIdL0ncvg_egj1Qj8n'; // COLE O SEU AQUI
+        const supabaseUrl = 'https://heyydxkxclbxcdbttjbf.supabase.co'; 
+        const supabaseKey = 'sb_publishable_cvQh4-2E_Sx5cvIdL0ncvg_egj1Qj8n'; 
         const db = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         Chart.defaults.font.family = "'Inter', 'sans-serif'"; Chart.defaults.color = '#64748b'; Chart.register(ChartDataLabels);
@@ -418,7 +425,6 @@
         let paginaAtual = 1;
         const ITENS_POR_PAGINA = 20;
 
-        // Filas para o modo Offline-First
         let filaSincronizacao = JSON.parse(localStorage.getItem('filaSincronizacaoSerralheria')) || [];
         let filaExclusao = JSON.parse(localStorage.getItem('filaExclusaoSerralheria')) || [];
 
@@ -429,11 +435,7 @@
             document.getElementById('perfil-usuario').value = 'supervisor';
             popularFiltroMaquinaBacklog();
             preencherDatasPadraoRelatorio();
-            
-            // Inicia o sistema em Modo Rápido (Cache Local)
             carregarCacheLocal();
-            
-            // Depois, tenta atualizar e sincronizar a nuvem em segundo plano
             sincronizarTudoBackground();
         });
 
@@ -442,22 +444,18 @@
         // ==========================================
         function carregarCacheLocal() {
             try { const cache = localStorage.getItem('dadosSerralheriaCache'); if (cache) atividades = JSON.parse(cache); } catch(e) {}
-            
-            // Aplica as ações pendentes em cima do cache para a tela ficar correta
             atividades = atividades.filter(a => !filaExclusao.includes(a.id));
             filaSincronizacao.forEach(pend => {
                 const locObj = converterDBParaLocal(pend);
                 const idx = atividades.findIndex(a => a.id === pend.id);
                 if (idx !== -1) atividades[idx] = locObj; else atividades.unshift(locObj);
             });
-
             popularFiltroAno(); resetarPaginaEAtualizar(); atualizarDashboard(); atualizarStatusSync();
         }
 
         function atualizarStatusSync() {
             const statusDiv = document.getElementById('sync-status');
             const pendentes = filaSincronizacao.length + filaExclusao.length;
-            
             if (pendentes > 0) {
                 statusDiv.innerHTML = `<button onclick="sincronizarTudoBackground()" class="flex items-center justify-center gap-1 text-orange-400 hover:text-orange-300 w-full p-2 bg-orange-400/10 rounded border border-orange-400/20 transition cursor-pointer"><i class="ph ph-cloud-warning text-lg animate-pulse"></i> <span>${pendentes} Edições offline. Enviar?</span></button>`;
             } else {
@@ -469,15 +467,12 @@
             document.getElementById('sync-status').innerHTML = `<div class="flex items-center justify-center gap-1 text-brand-cyan p-2"><i class="ph ph-spinner animate-spin text-lg"></i> Conectando à nuvem...</div>`;
             let falhou = false;
 
-            // 1. Processa Exclusões
             for (let i = filaExclusao.length - 1; i >= 0; i--) {
                 try { const { error } = await db.from('atividades').delete().eq('id', filaExclusao[i]); if (error) throw error; filaExclusao.splice(i, 1); localStorage.setItem('filaExclusaoSerralheria', JSON.stringify(filaExclusao)); } catch (e) { falhou = true; }
             }
-            // 2. Processa Criações/Edições
             for (let i = filaSincronizacao.length - 1; i >= 0; i--) {
                 try { const { error } = await db.from('atividades').upsert(filaSincronizacao[i]); if (error) throw error; filaSincronizacao.splice(i, 1); localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao)); } catch (e) { falhou = true; }
             }
-            // 3. Busca Dados Atualizados
             if (!falhou) {
                 try {
                     const { data, error } = await db.from('atividades').select('*');
@@ -488,6 +483,7 @@
                 } catch (e) { falhou = true; }
             }
             atualizarStatusSync();
+            setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
         }
 
         function converterDBParaLocal(item) {
@@ -519,7 +515,6 @@
                 status: perfilAtual === 'gestor' ? document.getElementById('task-status').value : (atvAtual.status || 'NÃO INICIADO')
             };
 
-            // Adiciona na fila de sincronização (Modo Offline)
             filaSincronizacao = filaSincronizacao.filter(item => item.id !== dbObj.id);
             filaSincronizacao.push(dbObj);
             localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao));
@@ -660,6 +655,7 @@
             const mx = Math.max(...dadosM);
             graficosCriados.historico = new Chart(document.getElementById('chartHistorico'), { type: 'line', data: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], datasets: [{ data: dadosM, borderColor: CORES.cyan, backgroundColor: 'rgba(0,159,227,0.2)', fill: true, tension: 0, pointBackgroundColor: CORES.cyan, pointRadius: 5, pointBorderColor: '#fff', pointBorderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 20 } }, scales: { y: { display: false, suggestedMax: mx+(mx*0.2) }, x: { grid: { display: false } } }, plugins: { legend: { display: false }, datalabels: { display: (c)=>c.dataset.data[c.dataIndex]>0, align: 'top', anchor: 'end', color: CORES.navy, font: { weight: 'bolder', size: 12 } } } } });
         }
+
         function exportarParaPPT() {
             const btn = document.getElementById('btn-exportar'); const iconOriginal = btn.innerHTML; btn.innerHTML = '<i class="ph ph-spinner animate-spin text-base text-brand-cyan"></i> Gerando...'; btn.disabled = true;
             html2canvas(document.getElementById('area-print'), { scale: 2, backgroundColor: '#f8fafc', logging: false }).then(canvas => {
@@ -667,9 +663,7 @@
             }).catch(err => { alert("Erro na exportação."); btn.innerHTML = iconOriginal; btn.disabled = false; });
         }
 
-        // ==========================================
-        // TABELA BACKLOG COM PAGINAÇÃO
-        // ==========================================
+        // TABELA BACKLOG
         function filtrarBacklog(filtro) { filtroBacklogAtivo = filtro; document.querySelectorAll('#botoes-filtro-backlog button').forEach(b => b.classList.remove('pill-active')); document.getElementById('btn-filtro-' + filtro).classList.add('pill-active'); resetarPaginaEAtualizar(); }
         function resetarPaginaEAtualizar() { paginaAtual = 1; renderizarTabela(); }
         function mudarPagina(direcao) { paginaAtual += direcao; renderizarTabela(); }
@@ -728,9 +722,7 @@
             });
         }
 
-        // ==========================================
-        // RELATÓRIOS
-        // ==========================================
+        // RELATÓRIOS E-MAIL
         function getSegundaSextaPassada() { let h = new Date(); let ds = h.getDay(); let dv = (ds === 0) ? 6 : ds - 1; let sA = new Date(h); sA.setDate(h.getDate() - dv); let sP = new Date(sA); sP.setDate(sA.getDate() - 3); let seP = new Date(sP); seP.setDate(sP.getDate() - 4); return { inc: seP.toISOString().split('T')[0], f: sP.toISOString().split('T')[0] }; }
         function getSegundaSextaAtual() { let h = new Date(); let ds = h.getDay(); let dv = (ds === 0) ? 6 : ds - 1; let sA = new Date(h); sA.setDate(h.getDate() - dv); let sAtual = new Date(sA); sAtual.setDate(sA.getDate() + 4); return { inc: sA.toISOString().split('T')[0], f: sAtual.toISOString().split('T')[0] }; }
         function preencherDatasPadraoRelatorio() { const p = getSegundaSextaPassada(); document.getElementById('rel-passada-inicio').value = p.inc; document.getElementById('rel-passada-fim').value = p.f; const a = getSegundaSextaAtual(); document.getElementById('rel-atual-inicio').value = a.inc; document.getElementById('rel-atual-fim').value = a.f; }
