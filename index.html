@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Serralheria</title>
     
-    <!-- Ícone da Aba do Navegador (Favicon) -->
+    <!-- Link para o Favicon -->
     <link rel="icon" type="image/jpeg" href="favicon.jpg">
-
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Biblioteca de Exportação Excel -->
+    <!-- Biblioteca de Exportação e Importação Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -47,7 +47,7 @@
     <!-- OVERLAY DE CARREGAMENTO (NUVEM) -->
     <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center transition-opacity">
         <i class="ph ph-spinner animate-spin text-5xl text-brand-cyan mb-2"></i>
-        <p class="text-sm font-bold text-brand-navy">A sincronizar com a nuvem...</p>
+        <p class="text-sm font-bold text-brand-navy" id="loading-text">A sincronizar com a nuvem...</p>
     </div>
 
     <aside class="w-64 bg-brand-navy text-white flex flex-col h-full shadow-2xl z-10 shrink-0">
@@ -114,7 +114,7 @@
             </div>
             
             <div id="area-print" class="space-y-3 bg-slate-50 p-2 rounded-lg">
-                <!-- Filtros protegidos do html2canvas -->
+                <!-- Filtros protegidos para não saírem na imagem html2canvas -->
                 <div data-html2canvas-ignore="true" class="bg-white p-3 rounded-lg shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center mb-2 border-t-2 border-t-brand-cyan">
                     <div class="flex items-center gap-2 text-brand-navy mr-2 border-r border-slate-100 pr-4">
                         <i class="ph ph-funnel text-xl text-brand-cyan"></i> <span class="text-xs font-bold uppercase tracking-wider">Filtros</span>
@@ -202,7 +202,7 @@
             </div> 
         </section>
 
-        <!-- ABA: ATIVIDADES COM BUSCA E PAGINAÇÃO -->
+        <!-- ABA: ATIVIDADES COM BUSCA, PAGINAÇÃO E IMPORTAÇÃO -->
         <section id="atividades" class="tab-content max-w-[1500px] mx-auto">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-slate-200 pb-3">
                 <div>
@@ -211,19 +211,21 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-2 items-center w-full sm:w-auto">
+                    <!-- PÍLULAS DE FILTRO RÁPIDO -->
                     <div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0" id="botoes-filtro-backlog">
                         <button onclick="filtrarBacklog('todos')" id="btn-filtro-todos" class="pill-active px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm"><i class="ph ph-list-bullets"></i> Todas</button>
                         <button onclick="filtrarBacklog('sem_plano')" id="btn-filtro-sem_plano" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm"><i class="ph ph-calendar-x"></i> Sem Planejamento</button>
                         <button onclick="filtrarBacklog('atrasadas')" id="btn-filtro-atrasadas" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Críticas / Atrasadas</button>
                         <button onclick="filtrarBacklog('execucao')" id="btn-filtro-execucao" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-500"></span> Em Execução</button>
                     </div>
+
                     <button onclick="abrirModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md shadow-md font-bold flex items-center gap-2 transition text-sm border border-orange-500 whitespace-nowrap shrink-0 w-full sm:w-auto justify-center">
                         <i class="ph ph-plus-circle text-lg"></i> Nova Solicitação
                     </button>
                 </div>
             </div>
 
-            <!-- BUSCA E EXPORTAÇÃO -->
+            <!-- BUSCA E BOTÕES EXCEL (EXPORTAR/IMPORTAR) -->
             <div class="mb-4 bg-white p-3 rounded-lg border border-slate-200 flex flex-wrap items-center gap-3 shadow-sm">
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <i class="ph ph-funnel text-brand-cyan text-xl"></i>
@@ -236,11 +238,22 @@
                     <input type="text" id="filtro-busca" onkeyup="resetarPaginaEAtualizar()" placeholder="Buscar por tarefa, nome, local..." class="border border-slate-300 rounded p-1.5 text-xs outline-none focus:border-brand-cyan w-full">
                 </div>
                 
-                <button onclick="document.getElementById('filtro-maquina-backlog').value = 'TODAS'; document.getElementById('filtro-busca').value=''; resetarPaginaEAtualizar();" class="text-[10px] font-bold text-slate-400 hover:text-red-500 underline transition shrink-0">Limpar Filtros</button>
+                <button onclick="document.getElementById('filtro-maquina-backlog').value = 'TODAS'; document.getElementById('filtro-busca').value=''; resetarPaginaEAtualizar();" class="text-[10px] font-bold text-slate-400 hover:text-red-500 underline transition shrink-0 mr-4">Limpar Filtros</button>
                 
-                <button onclick="exportarExcel()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition shrink-0 ml-auto">
-                    <i class="ph ph-file-xls text-base"></i> Exportar para Excel
-                </button>
+                <!-- Importar Arquivo -->
+                <div class="flex gap-2 w-full md:w-auto">
+                    <!-- Só exibe o Importar para Gestor para segurança -->
+                    <div id="btn-import-container" class="hidden relative">
+                        <input type="file" id="input-importar-excel" accept=".xlsx, .xls, .csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="importarExcel(event)">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition">
+                            <i class="ph ph-upload-simple text-base"></i> Importar Excel
+                        </button>
+                    </div>
+                    
+                    <button onclick="exportarExcel()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition">
+                        <i class="ph ph-download-simple text-base"></i> Exportar
+                    </button>
+                </div>
             </div>
 
             <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden border-t-2 border-t-brand-cyan flex flex-col min-h-[500px]">
@@ -313,7 +326,7 @@
     <div id="modal-senha" class="modal-custom fixed inset-0 bg-brand-navy/90 backdrop-blur-sm z-[70] items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden p-6 text-center border-t-4 border-t-brand-cyan">
             <i class="ph ph-lock-key text-5xl text-brand-cyan mb-2"></i><h3 class="text-xl font-bold text-brand-navy mb-1">Acesso Restrito</h3>
-            <p class="text-xs text-slate-500 mb-5">Insira a senha para acessar o planejamento.</p>
+            <p class="text-xs text-slate-500 mb-5">Insira a senha para acessar as funções de gestor.</p>
             <input type="password" id="input-senha" placeholder="••••••••" class="w-full border border-slate-300 rounded-lg p-3 mb-5 text-center text-xl tracking-[0.3em] outline-none focus:border-brand-cyan bg-slate-50 transition shadow-inner">
             <div class="flex gap-2 justify-center">
                 <button onclick="cancelarSenha()" class="px-4 py-2.5 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg w-full text-sm font-bold transition">Cancelar</button>
@@ -410,7 +423,7 @@
     </div>
 
     <!-- ===================================== -->
-    <!-- LÓGICA SUPABASE E OFFLINE-FIRST       -->
+    <!-- SCRIPTS CORE E SUPABASE               -->
     <!-- ===================================== -->
     <script>
         // CONFIGURAÇÕES SUPABASE
@@ -440,6 +453,87 @@
             carregarCacheLocal();
             sincronizarTudoBackground();
         });
+
+        // IMPORTAÇÃO DE EXCEL (NOVO RECURSO)
+        async function importarExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    document.getElementById('loading-text').innerText = "Importando dados do Excel...";
+                    document.getElementById('loading-overlay').style.display = 'flex';
+                    
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+                    if(jsonData.length === 0) throw new Error("Planilha vazia ou formato inválido.");
+
+                    let adicionados = 0;
+                    
+                    // Converte cada linha do Excel para o formato do Banco
+                    for (let row of jsonData) {
+                        const desc = row["Atividade"] || row["Descricao"] || row["Título"] || row["Tarefa"] || "";
+                        if(!desc.trim()) continue; // Pula linha vazia
+                        
+                        const nova = {
+                            id: Date.now().toString() + Math.floor(Math.random()*1000), // Garante ID único
+                            datacadastro: new Date().toISOString(),
+                            descricao: String(desc).toUpperCase(),
+                            diretriz: String(row["Diretrizes"] || row["Instruções"] || "").toUpperCase(),
+                            maquina: String(row["Máquina"] || row["Maquina"] || "NÃO INFORMADO").toUpperCase(),
+                            local: String(row["Local"] || row["Local da Máquina"] || "").toUpperCase(),
+                            solicitante: String(row["Solicitante"] || "NÃO INFORMADO").toUpperCase(),
+                            nucleo: String(row["Núcleo"] || row["Nucleo"] || "OUTROS").toUpperCase(),
+                            criticidade: String(row["Criticidade"] || "Baixa"),
+                            fotobase64: "", // Excel não tem foto base64
+                            responsavel: String(row["Serralheiro"] || row["Responsável"] || "").toUpperCase(),
+                            status: String(row["Status"] || "NÃO INICIADO").toUpperCase(),
+                            datainicio: formatarDataExcel(row["Data Início"] || row["Inicio"]),
+                            datafim: formatarDataExcel(row["Prazo Conclusão"] || row["Fim"] || row["Prazo"])
+                        };
+
+                        filaSincronizacao.push(nova);
+                        adicionados++;
+                    }
+
+                    if(adicionados > 0) {
+                        localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao));
+                        carregarCacheLocal();
+                        sincronizarTudoBackground();
+                        alert(`Sucesso! ${adicionados} atividades importadas da planilha.`);
+                    } else {
+                        alert("Nenhuma atividade válida encontrada na planilha. Verifique os nomes das colunas (Ex: 'Atividade').");
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    alert("Erro ao ler o Excel: " + err.message);
+                } finally {
+                    document.getElementById('input-importar-excel').value = ''; // Limpa input
+                    document.getElementById('loading-overlay').style.display = 'none';
+                    document.getElementById('loading-text').innerText = "A sincronizar com a nuvem...";
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Função auxiliar para tentar entender as datas do Excel (DD/MM/YYYY) para o formato do banco (YYYY-MM-DD)
+        function formatarDataExcel(val) {
+            if(!val) return "";
+            if(typeof val === 'string' && val.includes('/')) {
+                const p = val.split('/');
+                if(p.length === 3) {
+                    let y = p[2].length === 2 ? "20"+p[2] : p[2];
+                    return `${y}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+                }
+            }
+            return "";
+        }
 
         // ==========================================
         // LÓGICA DE SINCRONIZAÇÃO OFFLINE-FIRST
@@ -587,8 +681,35 @@
         function verFoto(imgSrc) { if(!imgSrc) return; document.getElementById('imagem-ampliada').src = imgSrc; document.getElementById('modal-foto').classList.add('active'); }
         function fecharModalFoto() { document.getElementById('modal-foto').classList.remove('active'); setTimeout(() => { document.getElementById('imagem-ampliada').src = ""; }, 200); }
 
-        function mudarPerfil() { const sel = document.getElementById('perfil-usuario'); if (sel.value === 'gestor') { document.getElementById('modal-senha').classList.add('active'); document.getElementById('input-senha').value = ''; setTimeout(() => document.getElementById('input-senha').focus(), 100); sel.value = 'supervisor'; } else { perfilAtual = 'supervisor'; resetarPaginaEAtualizar(); } }
-        function confirmarSenha() { if (document.getElementById('input-senha').value === 'gac+000') { perfilAtual = 'gestor'; document.getElementById('perfil-usuario').value = 'gestor'; resetarPaginaEAtualizar(); cancelarSenha(); } else { alert("Senha Incorreta!"); document.getElementById('input-senha').value = ''; document.getElementById('input-senha').focus(); } }
+        function mudarPerfil() { 
+            const sel = document.getElementById('perfil-usuario'); 
+            const btnImport = document.getElementById('btn-import-container');
+            
+            if (sel.value === 'gestor') { 
+                document.getElementById('modal-senha').classList.add('active'); 
+                document.getElementById('input-senha').value = ''; 
+                setTimeout(() => document.getElementById('input-senha').focus(), 100); 
+                sel.value = 'supervisor'; 
+            } else { 
+                perfilAtual = 'supervisor'; 
+                btnImport.classList.add('hidden');
+                resetarPaginaEAtualizar(); 
+            } 
+        }
+        
+        function confirmarSenha() { 
+            if (document.getElementById('input-senha').value === 'gac+000') { 
+                perfilAtual = 'gestor'; 
+                document.getElementById('perfil-usuario').value = 'gestor'; 
+                document.getElementById('btn-import-container').classList.remove('hidden'); 
+                resetarPaginaEAtualizar(); 
+                cancelarSenha(); 
+            } else { 
+                alert("Senha Incorreta!"); 
+                document.getElementById('input-senha').value = ''; 
+                document.getElementById('input-senha').focus(); 
+            } 
+        }
         function cancelarSenha() { document.getElementById('modal-senha').classList.remove('active'); } document.getElementById('input-senha').addEventListener('keypress', function(e) { if (e.key === 'Enter') confirmarSenha(); });
         
         function changeTab(tabName) {
