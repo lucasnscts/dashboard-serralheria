@@ -114,7 +114,6 @@
             </div>
             
             <div id="area-print" class="space-y-3 bg-slate-50 p-2 rounded-lg">
-                <!-- Filtros protegidos para não saírem na imagem html2canvas -->
                 <div data-html2canvas-ignore="true" class="bg-white p-3 rounded-lg shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center mb-2 border-t-2 border-t-brand-cyan">
                     <div class="flex items-center gap-2 text-brand-navy mr-2 border-r border-slate-100 pr-4">
                         <i class="ph ph-funnel text-xl text-brand-cyan"></i> <span class="text-xs font-bold uppercase tracking-wider">Filtros</span>
@@ -124,7 +123,6 @@
                         <select id="filtro-ano" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent"></select>
                     </div>
                     
-                    <!-- NOVO: Filtro de Mês no Dashboard -->
                     <div class="flex-1 min-w-[120px]">
                         <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Mês</label>
                         <select id="filtro-mes-dash" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent">
@@ -699,8 +697,8 @@
                 let sim = calcularSimilaridade(desc, p.descricao);
                 if (sim >= 0.6) {
                     const prosseguir = confirm(`⚠️ ATENÇÃO: POSSÍVEL DUPLICIDADE\n\nIdentificamos que já existe uma atividade pendente muito parecida para a máquina ${maq}:\n\n"${p.descricao}"\n\nVocê tem certeza que deseja cadastrar esta solicitação?`);
-                    if (!prosseguir) return; // Cancela o salvamento se o usuário não confirmar
-                    break; // Se confirmou uma vez, sai do loop
+                    if (!prosseguir) return; 
+                    break; 
                 }
             }
 
@@ -905,13 +903,22 @@
             const mkBar = (id, b, l=null) => { let ar=Object.keys(b).map(k=>({n:k,...b[k]})).sort((x,y)=>y.t-x.t); if(ar.length>1) ar=ar.filter(i=>i.n!=='NÃO INFORMADO'); if(l) ar=ar.slice(0,l); return new Chart(document.getElementById(id), { type: 'bar', data: { labels: ar.map(i=>i.n), datasets: [{ label: 'Não Iniciado/Andamento', data: ar.map(i=>i.p), backgroundColor: CORES.navy, borderRadius:{topLeft:3, bottomLeft:3} }, { label: 'Realizado', data: ar.map(i=>i.r), backgroundColor: CORES.green, borderRadius:{topRight:3, bottomRight:3} }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x:{stacked:true, display:false}, y:{stacked:true, grid:{display:false}, ticks:{font:{size:10}}} }, plugins: { legend: { position: 'top', align: 'start', labels: { boxWidth: 8, usePointStyle: true, font: {size:10} } }, datalabels: { display: (c)=>c.dataset.data[c.dataIndex]>0, align: 'center', anchor: 'center' } } } }); };
             graficosCriados.nucleo = mkBar('chartNucleo', agr('nucleo', true)); graficosCriados.maquina = mkBar('chartMaquina', agr('maquina', true), 10);
 
-            // CORREÇÃO DO GRÁFICO HISTÓRICO DE CONCLUSÃO (Ignora o filtro de mês para mostrar evolução do ano)
+            // CORREÇÃO DO GRÁFICO HISTÓRICO: Puxar dataRef se a dataFim não existir para unificar visão
             const dadosM = new Array(12).fill(0);
             atividades.forEach(a => { 
-                if(a.status==='REALIZADO' && a.dataFim && ((cS==='Todas')||(a.criticidade===cS))) {
-                    const anoConclusao = a.dataFim.split('-')[0];
-                    if (aS === 'Todos' || anoConclusao === aS) {
-                        dadosM[parseInt(a.dataFim.split('-')[1])-1]++; 
+                if(a.status === 'REALIZADO' && ((cS === 'Todas') || (a.criticidade === cS))) {
+                    let anoCalc, mesCalc;
+                    if (a.dataFim) {
+                        anoCalc = a.dataFim.split('-')[0];
+                        mesCalc = parseInt(a.dataFim.split('-')[1]) - 1;
+                    } else {
+                        let dRef = obterDataReferencia(a);
+                        anoCalc = dRef.getFullYear().toString();
+                        mesCalc = dRef.getMonth();
+                    }
+
+                    if (aS === 'Todos' || anoCalc === aS) {
+                        dadosM[mesCalc]++;
                     }
                 }
             });
