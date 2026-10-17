@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Serralheria</title>
+    
+    <!-- Ícone da Aba do Navegador (Favicon) -->
+    <link rel="icon" type="image/jpeg" href="favicon.jpg">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
@@ -110,7 +114,7 @@
             </div>
             
             <div id="area-print" class="space-y-3 bg-slate-50 p-2 rounded-lg">
-                <!-- AQUI ESTÁ A CORREÇÃO: data-html2canvas-ignore="true" -->
+                <!-- Filtros protegidos do html2canvas -->
                 <div data-html2canvas-ignore="true" class="bg-white p-3 rounded-lg shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center mb-2 border-t-2 border-t-brand-cyan">
                     <div class="flex items-center gap-2 text-brand-navy mr-2 border-r border-slate-100 pr-4">
                         <i class="ph ph-funnel text-xl text-brand-cyan"></i> <span class="text-xs font-bold uppercase tracking-wider">Filtros</span>
@@ -207,14 +211,12 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-2 items-center w-full sm:w-auto">
-                    <!-- PÍLULAS DE FILTRO RÁPIDO -->
                     <div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0" id="botoes-filtro-backlog">
                         <button onclick="filtrarBacklog('todos')" id="btn-filtro-todos" class="pill-active px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm"><i class="ph ph-list-bullets"></i> Todas</button>
                         <button onclick="filtrarBacklog('sem_plano')" id="btn-filtro-sem_plano" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm"><i class="ph ph-calendar-x"></i> Sem Planejamento</button>
                         <button onclick="filtrarBacklog('atrasadas')" id="btn-filtro-atrasadas" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Críticas / Atrasadas</button>
                         <button onclick="filtrarBacklog('execucao')" id="btn-filtro-execucao" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-500"></span> Em Execução</button>
                     </div>
-
                     <button onclick="abrirModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md shadow-md font-bold flex items-center gap-2 transition text-sm border border-orange-500 whitespace-nowrap shrink-0 w-full sm:w-auto justify-center">
                         <i class="ph ph-plus-circle text-lg"></i> Nova Solicitação
                     </button>
@@ -411,7 +413,7 @@
     <!-- LÓGICA SUPABASE E OFFLINE-FIRST       -->
     <!-- ===================================== -->
     <script>
-        // CONFIGURAÇÕES SUPABASE - COLOQUE AS SUAS CHAVES AQUI
+        // CONFIGURAÇÕES SUPABASE
         const supabaseUrl = 'https://heyydxkxclbxcdbttjbf.supabase.co'; 
         const supabaseKey = 'sb_publishable_cvQh4-2E_Sx5cvIdL0ncvg_egj1Qj8n'; 
         const db = window.supabase.createClient(supabaseUrl, supabaseKey);
