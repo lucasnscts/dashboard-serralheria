@@ -4,15 +4,12 @@ on:
   schedule:
     # Roda a cada 3 dias às 09:00 UTC (06:00 BRT)
     - cron: '0 9 */3 * *'
-  workflow_dispatch: # Permite rodar manualmente no botão
+  workflow_dispatch: # Permite rodar manualmente
 
 jobs:
-  ping-database:
+  ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping na API do Supabase
+      - name: Ping na API (Mantém Ativo)
         run: |
-          curl -s -o /dev/null -w "%{http_code}" \
-          -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-          "${{ secrets.SUPABASE_URL }}/rest/v1/atividades?select=id&limit=1"
+          curl -s "${{ secrets.SUPABASE_URL }}/rest/v1/" > /dev/null
