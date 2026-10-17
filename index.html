@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Serralheria</title>
+    <title>Gestão da Serralheria</title>
     
     <!-- Link para o Favicon -->
     <link rel="icon" type="image/jpeg" href="favicon.jpg">
@@ -225,8 +225,8 @@
         <section id="atividades" class="tab-content max-w-[1500px] mx-auto">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-slate-200 pb-3">
                 <div>
-                    <h2 class="text-2xl font-bold text-brand-navy tracking-tight">Backlog de Atividades</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Gerencie as solicitações, métricas e ordens de serviço</p>
+                    <h2 class="text-2xl font-black text-brand-navy tracking-tight">Backlog de Atividades</h2>
+                    <p class="text-xs text-slate-500 mt-0.5 font-medium">Gerencie as solicitações, métricas e ordens de serviço</p>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-2 items-center w-full sm:w-auto">
@@ -325,8 +325,8 @@
         <!-- ABA: RELATÓRIOS -->
         <section id="relatorios" class="tab-content max-w-[1200px] mx-auto">
             <div class="border-b border-slate-200 pb-3 mb-6">
-                <h2 class="text-2xl font-bold text-brand-navy tracking-tight">Relatórios de Acompanhamento (E-mail)</h2>
-                <p class="text-xs text-slate-500 mt-0.5">Gere automaticamente as tabelas para envio por e-mail.</p>
+                <h2 class="text-2xl font-black text-brand-navy tracking-tight">Relatórios de Acompanhamento (E-mail)</h2>
+                <p class="text-xs text-slate-500 mt-0.5 font-medium">Gere automaticamente as tabelas para envio por e-mail.</p>
             </div>
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
                 <div class="flex flex-col md:flex-row gap-6 mb-6">
@@ -524,7 +524,7 @@
             return intersecao.length / arr1.length;
         }
 
-        // IMPORTAÇÃO DE EXCEL
+        // IMPORTAÇÃO DE EXCEL COM ID BLINDADO
         async function importarExcel(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -618,7 +618,6 @@
             let htmlMes = '<option value="TODOS">Todos os Meses</option>';
             const nomeMeses = {"01":"Jan","02":"Fev","03":"Mar","04":"Abr","05":"Mai","06":"Jun","07":"Jul","08":"Ago","09":"Set","10":"Out","11":"Nov","12":"Dez"};
             
-            // CORREÇÃO: Ordenação cronológica real e tradução do mês
             Array.from(meses).sort((a, b) => {
                 let [mA, yA] = a.split('/');
                 let [mB, yB] = b.split('/');
