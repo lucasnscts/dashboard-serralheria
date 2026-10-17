@@ -211,12 +211,11 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-2 items-center w-full sm:w-auto">
-                    <!-- PÍLULAS DE FILTRO RÁPIDO -->
+                    <!-- PÍLULAS DE ALERTAS RÁPIDOS -->
                     <div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0" id="botoes-filtro-backlog">
-                        <button onclick="filtrarBacklog('todos')" id="btn-filtro-todos" class="pill-active px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm"><i class="ph ph-list-bullets"></i> Todas</button>
-                        <button onclick="filtrarBacklog('sem_plano')" id="btn-filtro-sem_plano" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm"><i class="ph ph-calendar-x"></i> Sem Planejamento</button>
-                        <button onclick="filtrarBacklog('atrasadas')" id="btn-filtro-atrasadas" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Críticas / Atrasadas</button>
-                        <button onclick="filtrarBacklog('execucao')" id="btn-filtro-execucao" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-500"></span> Em Execução</button>
+                        <button onclick="filtrarBacklog('todos')" id="btn-filtro-todos" class="pill-active px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><i class="ph ph-list-bullets"></i> Todas</button>
+                        <button onclick="filtrarBacklog('aguardando_gestor')" id="btn-filtro-aguardando_gestor" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1 text-orange-600"><i class="ph ph-warning"></i> Aguardando Gestor</button>
+                        <button onclick="filtrarBacklog('criticas_atrasadas')" id="btn-filtro-criticas_atrasadas" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Críticas / Atrasadas</button>
                     </div>
 
                     <button onclick="abrirModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md shadow-md font-bold flex items-center gap-2 transition text-sm border border-orange-500 whitespace-nowrap shrink-0 w-full sm:w-auto justify-center">
@@ -225,34 +224,54 @@
                 </div>
             </div>
 
-            <!-- BUSCA E BOTÕES EXCEL (EXPORTAR/IMPORTAR) -->
-            <div class="mb-4 bg-white p-3 rounded-lg border border-slate-200 flex flex-wrap items-center gap-3 shadow-sm">
-                <div class="flex items-center gap-2 w-full md:w-auto">
-                    <i class="ph ph-funnel text-brand-cyan text-xl"></i>
-                    <label class="text-xs font-bold text-slate-600 uppercase">Máquina:</label>
-                    <select id="filtro-maquina-backlog" onchange="resetarPaginaEAtualizar()" class="border border-slate-300 rounded p-1.5 text-xs outline-none focus:border-brand-cyan bg-slate-50 w-full md:w-48 uppercase"></select>
+            <!-- FILTROS AVANÇADOS, BUSCA E EXCEL -->
+            <div class="mb-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-3">
+                
+                <!-- Primeira Linha: Filtros em Menus Suspensos -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-calendar-blank"></i> Mês de Cadastro</label>
+                        <select id="filtro-mes-backlog" onchange="resetarPaginaEAtualizar()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700"></select>
+                    </div>
+                    <div>
+                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-traffic-signal"></i> Status</label>
+                        <select id="filtro-status-backlog" onchange="resetarPaginaEAtualizar()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700">
+                            <option value="TODOS">Todos</option>
+                            <option value="NÃO INICIADO">Não Iniciado</option>
+                            <option value="EM ANDAMENTO">Em Andamento</option>
+                            <option value="REALIZADO">Realizado</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-wrench"></i> Máquina</label>
+                        <select id="filtro-maquina-backlog" onchange="resetarPaginaEAtualizar()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700 uppercase"></select>
+                    </div>
+                    <div>
+                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-users"></i> Responsável</label>
+                        <select id="filtro-resp-backlog" onchange="resetarPaginaEAtualizar()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700 uppercase"></select>
+                    </div>
                 </div>
-                
-                <div class="flex items-center gap-2 w-full md:w-auto flex-1 border-l border-slate-200 pl-3">
-                    <i class="ph ph-magnifying-glass text-brand-cyan text-xl"></i>
-                    <input type="text" id="filtro-busca" onkeyup="resetarPaginaEAtualizar()" placeholder="Buscar por tarefa, nome, local..." class="border border-slate-300 rounded p-1.5 text-xs outline-none focus:border-brand-cyan w-full">
-                </div>
-                
-                <button onclick="document.getElementById('filtro-maquina-backlog').value = 'TODAS'; document.getElementById('filtro-busca').value=''; resetarPaginaEAtualizar();" class="text-[10px] font-bold text-slate-400 hover:text-red-500 underline transition shrink-0 mr-4">Limpar Filtros</button>
-                
-                <!-- Importar Arquivo -->
-                <div class="flex gap-2 w-full md:w-auto">
-                    <!-- Só exibe o Importar para Gestor para segurança -->
-                    <div id="btn-import-container" class="hidden relative">
-                        <input type="file" id="input-importar-excel" accept=".xlsx, .xls, .csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="importarExcel(event)">
-                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition">
-                            <i class="ph ph-upload-simple text-base"></i> Importar Excel
-                        </button>
+
+                <!-- Segunda Linha: Busca e Botões -->
+                <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-100">
+                    <div class="flex items-center gap-2 w-full md:w-auto flex-1">
+                        <i class="ph ph-magnifying-glass text-brand-cyan text-xl"></i>
+                        <input type="text" id="filtro-busca" onkeyup="resetarPaginaEAtualizar()" placeholder="Buscar por tarefa, solicitante, diretriz ou local..." class="border border-slate-300 rounded p-1.5 text-xs outline-none focus:border-brand-cyan w-full">
                     </div>
                     
-                    <button onclick="exportarExcel()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition">
-                        <i class="ph ph-download-simple text-base"></i> Exportar
-                    </button>
+                    <button onclick="limparFiltrosBacklog()" class="text-[10px] font-bold text-slate-400 hover:text-red-500 underline transition shrink-0 mr-2">Limpar Tudo</button>
+                    
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <div id="btn-import-container" class="hidden relative">
+                            <input type="file" id="input-importar-excel" accept=".xlsx, .xls, .csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="importarExcel(event)">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition">
+                                <i class="ph ph-upload-simple text-base"></i> Importar
+                            </button>
+                        </div>
+                        <button onclick="exportarExcel()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition">
+                            <i class="ph ph-download-simple text-base"></i> Exportar
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -271,7 +290,7 @@
                     </table>
                     <div id="empty-state" class="hidden p-12 text-center text-slate-400">
                         <i class="ph ph-magnifying-glass text-4xl mb-2 text-slate-300"></i>
-                        <p class="text-sm">Nenhuma atividade encontrada.</p>
+                        <p class="text-sm">Nenhuma atividade corresponde aos filtros aplicados.</p>
                     </div>
                 </div>
 
@@ -444,10 +463,7 @@
         let filaExclusao = JSON.parse(localStorage.getItem('filaExclusaoSerralheria')) || [];
 
         const LISTA_MAQUINAS = ["ARTICULADA 01", "ARTICULADA 02", "ARTICULADA 03", "ARTICULADAS", "BOBININHA 01", "BOBININHA 02", "BOBININHA 03", "CAIXILHO 02", "CAIXILHO 03", "CARPINTARIA", "EMBALAGEM", "ESTOQUE/BERÇO", "RECLASSIFICADOS", "ROLINHOS", "SERRALHERIA", "SLITTER 01", "SLITTER 02", "SLITTER 03", "SLITTER 04", "TRANSVERSAL 01", "TRANSVERSAL 02", "TRANSVERSAL 03", "TRANSVERSAL 04", "TRANSVERSAL 05", "OUTRO"];
-        
-        // Lista de Núcleos em ordem alfabética (com CORRETIVA incluída)
         const LISTA_NUCLEOS = ["ATC", "CORRETIVA", "DTO", "GIGA", "HORA DA SEGURANÇA", "INSPEÇÃO DE SEGURANÇA", "MELHORIA", "OCORRÊNCIA DE SEGURANÇA", "OST", "OST PRIORITÁRIA", "OUTROS"];
-
         const CORES = { navy: '#002855', cyan: '#009FE3', orange: '#f97316', green: '#10b981', red: '#ef4444', amber: '#facc15' };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -463,9 +479,7 @@
             const select = document.getElementById('task-nucleo');
             if(!select) return;
             let html = '<option value="" disabled selected>Selecione...</option>';
-            LISTA_NUCLEOS.forEach(nuc => {
-                html += `<option value="${nuc}">${nuc}</option>`;
-            });
+            LISTA_NUCLEOS.forEach(nuc => { html += `<option value="${nuc}">${nuc}</option>`; });
             select.innerHTML = html;
         }
 
@@ -489,7 +503,6 @@
                     if(jsonData.length === 0) throw new Error("Planilha vazia ou formato inválido.");
 
                     let adicionados = 0;
-                    
                     for (let row of jsonData) {
                         const desc = row["Atividade"] || row["Descricao"] || row["Título"] || row["Tarefa"] || "";
                         if(!desc.trim()) continue; 
@@ -549,8 +562,34 @@
         }
 
         // ==========================================
-        // LÓGICA DE SINCRONIZAÇÃO OFFLINE-FIRST
+        // LÓGICA DE SINCRONIZAÇÃO E FILTROS DINÂMICOS
         // ==========================================
+        function popularFiltrosDinamicosBacklog() {
+            // Dropdown de Mês
+            const selectMes = document.getElementById('filtro-mes-backlog');
+            const valMesAtual = selectMes ? selectMes.value : 'TODOS';
+            const meses = new Set();
+            atividades.forEach(a => {
+                let d = a.dataCadastro || a.id;
+                let dataObj = new Date(isNaN(d) ? d : parseInt(d));
+                let mm = String(dataObj.getMonth() + 1).padStart(2, '0');
+                let yyyy = dataObj.getFullYear();
+                meses.add(`${mm}/${yyyy}`);
+            });
+            let htmlMes = '<option value="TODOS">Todos os Meses</option>';
+            Array.from(meses).sort().reverse().forEach(m => { htmlMes += `<option value="${m}">${m}</option>`; });
+            if(selectMes) { selectMes.innerHTML = htmlMes; if(Array.from(meses).includes(valMesAtual)) selectMes.value = valMesAtual; }
+
+            // Dropdown de Responsável
+            const selectResp = document.getElementById('filtro-resp-backlog');
+            const valRespAtual = selectResp ? selectResp.value : 'TODOS';
+            const resps = new Set();
+            atividades.forEach(a => { if(a.responsavel) resps.add(a.responsavel.toUpperCase()); });
+            let htmlResp = '<option value="TODOS">Todos os Serralheiros</option><option value="NAO_ATRIBUIDO">🚨 Sem Responsável</option>';
+            Array.from(resps).sort().forEach(r => { htmlResp += `<option value="${r}">${r}</option>`; });
+            if(selectResp) { selectResp.innerHTML = htmlResp; if(Array.from(resps).includes(valRespAtual) || valRespAtual === 'NAO_ATRIBUIDO') selectResp.value = valRespAtual; }
+        }
+
         function carregarCacheLocal() {
             try { const cache = localStorage.getItem('dadosSerralheriaCache'); if (cache) atividades = JSON.parse(cache); } catch(e) {}
             atividades = atividades.filter(a => !filaExclusao.includes(a.id));
@@ -559,7 +598,7 @@
                 const idx = atividades.findIndex(a => a.id === pend.id);
                 if (idx !== -1) atividades[idx] = locObj; else atividades.unshift(locObj);
             });
-            popularFiltroAno(); resetarPaginaEAtualizar(); atualizarDashboard(); atualizarStatusSync();
+            popularFiltroAno(); popularFiltrosDinamicosBacklog(); resetarPaginaEAtualizar(); atualizarDashboard(); atualizarStatusSync();
         }
 
         function atualizarStatusSync() {
@@ -588,7 +627,7 @@
                     if (error) throw error;
                     atividades = data.map(converterDBParaLocal);
                     localStorage.setItem('dadosSerralheriaCache', JSON.stringify(atividades));
-                    popularFiltroAno(); resetarPaginaEAtualizar(); atualizarDashboard();
+                    popularFiltroAno(); popularFiltrosDinamicosBacklog(); resetarPaginaEAtualizar(); atualizarDashboard();
                 } catch (e) { falhou = true; }
             }
             atualizarStatusSync();
@@ -666,7 +705,7 @@
 
         function popularFiltroMaquinaBacklog() {
             const sels = [document.getElementById('filtro-maquina-backlog'), document.getElementById('task-maquina-form')];
-            let htmlForm = '<option value="" disabled selected>Selecione a Máquina...</option>'; let htmlFiltro = '<option value="TODAS">TODAS AS MÁQUINAS</option>';
+            let htmlForm = '<option value="" disabled selected>Selecione a Máquina...</option>'; let htmlFiltro = '<option value="TODAS">Todas as Máquinas</option>';
             LISTA_MAQUINAS.forEach(maq => { htmlForm += `<option value="${maq}">${maq}</option>`; htmlFiltro += `<option value="${maq}">${maq}</option>`; });
             if(sels[0]) sels[0].innerHTML = htmlFiltro; if(sels[1]) sels[1].innerHTML = htmlForm;
         }
@@ -799,21 +838,44 @@
             }).catch(err => { alert("Erro na exportação."); btn.innerHTML = iconOriginal; btn.disabled = false; });
         }
 
-        // TABELA BACKLOG
+        // TABELA BACKLOG E FILTROS DINÂMICOS
         function filtrarBacklog(filtro) { filtroBacklogAtivo = filtro; document.querySelectorAll('#botoes-filtro-backlog button').forEach(b => b.classList.remove('pill-active')); document.getElementById('btn-filtro-' + filtro).classList.add('pill-active'); resetarPaginaEAtualizar(); }
+        function limparFiltrosBacklog() { document.getElementById('filtro-mes-backlog').value = 'TODOS'; document.getElementById('filtro-status-backlog').value = 'TODOS'; document.getElementById('filtro-maquina-backlog').value = 'TODAS'; document.getElementById('filtro-resp-backlog').value = 'TODOS'; document.getElementById('filtro-busca').value = ''; filtrarBacklog('todos'); }
         function resetarPaginaEAtualizar() { paginaAtual = 1; renderizarTabela(); }
         function mudarPagina(direcao) { paginaAtual += direcao; renderizarTabela(); }
 
         function aplicarFiltrosBacklog() {
             const fMaq = document.getElementById('filtro-maquina-backlog') ? document.getElementById('filtro-maquina-backlog').value : 'TODAS';
+            const fStatus = document.getElementById('filtro-status-backlog') ? document.getElementById('filtro-status-backlog').value : 'TODOS';
+            const fMes = document.getElementById('filtro-mes-backlog') ? document.getElementById('filtro-mes-backlog').value : 'TODOS';
+            const fResp = document.getElementById('filtro-resp-backlog') ? document.getElementById('filtro-resp-backlog').value : 'TODOS';
             const termo = document.getElementById('filtro-busca') ? document.getElementById('filtro-busca').value.toUpperCase() : '';
+            
             return atividades.filter(a => {
                 if (fMaq !== 'TODAS' && a.maquina !== fMaq) return false;
+                if (fStatus !== 'TODOS' && a.status !== fStatus) return false;
+                if (fResp !== 'TODOS') {
+                    if (fResp === 'NAO_ATRIBUIDO' && a.responsavel) return false;
+                    if (fResp !== 'NAO_ATRIBUIDO' && (!a.responsavel || a.responsavel.toUpperCase() !== fResp)) return false;
+                }
+                if (fMes !== 'TODOS') {
+                    let d = a.dataCadastro || a.id;
+                    let dataObj = new Date(isNaN(d) ? d : parseInt(d));
+                    let mm = String(dataObj.getMonth() + 1).padStart(2, '0');
+                    let yyyy = dataObj.getFullYear();
+                    if (`${mm}/${yyyy}` !== fMes) return false;
+                }
                 if (termo) { const str = Object.values(a).join(' ').toUpperCase(); if (!str.includes(termo)) return false; }
+                
                 if(filtroBacklogAtivo === 'todos') return true;
-                if(filtroBacklogAtivo === 'sem_plano') return a.status === 'NÃO INICIADO' && (!a.responsavel || !a.dataInicio);
-                if(filtroBacklogAtivo === 'execucao') return a.status === 'EM ANDAMENTO';
-                if(filtroBacklogAtivo === 'atrasadas') { if(a.status === 'REALIZADO') return false; if(a.criticidade === 'Alta') return true; let d = a.dataCadastro ? new Date(a.dataCadastro) : new Date(parseInt(a.id)); return Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5; }
+                if(filtroBacklogAtivo === 'aguardando_gestor') return a.status !== 'REALIZADO' && (!a.responsavel || !a.dataInicio);
+                if(filtroBacklogAtivo === 'criticas_atrasadas') { 
+                    if(a.status === 'REALIZADO') return false; 
+                    if(a.criticidade === 'Alta') return true; 
+                    let d = a.dataCadastro ? new Date(a.dataCadastro) : new Date(parseInt(a.id)); 
+                    return Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5; 
+                }
+                return true;
             }).sort((a, b) => {
                 const sC = (i) => { if(i.status === 'REALIZADO') return -100; if(i.criticidade === 'Alta') return 50; let d = i.dataCadastro ? new Date(i.dataCadastro) : new Date(parseInt(i.id)); if(Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5) return 40; if(!i.responsavel || !i.dataInicio) return 30; return 0; };
                 return sC(b) - sC(a);
@@ -850,7 +912,7 @@
                 const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 transition group border-b border-slate-100";
                 tr.innerHTML = `
                     <td class="p-3 align-top border-r border-slate-100"><div class="flex items-center gap-2 mb-1.5"><div class="text-[13px] font-bold text-brand-navy leading-tight">${t.descricao}</div>${cHtml}${btnFoto}</div><div class="flex items-center gap-3 text-[10px] text-slate-500 mb-1"><span class="flex items-center gap-1 font-semibold"><i class="ph ph-wrench text-brand-cyan"></i> ${t.maquina}</span><span class="flex items-center gap-1"><i class="ph ph-map-pin"></i> ${t.local || '-'}</span></div>${t.diretriz ? `<div class="text-[10px] text-slate-500 mt-2 bg-slate-50 p-1.5 rounded border border-slate-100 line-clamp-1 group-hover:line-clamp-none transition-all"><i class="ph ph-chat-text text-brand-cyan"></i> ${t.diretriz}</div>` : ''}</td>
-                    <td class="p-3 align-top border-r border-slate-100"><div class="text-xs font-bold text-brand-navy flex items-center gap-1.5 mb-2"><i class="ph ph-user-circle text-xl ${t.responsavel ? 'text-orange-500' : 'text-slate-300'}"></i> ${t.responsavel ? t.responsavel : '<span class="text-slate-400 italic font-normal text-[10px] bg-slate-100 px-2 py-0.5 rounded">Aguardando Gestor</span>'}</div><div class="text-[10px] text-slate-500 flex flex-col gap-1"><span class="font-medium">Por: ${t.solicitante}</span>${t.nucleo ? `<span class="font-bold text-brand-cyan bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 w-max">${t.nucleo}</span>` : ''}</div></td>
+                    <td class="p-3 align-top border-r border-slate-100"><div class="text-xs font-bold text-brand-navy flex items-center gap-1.5 mb-2"><i class="ph ph-user-circle text-xl ${t.responsavel ? 'text-orange-500' : 'text-slate-300'}"></i> ${t.responsavel ? t.responsavel : '<span class="text-slate-400 italic font-normal text-[10px] bg-slate-100 px-2 py-0.5 rounded">🚨 Aguardando</span>'}</div><div class="text-[10px] text-slate-500 flex flex-col gap-1"><span class="font-medium">Por: ${t.solicitante}</span>${t.nucleo ? `<span class="font-bold text-brand-cyan bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 w-max">${t.nucleo}</span>` : ''}</div></td>
                     <td class="p-3 align-top"><div class="flex flex-col gap-2"><span class="px-2 py-1 rounded-md text-[9px] font-bold tracking-widest flex w-max uppercase border ${sCls}">${t.status}</span><div class="flex flex-col gap-0.5 mt-0.5">${bgDias}<span class="text-[9px] text-slate-500 font-medium ml-1 mt-1"><i class="ph ph-calendar-plus"></i> Cadastro: ${dFmt}</span>${t.status !== 'NÃO INICIADO' ? `<span class="text-[9px] text-brand-navy font-bold ml-1"><i class="ph ph-play-circle"></i> ${iStr}</span>` : ''}${t.status !== 'REALIZADO' ? `<span class="text-[9px] text-orange-600 font-bold ml-1"><i class="ph ph-flag-checkered"></i> ${pStr}</span>` : ''}</div></div></td>
                     <td class="p-3 text-center align-middle"><div class="flex flex-col items-center justify-center gap-2 opacity-30 group-hover:opacity-100 transition"><button onclick="abrirModal('${t.id}')" class="p-1.5 bg-white text-slate-600 border border-slate-200 rounded hover:bg-slate-100 hover:text-brand-cyan transition shadow-sm w-full flex justify-center" title="Editar"><i class="ph ph-pencil-simple text-lg"></i></button>${perfilAtual === 'gestor' ? `<button onclick="abrirModalExclusao('${t.id}')" class="p-1.5 bg-white text-slate-400 border border-slate-200 rounded hover:bg-red-50 hover:text-red-500 transition shadow-sm" title="Excluir"><i class="ph ph-trash text-lg"></i></button>` : ''}</div></td>
                 `;
