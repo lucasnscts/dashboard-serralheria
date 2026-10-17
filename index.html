@@ -524,7 +524,7 @@
             return intersecao.length / arr1.length;
         }
 
-        // IMPORTAÇÃO DE EXCEL COM ID BLINDADO
+        // IMPORTAÇÃO DE EXCEL
         async function importarExcel(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -616,7 +616,18 @@
                 meses.add(`${mm}/${yyyy}`);
             });
             let htmlMes = '<option value="TODOS">Todos os Meses</option>';
-            Array.from(meses).sort().reverse().forEach(m => { htmlMes += `<option value="${m}">${m}</option>`; });
+            const nomeMeses = {"01":"Jan","02":"Fev","03":"Mar","04":"Abr","05":"Mai","06":"Jun","07":"Jul","08":"Ago","09":"Set","10":"Out","11":"Nov","12":"Dez"};
+            
+            // CORREÇÃO: Ordenação cronológica real e tradução do mês
+            Array.from(meses).sort((a, b) => {
+                let [mA, yA] = a.split('/');
+                let [mB, yB] = b.split('/');
+                return yA !== yB ? parseInt(yB) - parseInt(yA) : parseInt(mB) - parseInt(mA);
+            }).forEach(m => { 
+                let [mm, yyyy] = m.split('/');
+                htmlMes += `<option value="${m}">${nomeMeses[mm]}/${yyyy}</option>`; 
+            });
+            
             if(selectMes) { selectMes.innerHTML = htmlMes; if(Array.from(meses).includes(valMesAtual)) selectMes.value = valMesAtual; }
 
             const selectResp = document.getElementById('filtro-resp-backlog');
