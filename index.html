@@ -123,6 +123,27 @@
                         <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Ano da Atividade</label>
                         <select id="filtro-ano" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent"></select>
                     </div>
+                    
+                    <!-- NOVO: Filtro de Mês no Dashboard -->
+                    <div class="flex-1 min-w-[120px]">
+                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Mês</label>
+                        <select id="filtro-mes-dash" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent">
+                            <option value="Todos">Todos os Meses</option>
+                            <option value="01">Janeiro</option>
+                            <option value="02">Fevereiro</option>
+                            <option value="03">Março</option>
+                            <option value="04">Abril</option>
+                            <option value="05">Maio</option>
+                            <option value="06">Junho</option>
+                            <option value="07">Julho</option>
+                            <option value="08">Agosto</option>
+                            <option value="09">Setembro</option>
+                            <option value="10">Outubro</option>
+                            <option value="11">Novembro</option>
+                            <option value="12">Dezembro</option>
+                        </select>
+                    </div>
+
                     <div class="flex-1 min-w-[120px]">
                         <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Status Geral</label>
                         <select id="filtro-status" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent">
@@ -180,7 +201,7 @@
                 <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                     <div class="flex justify-between items-center mb-2 border-b border-slate-100 pb-1">
                         <h3 class="text-xs font-bold text-brand-navy uppercase tracking-widest">Atividades Concluídas por Mês</h3>
-                        <span class="text-[9px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded">Apenas Status Realizado</span>
+                        <span class="text-[9px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded">Apenas Status Realizado (Ignora filtro de mês)</span>
                     </div>
                     <div class="relative h-52 w-full mt-2"><canvas id="chartHistorico"></canvas></div>
                 </div>
@@ -202,7 +223,7 @@
             </div> 
         </section>
 
-        <!-- ABA: ATIVIDADES COM BUSCA, PAGINAÇÃO E IMPORTAÇÃO -->
+        <!-- ABA: ATIVIDADES COM BUSCA E CADASTRO -->
         <section id="atividades" class="tab-content max-w-[1500px] mx-auto">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-slate-200 pb-3">
                 <div>
@@ -227,7 +248,6 @@
             <!-- FILTROS AVANÇADOS, BUSCA E EXCEL -->
             <div class="mb-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-3">
                 
-                <!-- Primeira Linha: Filtros em Menus Suspensos -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
                         <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-calendar-blank"></i> Mês da Atividade</label>
@@ -252,7 +272,6 @@
                     </div>
                 </div>
 
-                <!-- Segunda Linha: Busca e Botões -->
                 <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-100">
                     <div class="flex items-center gap-2 w-full md:w-auto flex-1">
                         <i class="ph ph-magnifying-glass text-brand-cyan text-xl"></i>
@@ -492,6 +511,21 @@
             select.innerHTML = html;
         }
 
+        // LÓGICA DE DETECÇÃO DE SIMILARIDADE
+        function removerAcentos(str) { 
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
+        }
+
+        function calcularSimilaridade(texto1, texto2) {
+            const stops = ['o','a','os','as','um','uma','uns','umas','de','do','da','dos','das','em','no','na','nos','nas','para','com','por','sem'];
+            const limpa = (t) => removerAcentos(t.toLowerCase()).split(/\W+/).filter(p => p.length > 2 && !stops.includes(p));
+            const arr1 = [...new Set(limpa(texto1))];
+            const arr2 = [...new Set(limpa(texto2))];
+            if(arr1.length === 0 || arr2.length === 0) return 0;
+            const intersecao = arr1.filter(p => arr2.includes(p));
+            return intersecao.length / arr1.length;
+        }
+
         // IMPORTAÇÃO DE EXCEL COM ID BLINDADO
         async function importarExcel(event) {
             const file = event.target.files[0];
@@ -647,15 +681,30 @@
         }
 
         // ==========================================
-        // CADASTRAR / EXCLUIR
+        // CADASTRAR / EXCLUIR E SIMILARIDADE
         // ==========================================
         async function salvarAtividade(e) {
             e.preventDefault();
-            const desc = document.getElementById('task-desc').value.trim(); const maq = document.getElementById('task-maquina-form').value; const sol = document.getElementById('task-solicitante').value.trim(); const nuc = document.getElementById('task-nucleo').value;
+            const desc = document.getElementById('task-desc').value.trim(); 
+            const maq = document.getElementById('task-maquina-form').value; 
+            const sol = document.getElementById('task-solicitante').value.trim(); 
+            const nuc = document.getElementById('task-nucleo').value;
             if (!desc || !maq || !sol || !nuc) { document.getElementById('alerta-erro').classList.remove('hidden'); document.getElementById('form-atividade').scrollTop = 0; return; }
 
-            const idForm = document.getElementById('task-id').value; let atvAtual = idForm ? atividades.find(a => a.id === idForm) : {};
+            const idForm = document.getElementById('task-id').value; 
             
+            // VERIFICAÇÃO DE SIMILARIDADE
+            const pendentes = atividades.filter(a => a.maquina === maq && a.status !== 'REALIZADO' && a.id !== idForm);
+            for (let p of pendentes) {
+                let sim = calcularSimilaridade(desc, p.descricao);
+                if (sim >= 0.6) {
+                    const prosseguir = confirm(`⚠️ ATENÇÃO: POSSÍVEL DUPLICIDADE\n\nIdentificamos que já existe uma atividade pendente muito parecida para a máquina ${maq}:\n\n"${p.descricao}"\n\nVocê tem certeza que deseja cadastrar esta solicitação?`);
+                    if (!prosseguir) return; // Cancela o salvamento se o usuário não confirmar
+                    break; // Se confirmou uma vez, sai do loop
+                }
+            }
+
+            let atvAtual = idForm ? atividades.find(a => a.id === idForm) : {};
             const dbObj = {
                 id: idForm ? idForm : Date.now().toString() + "-" + Math.floor(Math.random()*100000),
                 datacadastro: document.getElementById('task-cadastro').value ? document.getElementById('task-cadastro').value : new Date().toISOString(),
@@ -804,7 +853,7 @@
         function abrirModalExclusao(id) { document.getElementById('id-para-excluir').value = id; document.getElementById('modal-exclusao').classList.add('active'); }
         function fecharModalExclusao() { document.getElementById('modal-exclusao').classList.remove('active'); document.getElementById('id-para-excluir').value = ''; }
 
-        // DASHBOARD CÓDIGO CORRIGIDO
+        // DASHBOARD
         function popularFiltroAno() {
             const select = document.getElementById('filtro-ano'); const valAtual = select.value; const anos = new Set();
             atividades.forEach(a => { 
@@ -820,13 +869,26 @@
 
         function atualizarDashboard() {
             if (typeof Chart === 'undefined') return;
-            const aS = document.getElementById('filtro-ano').value; const sS = document.getElementById('filtro-status').value; const cS = document.getElementById('filtro-criticidade').value;
+            const aS = document.getElementById('filtro-ano').value; 
+            const mDash = document.getElementById('filtro-mes-dash').value; 
+            const sS = document.getElementById('filtro-status').value; 
+            const cS = document.getElementById('filtro-criticidade').value;
+            
             const filts = atividades.filter(a => { 
                 let mS = (sS === 'Todos') || (a.status === sS); 
                 let mC = (cS === 'Todas') || (a.criticidade === cS); 
                 let mA = true; 
-                if(aS !== 'Todos') { if(obterDataReferencia(a).getFullYear().toString() !== aS) mA = false; } 
-                return mS && mC && mA; 
+                let mMes = true;
+                
+                let dataObj = obterDataReferencia(a);
+
+                if(aS !== 'Todos') { if(dataObj.getFullYear().toString() !== aS) mA = false; } 
+                if(mDash !== 'Todos') { 
+                    let mesStr = String(dataObj.getMonth() + 1).padStart(2, '0');
+                    if(mesStr !== mDash) mMes = false; 
+                }
+                
+                return mS && mC && mA && mMes; 
             });
 
             document.getElementById('card-total').innerText = filts.length; document.getElementById('card-concluidas').innerText = filts.filter(a => a.status === 'REALIZADO').length; document.getElementById('card-andamento').innerText = filts.filter(a => a.status === 'EM ANDAMENTO').length; document.getElementById('card-nao-iniciadas').innerText = filts.filter(a => a.status === 'NÃO INICIADO').length;
@@ -843,7 +905,7 @@
             const mkBar = (id, b, l=null) => { let ar=Object.keys(b).map(k=>({n:k,...b[k]})).sort((x,y)=>y.t-x.t); if(ar.length>1) ar=ar.filter(i=>i.n!=='NÃO INFORMADO'); if(l) ar=ar.slice(0,l); return new Chart(document.getElementById(id), { type: 'bar', data: { labels: ar.map(i=>i.n), datasets: [{ label: 'Não Iniciado/Andamento', data: ar.map(i=>i.p), backgroundColor: CORES.navy, borderRadius:{topLeft:3, bottomLeft:3} }, { label: 'Realizado', data: ar.map(i=>i.r), backgroundColor: CORES.green, borderRadius:{topRight:3, bottomRight:3} }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x:{stacked:true, display:false}, y:{stacked:true, grid:{display:false}, ticks:{font:{size:10}}} }, plugins: { legend: { position: 'top', align: 'start', labels: { boxWidth: 8, usePointStyle: true, font: {size:10} } }, datalabels: { display: (c)=>c.dataset.data[c.dataIndex]>0, align: 'center', anchor: 'center' } } } }); };
             graficosCriados.nucleo = mkBar('chartNucleo', agr('nucleo', true)); graficosCriados.maquina = mkBar('chartMaquina', agr('maquina', true), 10);
 
-            // CORREÇÃO DO GRÁFICO HISTÓRICO DE CONCLUSÃO
+            // CORREÇÃO DO GRÁFICO HISTÓRICO DE CONCLUSÃO (Ignora o filtro de mês para mostrar evolução do ano)
             const dadosM = new Array(12).fill(0);
             atividades.forEach(a => { 
                 if(a.status==='REALIZADO' && a.dataFim && ((cS==='Todas')||(a.criticidade===cS))) {
