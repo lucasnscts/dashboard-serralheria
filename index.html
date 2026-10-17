@@ -9,8 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <!-- Biblioteca do Supabase -->
+    <!-- Biblioteca de Exportação Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
@@ -39,12 +40,6 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex overflow-hidden">
 
-    <!-- OVERLAY DE CARREGAMENTO (NUVEM) -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] flex flex-col items-center justify-center transition-opacity">
-        <i class="ph ph-spinner animate-spin text-5xl text-brand-cyan mb-2"></i>
-        <p class="text-sm font-bold text-brand-navy">A sincronizar com a nuvem...</p>
-    </div>
-
     <aside class="w-64 bg-brand-navy text-white flex flex-col h-full shadow-2xl z-10 shrink-0">
         <div class="p-5 text-center border-b border-white/10 bg-brand-navy-dark">
             <h1 class="text-xl font-bold text-white flex items-center justify-center gap-2">
@@ -65,7 +60,7 @@
             <ul class="space-y-1">
                 <li>
                     <button onclick="changeTab('dashboard')" id="btn-dashboard" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left transition bg-brand-cyan text-white font-bold shadow-md text-sm">
-                        <i class="ph ph-chart-pie-slice text-lg"></i> Dashboard
+                        <i class="ph ph-chart-pie-slice text-lg"></i> Dashboard Analítico
                     </button>
                 </li>
                 <li>
@@ -80,8 +75,12 @@
                 </li>
             </ul>
         </nav>
-        <div class="p-3 border-t border-white/10 text-[9px] text-center text-slate-400 uppercase tracking-wider flex items-center justify-center gap-1">
-            <i class="ph ph-cloud-check text-brand-cyan"></i> Supabase Connected
+        
+        <!-- Indicador de Status Offline/Online -->
+        <div class="p-3 border-t border-white/10 text-[10px] text-center font-bold tracking-wider" id="sync-status">
+            <div class="flex items-center justify-center gap-1 text-slate-400">
+                <i class="ph ph-spinner animate-spin text-brand-cyan"></i> Inicializando...
+            </div>
         </div>
     </aside>
 
@@ -192,7 +191,7 @@
             </div> 
         </section>
 
-        <!-- ABA: ATIVIDADES -->
+        <!-- ABA: ATIVIDADES COM BUSCA E PAGINAÇÃO -->
         <section id="atividades" class="tab-content max-w-[1500px] mx-auto">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-slate-200 pb-3">
                 <div>
@@ -200,45 +199,43 @@
                     <p class="text-xs text-slate-500 mt-0.5">Gerencie as solicitações, métricas e ordens de serviço</p>
                 </div>
                 
-                <div class="flex flex-col sm:flex-row gap-2 items-center">
+                <div class="flex flex-col sm:flex-row gap-2 items-center w-full sm:w-auto">
+                    <!-- PÍLULAS DE FILTRO RÁPIDO -->
                     <div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0" id="botoes-filtro-backlog">
-                        <button onclick="filtrarBacklog('todos')" id="btn-filtro-todos" class="pill-active px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm">
-                            <i class="ph ph-list-bullets"></i> Todas
-                        </button>
-                        <button onclick="filtrarBacklog('sem_plano')" id="btn-filtro-sem_plano" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm">
-                            <i class="ph ph-calendar-x"></i> Sem Planejamento
-                        </button>
-                        <button onclick="filtrarBacklog('atrasadas')" id="btn-filtro-atrasadas" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full bg-red-500"></span> Críticas / Atrasadas
-                        </button>
-                        <button onclick="filtrarBacklog('execucao')" id="btn-filtro-execucao" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full bg-orange-500"></span> Em Execução
-                        </button>
+                        <button onclick="filtrarBacklog('todos')" id="btn-filtro-todos" class="pill-active px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm"><i class="ph ph-list-bullets"></i> Todas</button>
+                        <button onclick="filtrarBacklog('sem_plano')" id="btn-filtro-sem_plano" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm"><i class="ph ph-calendar-x"></i> Sem Planejamento</button>
+                        <button onclick="filtrarBacklog('atrasadas')" id="btn-filtro-atrasadas" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Críticas / Atrasadas</button>
+                        <button onclick="filtrarBacklog('execucao')" id="btn-filtro-execucao" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-orange-500"></span> Em Execução</button>
                     </div>
-                    <button onclick="abrirModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md shadow-md font-bold flex items-center gap-2 transition text-sm border border-orange-500 whitespace-nowrap shrink-0">
+
+                    <button onclick="abrirModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md shadow-md font-bold flex items-center gap-2 transition text-sm border border-orange-500 whitespace-nowrap shrink-0 w-full sm:w-auto justify-center">
                         <i class="ph ph-plus-circle text-lg"></i> Nova Solicitação
                     </button>
                 </div>
             </div>
 
+            <!-- BUSCA E EXPORTAÇÃO -->
             <div class="mb-4 bg-white p-3 rounded-lg border border-slate-200 flex flex-wrap items-center gap-3 shadow-sm">
                 <div class="flex items-center gap-2 w-full md:w-auto">
                     <i class="ph ph-funnel text-brand-cyan text-xl"></i>
                     <label class="text-xs font-bold text-slate-600 uppercase">Máquina:</label>
-                    <select id="filtro-maquina-backlog" onchange="renderizarTabela()" class="border border-slate-300 rounded p-1.5 text-xs outline-none focus:border-brand-cyan bg-slate-50 w-full md:w-48 uppercase">
-                    </select>
+                    <select id="filtro-maquina-backlog" onchange="resetarPaginaEAtualizar()" class="border border-slate-300 rounded p-1.5 text-xs outline-none focus:border-brand-cyan bg-slate-50 w-full md:w-48 uppercase"></select>
                 </div>
                 
-                <div class="flex items-center gap-2 w-full md:w-auto flex-1">
+                <div class="flex items-center gap-2 w-full md:w-auto flex-1 border-l border-slate-200 pl-3">
                     <i class="ph ph-magnifying-glass text-brand-cyan text-xl"></i>
-                    <input type="text" id="filtro-busca" onkeyup="renderizarTabela()" placeholder="Buscar tarefa, núcleo ou solicitante..." class="border border-slate-300 rounded p-1.5 text-xs outline-none focus:border-brand-cyan w-full">
+                    <input type="text" id="filtro-busca" onkeyup="resetarPaginaEAtualizar()" placeholder="Buscar por tarefa, nome, local..." class="border border-slate-300 rounded p-1.5 text-xs outline-none focus:border-brand-cyan w-full">
                 </div>
                 
-                <button onclick="document.getElementById('filtro-maquina-backlog').value = 'TODAS'; document.getElementById('filtro-busca').value=''; renderizarTabela();" class="text-[10px] font-bold text-slate-400 hover:text-red-500 underline transition">Limpar</button>
+                <button onclick="document.getElementById('filtro-maquina-backlog').value = 'TODAS'; document.getElementById('filtro-busca').value=''; resetarPaginaEAtualizar();" class="text-[10px] font-bold text-slate-400 hover:text-red-500 underline transition shrink-0">Limpar Filtros</button>
+                
+                <button onclick="exportarExcel()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition shrink-0 ml-auto">
+                    <i class="ph ph-file-xls text-base"></i> Exportar para Excel
+                </button>
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden border-t-2 border-t-brand-cyan">
-                <div class="w-full">
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden border-t-2 border-t-brand-cyan flex flex-col min-h-[500px]">
+                <div class="w-full flex-1">
                     <table class="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-brand-navy uppercase text-[10px] font-bold tracking-wider">
@@ -250,10 +247,19 @@
                         </thead>
                         <tbody id="tabela-atividades" class="divide-y divide-slate-100"></tbody>
                     </table>
+                    <div id="empty-state" class="hidden p-12 text-center text-slate-400">
+                        <i class="ph ph-magnifying-glass text-4xl mb-2 text-slate-300"></i>
+                        <p class="text-sm">Nenhuma atividade encontrada.</p>
+                    </div>
                 </div>
-                <div id="empty-state" class="hidden p-12 text-center text-slate-400">
-                    <i class="ph ph-magnifying-glass text-4xl mb-2 text-slate-300"></i>
-                    <p class="text-sm">Nenhuma atividade corresponde aos filtros atuais.</p>
+
+                <!-- PAGINAÇÃO -->
+                <div class="bg-slate-50 border-t border-slate-200 p-3 flex justify-between items-center text-xs text-slate-600 mt-auto">
+                    <div id="info-paginacao" class="font-medium">Mostrando 0 a 0 de 0 resultados</div>
+                    <div class="flex gap-1">
+                        <button onclick="mudarPagina(-1)" id="btn-prev" class="px-3 py-1.5 border border-slate-300 rounded bg-white hover:bg-slate-100 transition disabled:opacity-50 disabled:cursor-not-allowed">Anterior</button>
+                        <button onclick="mudarPagina(1)" id="btn-next" class="px-3 py-1.5 border border-slate-300 rounded bg-white hover:bg-slate-100 transition disabled:opacity-50 disabled:cursor-not-allowed">Próxima</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -298,7 +304,7 @@
     <div id="modal-senha" class="modal-custom fixed inset-0 bg-brand-navy/90 backdrop-blur-sm z-[70] items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden p-6 text-center border-t-4 border-t-brand-cyan">
             <i class="ph ph-lock-key text-5xl text-brand-cyan mb-2"></i><h3 class="text-xl font-bold text-brand-navy mb-1">Acesso Restrito</h3>
-            <p class="text-xs text-slate-500 mb-5">Insira a senha para alterar informações de planejamento.</p>
+            <p class="text-xs text-slate-500 mb-5">Insira a senha para acessar o planejamento.</p>
             <input type="password" id="input-senha" placeholder="••••••••" class="w-full border border-slate-300 rounded-lg p-3 mb-5 text-center text-xl tracking-[0.3em] outline-none focus:border-brand-cyan bg-slate-50 transition shadow-inner">
             <div class="flex gap-2 justify-center">
                 <button onclick="cancelarSenha()" class="px-4 py-2.5 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg w-full text-sm font-bold transition">Cancelar</button>
@@ -314,7 +320,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE FORMULÁRIO -->
     <div id="modal-overlay" class="modal-custom fixed inset-0 bg-brand-navy/80 backdrop-blur-sm z-50 items-center justify-center p-4">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-[fadeIn_0.2s_ease-out] flex flex-col max-h-[95vh] border border-slate-200 border-t-4 border-t-brand-cyan">
             <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -341,9 +346,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Máquina *</label>
-                            <select id="task-maquina-form" required class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-white font-medium uppercase text-brand-navy">
-                                <!-- Preenchido via JS -->
-                            </select>
+                            <select id="task-maquina-form" required class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-white font-medium uppercase text-brand-navy"></select>
                         </div>
                         <div><label class="block text-xs font-semibold text-slate-700 mb-1">Local da Máquina</label><input type="text" id="task-local" placeholder="Ex: Desenrolador" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan uppercase text-xs font-medium placeholder-slate-400"></div>
                     </div>
@@ -379,7 +382,7 @@
                 </div>
                 <div class="pt-3 flex justify-end gap-2 mt-3">
                     <button type="button" onclick="fecharModal()" class="px-4 py-2 text-slate-600 font-bold hover:bg-slate-200 bg-slate-100 rounded-lg transition text-xs">Cancelar</button>
-                    <button type="submit" id="btn-submit-modal" class="px-5 py-2 bg-brand-navy hover:bg-brand-navy-dark text-white font-bold rounded-lg shadow-md transition flex items-center justify-center min-w-[120px] gap-2 text-xs"><i class="ph ph-floppy-disk text-base text-brand-cyan"></i> Guardar</button>
+                    <button type="submit" id="btn-submit-modal" class="px-5 py-2 bg-brand-navy hover:bg-brand-navy-dark text-white font-bold rounded-lg shadow-md transition flex items-center justify-center gap-2 text-xs w-[120px]"><i class="ph ph-floppy-disk text-base text-brand-cyan"></i> Guardar</button>
                 </div>
             </form>
         </div>
@@ -397,11 +400,13 @@
         </div>
     </div>
 
-    <!-- LÓGICA SUPABASE E CORE -->
+    <!-- ===================================== -->
+    <!-- LÓGICA SUPABASE E OFFLINE-FIRST (NOVO) -->
+    <!-- ===================================== -->
     <script>
-        // CONFIGURAÇÕES SUPABASE
-        const supabaseUrl = 'https://heyydxkxclbxcdbttjbf.supabase.co';
-        const supabaseKey = 'sb_publishable_cvQh4-2E_Sx5cvIdL0ncvg_egj1Qj8n';
+        // CONFIGURAÇÕES SUPABASE - COLOQUE AS SUAS CHAVES AQUI
+        const supabaseUrl = 'https://heyydxkxclbxcdbttjbf.supabase.co'; // COLE O SEU AQUI
+        const supabaseKey = 'sb_publishable_cvQh4-2E_Sx5cvIdL0ncvg_egj1Qj8n'; // COLE O SEU AQUI
         const db = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         Chart.defaults.font.family = "'Inter', 'sans-serif'"; Chart.defaults.color = '#64748b'; Chart.register(ChartDataLabels);
@@ -410,6 +415,12 @@
         let graficosCriados = {};
         let perfilAtual = 'supervisor';
         let filtroBacklogAtivo = 'todos';
+        let paginaAtual = 1;
+        const ITENS_POR_PAGINA = 20;
+
+        // Filas para o modo Offline-First
+        let filaSincronizacao = JSON.parse(localStorage.getItem('filaSincronizacaoSerralheria')) || [];
+        let filaExclusao = JSON.parse(localStorage.getItem('filaExclusaoSerralheria')) || [];
 
         const LISTA_MAQUINAS = ["ARTICULADA 01", "ARTICULADA 02", "ARTICULADA 03", "ARTICULADAS", "BOBININHA 01", "BOBININHA 02", "BOBININHA 03", "CAIXILHO 02", "CAIXILHO 03", "CARPINTARIA", "EMBALAGEM", "ESTOQUE/BERÇO", "RECLASSIFICADOS", "ROLINHOS", "SERRALHERIA", "SLITTER 01", "SLITTER 02", "SLITTER 03", "SLITTER 04", "TRANSVERSAL 01", "TRANSVERSAL 02", "TRANSVERSAL 03", "TRANSVERSAL 04", "TRANSVERSAL 05", "OUTRO"];
         const CORES = { navy: '#002855', cyan: '#009FE3', orange: '#f97316', green: '#10b981', red: '#ef4444', amber: '#facc15' };
@@ -418,76 +429,89 @@
             document.getElementById('perfil-usuario').value = 'supervisor';
             popularFiltroMaquinaBacklog();
             preencherDatasPadraoRelatorio();
-            carregarDadosDaNuvem(); // INICIA CONEXÃO
+            
+            // Inicia o sistema em Modo Rápido (Cache Local)
+            carregarCacheLocal();
+            
+            // Depois, tenta atualizar e sincronizar a nuvem em segundo plano
+            sincronizarTudoBackground();
         });
 
         // ==========================================
-        // CARGA DA NUVEM (SUPABASE)
+        // LÓGICA DE SINCRONIZAÇÃO OFFLINE-FIRST
         // ==========================================
-        async function carregarDadosDaNuvem() {
-            try {
-                const overlay = document.getElementById('loading-overlay');
-                overlay.style.display = 'flex';
-                
-                const { data, error } = await db.from('atividades').select('*');
-                if (error) throw error;
-                
-                // Mapear dados para o formato JavaScript local
-                atividades = data.map(item => ({
-                    id: item.id,
-                    dataCadastro: item.datacadastro,
-                    descricao: item.descricao,
-                    diretriz: item.diretriz,
-                    maquina: item.maquina,
-                    local: item.local,
-                    solicitante: item.solicitante,
-                    nucleo: item.nucleo,
-                    criticidade: item.criticidade,
-                    fotoBase64: item.fotobase64,
-                    responsavel: item.responsavel,
-                    dataInicio: item.datainicio,
-                    dataFim: item.datafim,
-                    status: item.status
-                }));
+        function carregarCacheLocal() {
+            try { const cache = localStorage.getItem('dadosSerralheriaCache'); if (cache) atividades = JSON.parse(cache); } catch(e) {}
+            
+            // Aplica as ações pendentes em cima do cache para a tela ficar correta
+            atividades = atividades.filter(a => !filaExclusao.includes(a.id));
+            filaSincronizacao.forEach(pend => {
+                const locObj = converterDBParaLocal(pend);
+                const idx = atividades.findIndex(a => a.id === pend.id);
+                if (idx !== -1) atividades[idx] = locObj; else atividades.unshift(locObj);
+            });
 
-                popularFiltroAno();
-                renderizarTabela();
-                atualizarDashboard();
-                
-                setTimeout(() => { overlay.style.display = 'none'; }, 500);
-            } catch (err) {
-                console.error("Falha ao puxar dados da nuvem:", err);
-                alert("Erro ao conectar com o banco de dados.");
-                document.getElementById('loading-overlay').style.display = 'none';
+            popularFiltroAno(); resetarPaginaEAtualizar(); atualizarDashboard(); atualizarStatusSync();
+        }
+
+        function atualizarStatusSync() {
+            const statusDiv = document.getElementById('sync-status');
+            const pendentes = filaSincronizacao.length + filaExclusao.length;
+            
+            if (pendentes > 0) {
+                statusDiv.innerHTML = `<button onclick="sincronizarTudoBackground()" class="flex items-center justify-center gap-1 text-orange-400 hover:text-orange-300 w-full p-2 bg-orange-400/10 rounded border border-orange-400/20 transition cursor-pointer"><i class="ph ph-cloud-warning text-lg animate-pulse"></i> <span>${pendentes} Edições offline. Enviar?</span></button>`;
+            } else {
+                statusDiv.innerHTML = `<div class="flex items-center justify-center gap-1 text-emerald-400 p-2"><i class="ph ph-cloud-check text-lg"></i> <span>Nuvem Sincronizada</span></div>`;
             }
         }
 
+        async function sincronizarTudoBackground() {
+            document.getElementById('sync-status').innerHTML = `<div class="flex items-center justify-center gap-1 text-brand-cyan p-2"><i class="ph ph-spinner animate-spin text-lg"></i> Conectando à nuvem...</div>`;
+            let falhou = false;
+
+            // 1. Processa Exclusões
+            for (let i = filaExclusao.length - 1; i >= 0; i--) {
+                try { const { error } = await db.from('atividades').delete().eq('id', filaExclusao[i]); if (error) throw error; filaExclusao.splice(i, 1); localStorage.setItem('filaExclusaoSerralheria', JSON.stringify(filaExclusao)); } catch (e) { falhou = true; }
+            }
+            // 2. Processa Criações/Edições
+            for (let i = filaSincronizacao.length - 1; i >= 0; i--) {
+                try { const { error } = await db.from('atividades').upsert(filaSincronizacao[i]); if (error) throw error; filaSincronizacao.splice(i, 1); localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao)); } catch (e) { falhou = true; }
+            }
+            // 3. Busca Dados Atualizados
+            if (!falhou) {
+                try {
+                    const { data, error } = await db.from('atividades').select('*');
+                    if (error) throw error;
+                    atividades = data.map(converterDBParaLocal);
+                    localStorage.setItem('dadosSerralheriaCache', JSON.stringify(atividades));
+                    popularFiltroAno(); resetarPaginaEAtualizar(); atualizarDashboard();
+                } catch (e) { falhou = true; }
+            }
+            atualizarStatusSync();
+        }
+
+        function converterDBParaLocal(item) {
+            return {
+                id: item.id, dataCadastro: item.datacadastro, descricao: item.descricao, diretriz: item.diretriz, maquina: item.maquina, local: item.local, solicitante: item.solicitante, nucleo: item.nucleo, criticidade: item.criticidade, fotoBase64: item.fotobase64, responsavel: item.responsavel, dataInicio: item.datainicio, dataFim: item.datafim, status: item.status
+            };
+        }
+
         // ==========================================
-        // SALVAR NA NUVEM (SUPABASE)
+        // CADASTRAR / EXCLUIR
         // ==========================================
         async function salvarAtividade(e) {
             e.preventDefault();
             const desc = document.getElementById('task-desc').value.trim(); const maq = document.getElementById('task-maquina-form').value; const sol = document.getElementById('task-solicitante').value.trim(); const nuc = document.getElementById('task-nucleo').value;
             if (!desc || !maq || !sol || !nuc) { document.getElementById('alerta-erro').classList.remove('hidden'); document.getElementById('form-atividade').scrollTop = 0; return; }
 
-            const btnSub = document.getElementById('btn-submit-modal');
-            const iconOriginal = btnSub.innerHTML;
-            btnSub.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Guardando...';
-            btnSub.disabled = true;
-
             const idForm = document.getElementById('task-id').value; let atvAtual = idForm ? atividades.find(a => a.id === idForm) : {};
             
-            // Objeto no formato exato das colunas do Supabase
             const dbObj = {
                 id: idForm ? idForm : Date.now().toString(),
                 datacadastro: document.getElementById('task-cadastro').value ? document.getElementById('task-cadastro').value : new Date().toISOString(),
-                descricao: desc.toUpperCase(),
-                diretriz: document.getElementById('task-diretriz').value,
-                maquina: maq.toUpperCase(),
-                local: document.getElementById('task-local').value.toUpperCase(),
-                solicitante: sol.toUpperCase(),
-                nucleo: nuc, 
-                criticidade: document.getElementById('task-criticidade').value,
+                descricao: desc.toUpperCase(), diretriz: document.getElementById('task-diretriz').value,
+                maquina: maq.toUpperCase(), local: document.getElementById('task-local').value.toUpperCase(),
+                solicitante: sol.toUpperCase(), nucleo: nuc, criticidade: document.getElementById('task-criticidade').value,
                 fotobase64: document.getElementById('task-foto-base64').value,
                 responsavel: perfilAtual === 'gestor' ? document.getElementById('task-responsavel').value.toUpperCase() : (atvAtual.responsavel || ''),
                 datainicio: perfilAtual === 'gestor' ? document.getElementById('task-inicio').value : (atvAtual.dataInicio || ''),
@@ -495,35 +519,45 @@
                 status: perfilAtual === 'gestor' ? document.getElementById('task-status').value : (atvAtual.status || 'NÃO INICIADO')
             };
 
-            try {
-                // Upsert (Insere se não existir, atualiza se existir)
-                const { error } = await db.from('atividades').upsert(dbObj);
-                if (error) throw error;
-                
-                fecharModal();
-                await carregarDadosDaNuvem(); // Atualiza a tela com dados reais da nuvem
-            } catch (erro) {
-                alert("Erro ao gravar no Supabase: " + erro.message);
-            } finally {
-                btnSub.innerHTML = iconOriginal;
-                btnSub.disabled = false;
-            }
+            // Adiciona na fila de sincronização (Modo Offline)
+            filaSincronizacao = filaSincronizacao.filter(item => item.id !== dbObj.id);
+            filaSincronizacao.push(dbObj);
+            localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao));
+            
+            fecharModal(); carregarCacheLocal(); sincronizarTudoBackground();
+        }
+
+        async function confirmarExclusao() {
+            const id = document.getElementById('id-para-excluir').value;
+            if (!filaExclusao.includes(id)) filaExclusao.push(id);
+            localStorage.setItem('filaExclusaoSerralheria', JSON.stringify(filaExclusao));
+            
+            filaSincronizacao = filaSincronizacao.filter(item => item.id !== id);
+            localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao));
+
+            fecharModalExclusao(); carregarCacheLocal(); sincronizarTudoBackground();
         }
 
         // ==========================================
-        // EXCLUIR DA NUVEM (SUPABASE)
+        // EXPORTAÇÃO EXCEL, FOTOS E UTILITÁRIOS
         // ==========================================
-        async function confirmarExclusao() {
-            const id = document.getElementById('id-para-excluir').value;
-            try {
-                const { error } = await db.from('atividades').delete().eq('id', id);
-                if (error) throw error;
-                
-                fecharModalExclusao();
-                await carregarDadosDaNuvem();
-            } catch (err) {
-                alert("Erro ao apagar registro: " + err.message);
-            }
+        function exportarExcel() {
+            const filts = aplicarFiltrosBacklog();
+            if(filts.length === 0) { alert("Não há dados para exportar com os filtros atuais."); return; }
+            
+            const dadosExcel = filts.map(a => ({
+                "ID/Cadastro": new Date(isNaN(a.dataCadastro||a.id)?(a.dataCadastro||a.id):parseInt(a.dataCadastro||a.id)).toLocaleDateString('pt-BR'),
+                "Atividade": a.descricao, "Diretrizes": a.diretriz, "Máquina": a.maquina, "Local": a.local,
+                "Solicitante": a.solicitante, "Núcleo": a.nucleo, "Criticidade": a.criticidade,
+                "Serralheiro": a.responsavel || "Não Atribuído", "Status": a.status,
+                "Data Início": a.dataInicio ? a.dataInicio.split('-').reverse().join('/') : "",
+                "Prazo Conclusão": a.dataFim ? a.dataFim.split('-').reverse().join('/') : ""
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(dadosExcel);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Backlog");
+            XLSX.writeFile(wb, `Serralheria_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
         function popularFiltroMaquinaBacklog() {
@@ -533,7 +567,6 @@
             if(sels[0]) sels[0].innerHTML = htmlFiltro; if(sels[1]) sels[1].innerHTML = htmlForm;
         }
 
-        // FOTOS
         function processarImagem(event) {
             const file = event.target.files[0]; if (!file) return;
             document.getElementById('nome-arquivo').innerText = "Processando...";
@@ -557,9 +590,8 @@
         function verFoto(imgSrc) { if(!imgSrc) return; document.getElementById('imagem-ampliada').src = imgSrc; document.getElementById('modal-foto').classList.add('active'); }
         function fecharModalFoto() { document.getElementById('modal-foto').classList.remove('active'); setTimeout(() => { document.getElementById('imagem-ampliada').src = ""; }, 200); }
 
-        // PERFIS E NAVEGAÇÃO
-        function mudarPerfil() { const sel = document.getElementById('perfil-usuario'); if (sel.value === 'gestor') { document.getElementById('modal-senha').classList.add('active'); document.getElementById('input-senha').value = ''; setTimeout(() => document.getElementById('input-senha').focus(), 100); sel.value = 'supervisor'; } else { perfilAtual = 'supervisor'; renderizarTabela(); } }
-        function confirmarSenha() { if (document.getElementById('input-senha').value === 'gac+000') { perfilAtual = 'gestor'; document.getElementById('perfil-usuario').value = 'gestor'; renderizarTabela(); cancelarSenha(); } else { alert("Senha Incorreta!"); document.getElementById('input-senha').value = ''; document.getElementById('input-senha').focus(); } }
+        function mudarPerfil() { const sel = document.getElementById('perfil-usuario'); if (sel.value === 'gestor') { document.getElementById('modal-senha').classList.add('active'); document.getElementById('input-senha').value = ''; setTimeout(() => document.getElementById('input-senha').focus(), 100); sel.value = 'supervisor'; } else { perfilAtual = 'supervisor'; resetarPaginaEAtualizar(); } }
+        function confirmarSenha() { if (document.getElementById('input-senha').value === 'gac+000') { perfilAtual = 'gestor'; document.getElementById('perfil-usuario').value = 'gestor'; resetarPaginaEAtualizar(); cancelarSenha(); } else { alert("Senha Incorreta!"); document.getElementById('input-senha').value = ''; document.getElementById('input-senha').focus(); } }
         function cancelarSenha() { document.getElementById('modal-senha').classList.remove('active'); } document.getElementById('input-senha').addEventListener('keypress', function(e) { if (e.key === 'Enter') confirmarSenha(); });
         
         function changeTab(tabName) {
@@ -571,7 +603,6 @@
             if(tabName === 'dashboard') atualizarDashboard();
         }
 
-        // MODAIS
         function abrirModal(id = null) {
             document.getElementById('modal-overlay').classList.add('active'); document.getElementById('alerta-erro').classList.add('hidden');
             const form = document.getElementById('form-atividade'); document.getElementById('area-gestor').style.display = (perfilAtual === 'supervisor') ? 'none' : 'block'; removerFoto();
@@ -617,7 +648,6 @@
             const mkPie = (id, lbs, dat, bg) => new Chart(document.getElementById(id), { type: 'doughnut', data: { labels: lbs, datasets: [{ data: dat, backgroundColor: bg, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels:{boxWidth:10, font:{size:10}} }, datalabels: optsRosca } } });
             
             graficosCriados.status = mkPie('chartStatus', ['Realizado', 'Não Iniciado', 'Andamento'], [filts.filter(a=>a.status==='REALIZADO').length, filts.filter(a=>a.status==='NÃO INICIADO').length, filts.filter(a=>a.status==='EM ANDAMENTO').length], [CORES.green, CORES.navy, CORES.orange]);
-            
             const agr = (c, s=true) => { const ct={}; filts.forEach(a=>{ let v=a[c]||'NÃO INFORMADO'; if(!ct[v]) ct[v]=s?{r:0,p:0,t:0}:0; if(s){ if(a.status==='REALIZADO') ct[v].r++; else ct[v].p++; ct[v].t++; }else ct[v]++; }); return ct; };
             const mS = agr('responsavel', false); graficosCriados.serralheiros = mkPie('chartSerralheiro', Object.keys(mS).length?Object.keys(mS):['Vazio'], Object.keys(mS).length?Object.values(mS):[1], [CORES.cyan, '#84cc16', CORES.orange, '#94a3b8']);
             const mP = agr('criticidade', false); graficosCriados.prioridade = mkPie('chartPrioridade', ['Alta', 'Média', 'Baixa'], [mP['Alta']||0, mP['Média']||0, mP['Baixa']||0], [CORES.red, CORES.amber, CORES.cyan]);
@@ -630,7 +660,6 @@
             const mx = Math.max(...dadosM);
             graficosCriados.historico = new Chart(document.getElementById('chartHistorico'), { type: 'line', data: { labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'], datasets: [{ data: dadosM, borderColor: CORES.cyan, backgroundColor: 'rgba(0,159,227,0.2)', fill: true, tension: 0, pointBackgroundColor: CORES.cyan, pointRadius: 5, pointBorderColor: '#fff', pointBorderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 20 } }, scales: { y: { display: false, suggestedMax: mx+(mx*0.2) }, x: { grid: { display: false } } }, plugins: { legend: { display: false }, datalabels: { display: (c)=>c.dataset.data[c.dataIndex]>0, align: 'top', anchor: 'end', color: CORES.navy, font: { weight: 'bolder', size: 12 } } } } });
         }
-
         function exportarParaPPT() {
             const btn = document.getElementById('btn-exportar'); const iconOriginal = btn.innerHTML; btn.innerHTML = '<i class="ph ph-spinner animate-spin text-base text-brand-cyan"></i> Gerando...'; btn.disabled = true;
             html2canvas(document.getElementById('area-print'), { scale: 2, backgroundColor: '#f8fafc', logging: false }).then(canvas => {
@@ -638,31 +667,47 @@
             }).catch(err => { alert("Erro na exportação."); btn.innerHTML = iconOriginal; btn.disabled = false; });
         }
 
-        // TABELA BACKLOG
-        function filtrarBacklog(filtro) { filtroBacklogAtivo = filtro; document.querySelectorAll('#botoes-filtro-backlog button').forEach(b => b.classList.remove('pill-active')); document.getElementById('btn-filtro-' + filtro).classList.add('pill-active'); renderizarTabela(); }
+        // ==========================================
+        // TABELA BACKLOG COM PAGINAÇÃO
+        // ==========================================
+        function filtrarBacklog(filtro) { filtroBacklogAtivo = filtro; document.querySelectorAll('#botoes-filtro-backlog button').forEach(b => b.classList.remove('pill-active')); document.getElementById('btn-filtro-' + filtro).classList.add('pill-active'); resetarPaginaEAtualizar(); }
+        function resetarPaginaEAtualizar() { paginaAtual = 1; renderizarTabela(); }
+        function mudarPagina(direcao) { paginaAtual += direcao; renderizarTabela(); }
 
-        function renderizarTabela() {
-            const tbody = document.getElementById('tabela-atividades'); if(!tbody) return; tbody.innerHTML = '';
-            const filtroMaquina = document.getElementById('filtro-maquina-backlog') ? document.getElementById('filtro-maquina-backlog').value : 'TODAS';
-            const termoBusca = document.getElementById('filtro-busca') ? document.getElementById('filtro-busca').value.toUpperCase() : '';
-            
-            let exibidas = atividades.filter(a => {
-                if (filtroMaquina !== 'TODAS' && a.maquina !== filtroMaquina) return false;
-                if (termoBusca) { const objStr = Object.values(a).join(' ').toUpperCase(); if (!objStr.includes(termoBusca)) return false; }
+        function aplicarFiltrosBacklog() {
+            const fMaq = document.getElementById('filtro-maquina-backlog') ? document.getElementById('filtro-maquina-backlog').value : 'TODAS';
+            const termo = document.getElementById('filtro-busca') ? document.getElementById('filtro-busca').value.toUpperCase() : '';
+            return atividades.filter(a => {
+                if (fMaq !== 'TODAS' && a.maquina !== fMaq) return false;
+                if (termo) { const str = Object.values(a).join(' ').toUpperCase(); if (!str.includes(termo)) return false; }
                 if(filtroBacklogAtivo === 'todos') return true;
                 if(filtroBacklogAtivo === 'sem_plano') return a.status === 'NÃO INICIADO' && (!a.responsavel || !a.dataInicio);
                 if(filtroBacklogAtivo === 'execucao') return a.status === 'EM ANDAMENTO';
                 if(filtroBacklogAtivo === 'atrasadas') { if(a.status === 'REALIZADO') return false; if(a.criticidade === 'Alta') return true; let d = a.dataCadastro ? new Date(a.dataCadastro) : new Date(parseInt(a.id)); return Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5; }
-            });
-
-            exibidas.sort((a, b) => {
+            }).sort((a, b) => {
                 const sC = (i) => { if(i.status === 'REALIZADO') return -100; if(i.criticidade === 'Alta') return 50; let d = i.dataCadastro ? new Date(i.dataCadastro) : new Date(parseInt(i.id)); if(Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5) return 40; if(!i.responsavel || !i.dataInicio) return 30; return 0; };
                 return sC(b) - sC(a);
             });
+        }
 
-            if (exibidas.length === 0) { document.getElementById('empty-state').classList.remove('hidden'); return; } else document.getElementById('empty-state').classList.add('hidden');
+        function renderizarTabela() {
+            const tbody = document.getElementById('tabela-atividades'); if(!tbody) return; tbody.innerHTML = '';
+            const exibidas = aplicarFiltrosBacklog();
+            
+            const btnP = document.getElementById('btn-prev'); const btnN = document.getElementById('btn-next'); const inf = document.getElementById('info-paginacao');
+            if (exibidas.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden'); inf.innerText = "Mostrando 0 resultados"; btnP.disabled = true; btnN.disabled = true; return;
+            } else document.getElementById('empty-state').classList.add('hidden');
 
-            exibidas.forEach(t => {
+            const totalPaginas = Math.ceil(exibidas.length / ITENS_POR_PAGINA);
+            if (paginaAtual < 1) paginaAtual = 1; if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+            const idxInicio = (paginaAtual - 1) * ITENS_POR_PAGINA; const idxFim = idxInicio + ITENS_POR_PAGINA;
+            const itensPagina = exibidas.slice(idxInicio, idxFim);
+
+            inf.innerText = `Mostrando ${idxInicio + 1} a ${Math.min(idxFim, exibidas.length)} de ${exibidas.length} resultados`;
+            btnP.disabled = paginaAtual === 1; btnN.disabled = paginaAtual === totalPaginas;
+
+            itensPagina.forEach(t => {
                 let dCad = t.dataCadastro ? new Date(t.dataCadastro) : new Date(parseInt(t.id)); let dFmt = dCad.toLocaleDateString('pt-BR'); let bgDias = '';
                 if (t.status !== 'REALIZADO') { const dias = Math.floor(Math.abs(new Date().getTime() - dCad.getTime()) / (1000 * 60 * 60 * 24)); let cor = dias >= 7 ? 'bg-red-100 text-red-700 border-red-200' : (dias >= 3 ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-600 border-slate-200'); let tx = dias === 0 ? 'Cadastrado Hoje' : (dias === 1 ? 'Pendente 1 dia' : `Pendente ${dias} dias`); bgDias = `<span class="${cor} border text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-clock"></i> ${tx}</span>`; } else bgDias = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-check-circle"></i> Resolvido</span>`;
 
@@ -670,65 +715,39 @@
                 let pStr = t.dataFim ? `Até ${t.dataFim.split('-')[2]}/${t.dataFim.split('-')[1]}` : 'Sem prazo definido'; let iStr = t.dataInicio ? `Início ${t.dataInicio.split('-')[2]}/${t.dataInicio.split('-')[1]}` : 'Sem início';
                 let cCls = t.criticidade === 'Alta' ? 'text-red-600 bg-red-50 border-red-200' : (t.criticidade === 'Média' ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-slate-400 bg-slate-100 border-slate-200'); let cIco = t.criticidade === 'Alta' ? 'ph-warning-circle' : (t.criticidade === 'Média' ? 'ph-warning' : 'ph-arrow-down');
                 let cHtml = `<span class="text-[9px] border font-bold px-1.5 py-0.5 rounded flex items-center gap-1 ${cCls}"><i class="ph ${cIco}"></i> ${t.criticidade || 'Baixa'}</span>`;
-                let btnFoto = t.fotoBase64 ? `<button onclick="verFoto('${t.fotoBase64}')" class="text-brand-cyan hover:text-brand-navy transition bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 text-[10px] font-bold flex items-center gap-1"><i class="ph ph-image text-sm"></i> Ver Foto</button>` : '';
+                let btnFoto = t.fotoBase64 ? `<button onclick="verFoto('${t.fotoBase64}')" class="text-brand-cyan hover:text-brand-navy transition bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 text-[10px] font-bold flex items-center gap-1"><i class="ph ph-image text-sm"></i> Foto</button>` : '';
 
                 const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 transition group border-b border-slate-100";
                 tr.innerHTML = `
-                    <td class="p-3 align-top border-r border-slate-100">
-                        <div class="flex items-center gap-2 mb-1.5"><div class="text-[13px] font-bold text-brand-navy leading-tight">${t.descricao}</div>${cHtml}${btnFoto}</div>
-                        <div class="flex items-center gap-3 text-[10px] text-slate-500 mb-1"><span class="flex items-center gap-1 font-semibold"><i class="ph ph-wrench text-brand-cyan"></i> ${t.maquina}</span><span class="flex items-center gap-1"><i class="ph ph-map-pin"></i> ${t.local || '-'}</span></div>
-                        ${t.diretriz ? `<div class="text-[10px] text-slate-500 mt-2 bg-slate-50 p-1.5 rounded border border-slate-100 line-clamp-1 group-hover:line-clamp-none transition-all"><i class="ph ph-chat-text text-brand-cyan"></i> ${t.diretriz}</div>` : ''}
-                    </td>
-                    <td class="p-3 align-top border-r border-slate-100">
-                        <div class="text-xs font-bold text-brand-navy flex items-center gap-1.5 mb-2"><i class="ph ph-user-circle text-xl ${t.responsavel ? 'text-orange-500' : 'text-slate-300'}"></i> ${t.responsavel ? t.responsavel : '<span class="text-slate-400 italic font-normal text-[10px] bg-slate-100 px-2 py-0.5 rounded">Aguardando Gestor</span>'}</div>
-                        <div class="text-[10px] text-slate-500 flex flex-col gap-1"><span class="font-medium">Por: ${t.solicitante}</span>${t.nucleo ? `<span class="font-bold text-brand-cyan bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 w-max">${t.nucleo}</span>` : ''}</div>
-                    </td>
-                    <td class="p-3 align-top">
-                        <div class="flex flex-col gap-2">
-                            <span class="px-2 py-1 rounded-md text-[9px] font-bold tracking-widest flex w-max uppercase border ${sCls}">${t.status}</span>
-                            <div class="flex flex-col gap-0.5 mt-0.5">${bgDias}<span class="text-[9px] text-slate-500 font-medium ml-1 mt-1"><i class="ph ph-calendar-plus"></i> Cadastro: ${dFmt}</span>${t.status !== 'NÃO INICIADO' ? `<span class="text-[9px] text-brand-navy font-bold ml-1"><i class="ph ph-play-circle"></i> ${iStr}</span>` : ''}${t.status !== 'REALIZADO' ? `<span class="text-[9px] text-orange-600 font-bold ml-1"><i class="ph ph-flag-checkered"></i> ${pStr}</span>` : ''}</div>
-                        </div>
-                    </td>
-                    <td class="p-3 text-center align-middle">
-                        <div class="flex flex-col items-center justify-center gap-2 opacity-30 group-hover:opacity-100 transition">
-                            <button onclick="abrirModal('${t.id}')" class="p-1.5 bg-white text-slate-600 border border-slate-200 rounded hover:bg-slate-100 hover:text-brand-cyan transition shadow-sm w-full flex justify-center" title="Editar"><i class="ph ph-pencil-simple text-lg"></i></button>
-                            ${perfilAtual === 'gestor' ? `<button onclick="abrirModalExclusao('${t.id}')" class="p-1.5 bg-white text-slate-400 border border-slate-200 rounded hover:bg-red-50 hover:text-red-500 transition shadow-sm" title="Excluir"><i class="ph ph-trash text-lg"></i></button>` : ''}
-                        </div>
-                    </td>
+                    <td class="p-3 align-top border-r border-slate-100"><div class="flex items-center gap-2 mb-1.5"><div class="text-[13px] font-bold text-brand-navy leading-tight">${t.descricao}</div>${cHtml}${btnFoto}</div><div class="flex items-center gap-3 text-[10px] text-slate-500 mb-1"><span class="flex items-center gap-1 font-semibold"><i class="ph ph-wrench text-brand-cyan"></i> ${t.maquina}</span><span class="flex items-center gap-1"><i class="ph ph-map-pin"></i> ${t.local || '-'}</span></div>${t.diretriz ? `<div class="text-[10px] text-slate-500 mt-2 bg-slate-50 p-1.5 rounded border border-slate-100 line-clamp-1 group-hover:line-clamp-none transition-all"><i class="ph ph-chat-text text-brand-cyan"></i> ${t.diretriz}</div>` : ''}</td>
+                    <td class="p-3 align-top border-r border-slate-100"><div class="text-xs font-bold text-brand-navy flex items-center gap-1.5 mb-2"><i class="ph ph-user-circle text-xl ${t.responsavel ? 'text-orange-500' : 'text-slate-300'}"></i> ${t.responsavel ? t.responsavel : '<span class="text-slate-400 italic font-normal text-[10px] bg-slate-100 px-2 py-0.5 rounded">Aguardando Gestor</span>'}</div><div class="text-[10px] text-slate-500 flex flex-col gap-1"><span class="font-medium">Por: ${t.solicitante}</span>${t.nucleo ? `<span class="font-bold text-brand-cyan bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 w-max">${t.nucleo}</span>` : ''}</div></td>
+                    <td class="p-3 align-top"><div class="flex flex-col gap-2"><span class="px-2 py-1 rounded-md text-[9px] font-bold tracking-widest flex w-max uppercase border ${sCls}">${t.status}</span><div class="flex flex-col gap-0.5 mt-0.5">${bgDias}<span class="text-[9px] text-slate-500 font-medium ml-1 mt-1"><i class="ph ph-calendar-plus"></i> Cadastro: ${dFmt}</span>${t.status !== 'NÃO INICIADO' ? `<span class="text-[9px] text-brand-navy font-bold ml-1"><i class="ph ph-play-circle"></i> ${iStr}</span>` : ''}${t.status !== 'REALIZADO' ? `<span class="text-[9px] text-orange-600 font-bold ml-1"><i class="ph ph-flag-checkered"></i> ${pStr}</span>` : ''}</div></div></td>
+                    <td class="p-3 text-center align-middle"><div class="flex flex-col items-center justify-center gap-2 opacity-30 group-hover:opacity-100 transition"><button onclick="abrirModal('${t.id}')" class="p-1.5 bg-white text-slate-600 border border-slate-200 rounded hover:bg-slate-100 hover:text-brand-cyan transition shadow-sm w-full flex justify-center" title="Editar"><i class="ph ph-pencil-simple text-lg"></i></button>${perfilAtual === 'gestor' ? `<button onclick="abrirModalExclusao('${t.id}')" class="p-1.5 bg-white text-slate-400 border border-slate-200 rounded hover:bg-red-50 hover:text-red-500 transition shadow-sm" title="Excluir"><i class="ph ph-trash text-lg"></i></button>` : ''}</div></td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // RELATÓRIO E-MAIL
+        // ==========================================
+        // RELATÓRIOS
+        // ==========================================
         function getSegundaSextaPassada() { let h = new Date(); let ds = h.getDay(); let dv = (ds === 0) ? 6 : ds - 1; let sA = new Date(h); sA.setDate(h.getDate() - dv); let sP = new Date(sA); sP.setDate(sA.getDate() - 3); let seP = new Date(sP); seP.setDate(sP.getDate() - 4); return { inc: seP.toISOString().split('T')[0], f: sP.toISOString().split('T')[0] }; }
         function getSegundaSextaAtual() { let h = new Date(); let ds = h.getDay(); let dv = (ds === 0) ? 6 : ds - 1; let sA = new Date(h); sA.setDate(h.getDate() - dv); let sAtual = new Date(sA); sAtual.setDate(sA.getDate() + 4); return { inc: sA.toISOString().split('T')[0], f: sAtual.toISOString().split('T')[0] }; }
         function preencherDatasPadraoRelatorio() { const p = getSegundaSextaPassada(); document.getElementById('rel-passada-inicio').value = p.inc; document.getElementById('rel-passada-fim').value = p.f; const a = getSegundaSextaAtual(); document.getElementById('rel-atual-inicio').value = a.inc; document.getElementById('rel-atual-fim').value = a.f; }
         function formataDataBr(dataISO) { if(!dataISO) return '-'; const p = dataISO.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
 
         function gerarRelatorio() {
-            const diP = document.getElementById('rel-passada-inicio').value; const dfP = document.getElementById('rel-passada-fim').value;
-            const diA = document.getElementById('rel-atual-inicio').value; const dfA = document.getElementById('rel-atual-fim').value;
-
+            const diP = document.getElementById('rel-passada-inicio').value; const dfP = document.getElementById('rel-passada-fim').value; const diA = document.getElementById('rel-atual-inicio').value; const dfA = document.getElementById('rel-atual-fim').value;
             const aR = atividades.filter(a => a.status === 'REALIZADO' && a.dataFim && a.dataFim >= diP && a.dataFim <= dfP);
             const aP = atividades.filter(a => a.status !== 'REALIZADO' && a.dataInicio && a.dataInicio >= diA && a.dataInicio <= dfA);
-
             let html = `<div style="font-family: Arial, sans-serif; font-size: 12px; color: #000;"><p>Boa tarde a todos.</p><p>Segue a programação da serralheria para esta semana, juntamente com as atividades realizadas na semana passada.</p><p>Caso surjam demandas urgentes, peço que nos informem para readequação.</p><br><p style="background-color: #00FF00; display: inline-block; font-weight: bold; margin-bottom: 2px;">ATIVIDADES REALIZADAS NA SEMANA PASSADA:</p><table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11px; margin-bottom: 20px;"><thead><tr style="background-color: #92D050; text-align: center; font-weight: bold;"><th style="border: 1px solid #000; padding: 4px;">ATIVIDADES</th><th style="border: 1px solid #000; padding: 4px;">LOCAL</th><th style="border: 1px solid #000; padding: 4px;">DATA INÍCIO</th><th style="border: 1px solid #000; padding: 4px;">DATA FIM</th></tr></thead><tbody>`;
-            if (aR.length === 0) html += `<tr><td colspan="4" style="border: 1px solid #000; padding: 4px; text-align: center;">Nenhuma atividade finalizada no período.</td></tr>`;
-            else aR.forEach(t => { html += `<tr><td style="border: 1px solid #000; padding: 4px;">${t.descricao}</td><td style="border: 1px solid #000; padding: 4px;">${t.maquina}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataInicio)}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataFim)}</td></tr>`; });
-            
+            if (aR.length === 0) html += `<tr><td colspan="4" style="border: 1px solid #000; padding: 4px; text-align: center;">Nenhuma atividade finalizada no período.</td></tr>`; else aR.forEach(t => { html += `<tr><td style="border: 1px solid #000; padding: 4px;">${t.descricao}</td><td style="border: 1px solid #000; padding: 4px;">${t.maquina}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataInicio)}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataFim)}</td></tr>`; });
             html += `</tbody></table><br><p style="background-color: #FFFF00; display: inline-block; font-weight: bold; margin-bottom: 2px;">ATIVIDADES A SEREM REALIZADAS ESSA SEMANA:</p><table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11px;"><thead><tr style="background-color: #FFFF00; text-align: center; font-weight: bold;"><th style="border: 1px solid #000; padding: 4px;">ATIVIDADES</th><th style="border: 1px solid #000; padding: 4px;">LOCAL</th><th style="border: 1px solid #000; padding: 4px;">DATA INÍCIO</th><th style="border: 1px solid #000; padding: 4px;">DATA FIM</th></tr></thead><tbody>`;
-            if (aP.length === 0) html += `<tr><td colspan="4" style="border: 1px solid #000; padding: 4px; text-align: center;">Nenhuma atividade planejada no período.</td></tr>`;
-            else aP.forEach(t => { html += `<tr><td style="border: 1px solid #000; padding: 4px;">${t.descricao}</td><td style="border: 1px solid #000; padding: 4px;">${t.maquina}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataInicio)}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataFim)}</td></tr>`; });
-            
+            if (aP.length === 0) html += `<tr><td colspan="4" style="border: 1px solid #000; padding: 4px; text-align: center;">Nenhuma atividade planejada no período.</td></tr>`; else aP.forEach(t => { html += `<tr><td style="border: 1px solid #000; padding: 4px;">${t.descricao}</td><td style="border: 1px solid #000; padding: 4px;">${t.maquina}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataInicio)}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataFim)}</td></tr>`; });
             html += `</tbody></table></div>`;
             document.getElementById('resultado-relatorio').innerHTML = html; document.getElementById('resultado-relatorio').classList.remove('hidden'); document.getElementById('btn-copiar-email').classList.remove('hidden'); document.getElementById('btn-copiar-email').classList.add('flex');
         }
-
-        function copiarTabelasParaEmail() {
-            const range = document.createRange(); range.selectNode(document.getElementById('resultado-relatorio')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
-            try { document.execCommand('copy'); const btn = document.getElementById('btn-copiar-email'); const h = btn.innerHTML; btn.innerHTML = '<i class="ph ph-check text-lg"></i> Copiado!'; btn.classList.replace('bg-emerald-500', 'bg-emerald-700'); setTimeout(() => { btn.innerHTML = h; btn.classList.replace('bg-emerald-700', 'bg-emerald-500'); }, 2500); } catch (err) { alert('Falha ao copiar.'); } window.getSelection().removeAllRanges();
-        }
+        function copiarTabelasParaEmail() { const range = document.createRange(); range.selectNode(document.getElementById('resultado-relatorio')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); try { document.execCommand('copy'); const btn = document.getElementById('btn-copiar-email'); const h = btn.innerHTML; btn.innerHTML = '<i class="ph ph-check text-lg"></i> Copiado!'; btn.classList.replace('bg-emerald-500', 'bg-emerald-700'); setTimeout(() => { btn.innerHTML = h; btn.classList.replace('bg-emerald-700', 'bg-emerald-500'); }, 2500); } catch (err) { alert('Falha ao copiar.'); } window.getSelection().removeAllRanges(); }
     </script>
 </body>
 </html>
