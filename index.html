@@ -377,7 +377,7 @@
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Núcleo *</label>
                             <select id="task-nucleo" required class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-white font-medium">
-                                <option value="" disabled selected>Selecione...</option><option value="OST">OST</option><option value="OST PRIORITÁRIA">OST PRIORITÁRIA</option><option value="HORA DA SEGURANÇA">HORA DA SEGURANÇA</option><option value="INSPEÇÃO DE SEGURANÇA">INSPEÇÃO DE SEGURANÇA</option><option value="OCORRÊNCIA DE SEGURANÇA">OCORRÊNCIA DE SEGURANÇA</option><option value="ATC">ATC</option><option value="DTO">DTO</option><option value="MELHORIA">MELHORIA</option><option value="GIGA">GIGA</option><option value="OUTROS">OUTROS</option>
+                                <!-- Preenchido dinamicamente em ordem alfabética com CORRETIVA inclusa -->
                             </select>
                         </div>
                     </div>
@@ -444,17 +444,32 @@
         let filaExclusao = JSON.parse(localStorage.getItem('filaExclusaoSerralheria')) || [];
 
         const LISTA_MAQUINAS = ["ARTICULADA 01", "ARTICULADA 02", "ARTICULADA 03", "ARTICULADAS", "BOBININHA 01", "BOBININHA 02", "BOBININHA 03", "CAIXILHO 02", "CAIXILHO 03", "CARPINTARIA", "EMBALAGEM", "ESTOQUE/BERÇO", "RECLASSIFICADOS", "ROLINHOS", "SERRALHERIA", "SLITTER 01", "SLITTER 02", "SLITTER 03", "SLITTER 04", "TRANSVERSAL 01", "TRANSVERSAL 02", "TRANSVERSAL 03", "TRANSVERSAL 04", "TRANSVERSAL 05", "OUTRO"];
+        
+        // Lista de Núcleos em ordem alfabética (com CORRETIVA incluída)
+        const LISTA_NUCLEOS = ["ATC", "CORRETIVA", "DTO", "GIGA", "HORA DA SEGURANÇA", "INSPEÇÃO DE SEGURANÇA", "MELHORIA", "OCORRÊNCIA DE SEGURANÇA", "OST", "OST PRIORITÁRIA", "OUTROS"];
+
         const CORES = { navy: '#002855', cyan: '#009FE3', orange: '#f97316', green: '#10b981', red: '#ef4444', amber: '#facc15' };
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('perfil-usuario').value = 'supervisor';
             popularFiltroMaquinaBacklog();
+            popularSelectNucleos();
             preencherDatasPadraoRelatorio();
             carregarCacheLocal();
             sincronizarTudoBackground();
         });
 
-        // IMPORTAÇÃO DE EXCEL (NOVO RECURSO)
+        function popularSelectNucleos() {
+            const select = document.getElementById('task-nucleo');
+            if(!select) return;
+            let html = '<option value="" disabled selected>Selecione...</option>';
+            LISTA_NUCLEOS.forEach(nuc => {
+                html += `<option value="${nuc}">${nuc}</option>`;
+            });
+            select.innerHTML = html;
+        }
+
+        // IMPORTAÇÃO DE EXCEL
         async function importarExcel(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -475,13 +490,12 @@
 
                     let adicionados = 0;
                     
-                    // Converte cada linha do Excel para o formato do Banco
                     for (let row of jsonData) {
                         const desc = row["Atividade"] || row["Descricao"] || row["Título"] || row["Tarefa"] || "";
-                        if(!desc.trim()) continue; // Pula linha vazia
+                        if(!desc.trim()) continue; 
                         
                         const nova = {
-                            id: Date.now().toString() + Math.floor(Math.random()*1000), // Garante ID único
+                            id: Date.now().toString() + "-" + adicionados + "-" + Math.floor(Math.random()*100000), 
                             datacadastro: new Date().toISOString(),
                             descricao: String(desc).toUpperCase(),
                             diretriz: String(row["Diretrizes"] || row["Instruções"] || "").toUpperCase(),
@@ -490,7 +504,7 @@
                             solicitante: String(row["Solicitante"] || "NÃO INFORMADO").toUpperCase(),
                             nucleo: String(row["Núcleo"] || row["Nucleo"] || "OUTROS").toUpperCase(),
                             criticidade: String(row["Criticidade"] || "Baixa"),
-                            fotobase64: "", // Excel não tem foto base64
+                            fotobase64: "", 
                             responsavel: String(row["Serralheiro"] || row["Responsável"] || "").toUpperCase(),
                             status: String(row["Status"] || "NÃO INICIADO").toUpperCase(),
                             datainicio: formatarDataExcel(row["Data Início"] || row["Inicio"]),
@@ -507,14 +521,14 @@
                         sincronizarTudoBackground();
                         alert(`Sucesso! ${adicionados} atividades importadas da planilha.`);
                     } else {
-                        alert("Nenhuma atividade válida encontrada na planilha. Verifique os nomes das colunas (Ex: 'Atividade').");
+                        alert("Nenhuma atividade válida encontrada na planilha.");
                     }
 
                 } catch (err) {
                     console.error(err);
                     alert("Erro ao ler o Excel: " + err.message);
                 } finally {
-                    document.getElementById('input-importar-excel').value = ''; // Limpa input
+                    document.getElementById('input-importar-excel').value = ''; 
                     document.getElementById('loading-overlay').style.display = 'none';
                     document.getElementById('loading-text').innerText = "A sincronizar com a nuvem...";
                 }
@@ -522,7 +536,6 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // Função auxiliar para tentar entender as datas do Excel (DD/MM/YYYY) para o formato do banco (YYYY-MM-DD)
         function formatarDataExcel(val) {
             if(!val) return "";
             if(typeof val === 'string' && val.includes('/')) {
