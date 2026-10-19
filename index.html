@@ -52,8 +52,8 @@
 
     <aside class="w-64 bg-brand-navy text-white flex flex-col h-full shadow-2xl z-10 shrink-0">
         <div class="p-5 text-center border-b border-white/10 bg-brand-navy-dark">
-            <h1 class="text-lg font-black text-white flex items-center justify-center gap-2">
-                <i class="ph ph-wrench text-xl text-brand-cyan"></i> Gestão de Melhorias
+            <h1 class="text-xl font-bold text-white flex items-center justify-center gap-2">
+                <i class="ph ph-wrench text-2xl text-brand-cyan"></i> Serralheria
             </h1>
             <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-semibold">Produção Área 02</p>
         </div>
@@ -75,12 +75,7 @@
                 </li>
                 <li>
                     <button onclick="changeTab('atividades')" id="btn-atividades" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover:bg-white/10 text-slate-300 transition font-medium text-sm">
-                        <i class="ph ph-list-checks text-lg"></i> Backlog Serralheria
-                    </button>
-                </li>
-                <li>
-                    <button onclick="changeTab('externas')" id="btn-externas" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover:bg-white/10 text-slate-300 transition font-medium text-sm">
-                        <i class="ph ph-buildings text-lg"></i> Pendências Externas
+                        <i class="ph ph-list-checks text-lg"></i> Backlog & Cadastro
                     </button>
                 </li>
                 <li>
@@ -106,7 +101,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-slate-200 pb-3 mb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-black text-brand-navy tracking-tight">Gestão de Melhorias</h2>
-                    <p class="text-xs text-slate-500 mt-0.5 font-medium">Indicadores de desempenho e carga da Produção</p>
+                    <p class="text-xs text-slate-500 mt-0.5 font-medium">Indicadores de desempenho e carga da Serralheria</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="exportarParaPPT()" id="btn-exportar" class="bg-white hover:bg-slate-50 text-brand-navy px-3 py-1.5 rounded-md shadow-sm flex items-center gap-2 transition text-xs font-bold border border-slate-200">
@@ -119,40 +114,50 @@
             </div>
             
             <div id="area-print" class="space-y-3 bg-slate-50 p-2 rounded-lg">
-                <!-- Filtros protegidos para não saírem na imagem html2canvas -->
                 <div data-html2canvas-ignore="true" class="bg-white p-3 rounded-lg shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center mb-2 border-t-2 border-t-brand-cyan">
                     <div class="flex items-center gap-2 text-brand-navy mr-2 border-r border-slate-100 pr-4">
                         <i class="ph ph-funnel text-xl text-brand-cyan"></i> <span class="text-xs font-bold uppercase tracking-wider">Filtros</span>
                     </div>
                     <div class="flex-1 min-w-[120px]">
-                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Setor de Atendimento</label>
-                        <select id="filtro-dash-destino" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent">
-                            <option value="Todos">Toda a Fábrica</option>
-                            <option value="SERRALHERIA">Apenas Serralheria</option>
-                            <option value="EXTERNOS">Apenas Terceiros (Ext.)</option>
-                        </select>
-                    </div>
-                    <div class="flex-1 min-w-[120px]">
                         <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Ano da Atividade</label>
                         <select id="filtro-ano" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent"></select>
                     </div>
+                    
                     <div class="flex-1 min-w-[120px]">
                         <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Mês</label>
                         <select id="filtro-mes-dash" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent">
                             <option value="Todos">Todos os Meses</option>
-                            <option value="01">Janeiro</option><option value="02">Fevereiro</option><option value="03">Março</option><option value="04">Abril</option><option value="05">Maio</option><option value="06">Junho</option><option value="07">Julho</option><option value="08">Agosto</option><option value="09">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+                            <option value="01">Janeiro</option>
+                            <option value="02">Fevereiro</option>
+                            <option value="03">Março</option>
+                            <option value="04">Abril</option>
+                            <option value="05">Maio</option>
+                            <option value="06">Junho</option>
+                            <option value="07">Julho</option>
+                            <option value="08">Agosto</option>
+                            <option value="09">Setembro</option>
+                            <option value="10">Outubro</option>
+                            <option value="11">Novembro</option>
+                            <option value="12">Dezembro</option>
                         </select>
                     </div>
+
                     <div class="flex-1 min-w-[120px]">
                         <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Status Geral</label>
                         <select id="filtro-status" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent">
-                            <option value="Todos">Todos os Status</option><option value="NÃO INICIADO">Não Iniciado</option><option value="EM ANDAMENTO">Em Andamento</option><option value="REALIZADO">Realizado</option>
+                            <option value="Todos">Todos os Status</option>
+                            <option value="NÃO INICIADO">Não Iniciado</option>
+                            <option value="EM ANDAMENTO">Em Andamento</option>
+                            <option value="REALIZADO">Realizado</option>
                         </select>
                     </div>
                     <div class="flex-1 min-w-[120px]">
                         <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Criticidade</label>
                         <select id="filtro-criticidade" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent">
-                            <option value="Todas">Todas</option><option value="Alta">Alta (Urgente)</option><option value="Média">Média (Atenção)</option><option value="Baixa">Baixa (Padrão)</option>
+                            <option value="Todas">Todas</option>
+                            <option value="Alta">Alta (Urgente)</option>
+                            <option value="Média">Média (Atenção)</option>
+                            <option value="Baixa">Baixa (Padrão)</option>
                         </select>
                     </div>
                 </div>
@@ -182,7 +187,7 @@
                         <div class="relative h-40 w-full flex justify-center"><canvas id="chartStatus"></canvas></div>
                     </div>
                     <div class="bg-white p-3 rounded-lg shadow-sm border border-slate-200 flex flex-col items-center">
-                        <h3 class="text-[11px] font-bold text-brand-navy uppercase tracking-widest mb-1 w-full text-center border-b border-slate-100 pb-1">Por Serralheiro (Apenas Serralheria)</h3>
+                        <h3 class="text-[11px] font-bold text-brand-navy uppercase tracking-widest mb-1 w-full text-center border-b border-slate-100 pb-1">Por Serralheiro</h3>
                         <div class="relative h-40 w-full flex justify-center"><canvas id="chartSerralheiro"></canvas></div>
                     </div>
                     <div class="bg-white p-3 rounded-lg shadow-sm border border-slate-200 flex flex-col items-center">
@@ -216,65 +221,71 @@
             </div> 
         </section>
 
-        <!-- ABA: BACKLOG SERRALHERIA -->
+        <!-- ABA: ATIVIDADES COM BUSCA E CADASTRO -->
         <section id="atividades" class="tab-content max-w-[1500px] mx-auto">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-slate-200 pb-3">
                 <div>
-                    <h2 class="text-2xl font-black text-brand-navy tracking-tight">Backlog Serralheria</h2>
-                    <p class="text-xs text-slate-500 mt-0.5 font-medium">Gerencie as solicitações internas da equipe de Serralheria</p>
+                    <h2 class="text-2xl font-black text-brand-navy tracking-tight">Backlog de Atividades</h2>
+                    <p class="text-xs text-slate-500 mt-0.5 font-medium">Gerencie as solicitações, métricas e ordens de serviço</p>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-2 items-center w-full sm:w-auto">
-                    <div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0" id="botoes-filtro-serralheria">
-                        <button onclick="filtrarSerralheria('todos')" id="btn-filtro-serr-todos" class="pill-active px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><i class="ph ph-list-bullets"></i> Todas</button>
-                        <button onclick="filtrarSerralheria('aguardando_gestor')" id="btn-filtro-serr-aguardando_gestor" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1 text-orange-600"><i class="ph ph-warning"></i> Aguardando Gestor</button>
-                        <button onclick="filtrarSerralheria('criticas_atrasadas')" id="btn-filtro-serr-criticas_atrasadas" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Críticas / Atrasadas</button>
+                    <!-- PÍLULAS DE ALERTAS RÁPIDOS -->
+                    <div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0" id="botoes-filtro-backlog">
+                        <button onclick="filtrarBacklog('todos')" id="btn-filtro-todos" class="pill-active px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><i class="ph ph-list-bullets"></i> Todas</button>
+                        <button onclick="filtrarBacklog('aguardando_gestor')" id="btn-filtro-aguardando_gestor" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1 text-orange-600"><i class="ph ph-warning"></i> Aguardando Gestor</button>
+                        <button onclick="filtrarBacklog('criticas_atrasadas')" id="btn-filtro-criticas_atrasadas" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Críticas / Atrasadas</button>
                     </div>
 
-                    <button onclick="abrirModal('', 'SERRALHERIA')" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md shadow-md font-bold flex items-center gap-2 transition text-sm border border-orange-500 whitespace-nowrap shrink-0 w-full sm:w-auto justify-center">
+                    <button onclick="abrirModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md shadow-md font-bold flex items-center gap-2 transition text-sm border border-orange-500 whitespace-nowrap shrink-0 w-full sm:w-auto justify-center">
                         <i class="ph ph-plus-circle text-lg"></i> Nova Solicitação
                     </button>
                 </div>
             </div>
 
+            <!-- FILTROS AVANÇADOS, BUSCA E EXCEL -->
             <div class="mb-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-3">
+                
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <div>
                         <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-calendar-blank"></i> Mês da Atividade</label>
-                        <select id="filtro-mes-serr" onchange="resetarPaginas()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700"></select>
+                        <select id="filtro-mes-backlog" onchange="resetarPaginaEAtualizar()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700"></select>
                     </div>
                     <div>
                         <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-traffic-signal"></i> Status</label>
-                        <select id="filtro-status-serr" onchange="resetarPaginas()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700">
-                            <option value="TODOS">Todos</option><option value="NÃO INICIADO">Não Iniciado</option><option value="EM ANDAMENTO">Em Andamento</option><option value="REALIZADO">Realizado</option>
+                        <select id="filtro-status-backlog" onchange="resetarPaginaEAtualizar()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700">
+                            <option value="TODOS">Todos</option>
+                            <option value="NÃO INICIADO">Não Iniciado</option>
+                            <option value="EM ANDAMENTO">Em Andamento</option>
+                            <option value="REALIZADO">Realizado</option>
                         </select>
                     </div>
                     <div>
                         <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-wrench"></i> Máquina</label>
-                        <select id="filtro-maquina-serr" onchange="resetarPaginas()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700 uppercase"></select>
+                        <select id="filtro-maquina-backlog" onchange="resetarPaginaEAtualizar()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700 uppercase"></select>
                     </div>
                     <div>
-                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-users"></i> Serralheiro</label>
-                        <select id="filtro-resp-serr" onchange="resetarPaginas()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700 uppercase"></select>
+                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-users"></i> Responsável</label>
+                        <select id="filtro-resp-backlog" onchange="resetarPaginaEAtualizar()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700 uppercase"></select>
                     </div>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-100">
                     <div class="flex items-center gap-2 w-full md:w-auto flex-1">
                         <i class="ph ph-magnifying-glass text-brand-cyan text-xl"></i>
-                        <input type="text" id="filtro-busca-serr" onkeyup="resetarPaginas()" placeholder="Buscar por tarefa, solicitante, diretriz ou local..." class="border border-slate-300 rounded p-1.5 text-xs outline-none focus:border-brand-cyan w-full">
+                        <input type="text" id="filtro-busca" onkeyup="resetarPaginaEAtualizar()" placeholder="Buscar por tarefa, solicitante, diretriz ou local..." class="border border-slate-300 rounded p-1.5 text-xs outline-none focus:border-brand-cyan w-full">
                     </div>
                     
-                    <button onclick="limparFiltrosSerralheria()" class="text-[10px] font-bold text-slate-400 hover:text-red-500 underline transition shrink-0 mr-2">Limpar Tudo</button>
+                    <button onclick="limparFiltrosBacklog()" class="text-[10px] font-bold text-slate-400 hover:text-red-500 underline transition shrink-0 mr-2">Limpar Tudo</button>
                     
                     <div class="flex gap-2 w-full md:w-auto">
-                        <div id="btn-import-container-serr" class="hidden relative">
-                            <input type="file" id="input-importar-excel-serr" accept=".xlsx, .xls, .csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="importarExcel(event)">
+                        <div id="btn-import-container" class="hidden relative">
+                            <input type="file" id="input-importar-excel" accept=".xlsx, .xls, .csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="importarExcel(event)">
                             <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition">
-                                <i class="ph ph-upload-simple text-base"></i> Importar Excel
+                                <i class="ph ph-upload-simple text-base"></i> Importar
                             </button>
                         </div>
-                        <button onclick="exportarExcel('SERRALHERIA')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition">
+                        <button onclick="exportarExcel()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition">
                             <i class="ph ph-download-simple text-base"></i> Exportar
                         </button>
                     </div>
@@ -292,106 +303,20 @@
                                 <th class="p-3 text-center w-1/12">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="tabela-serralheria" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="tabela-atividades" class="divide-y divide-slate-100"></tbody>
                     </table>
-                    <div id="empty-state-serr" class="hidden p-12 text-center text-slate-400">
+                    <div id="empty-state" class="hidden p-12 text-center text-slate-400">
                         <i class="ph ph-magnifying-glass text-4xl mb-2 text-slate-300"></i>
                         <p class="text-sm">Nenhuma atividade corresponde aos filtros aplicados.</p>
                     </div>
                 </div>
 
+                <!-- PAGINAÇÃO -->
                 <div class="bg-slate-50 border-t border-slate-200 p-3 flex justify-between items-center text-xs text-slate-600 mt-auto">
-                    <div id="info-paginacao-serr" class="font-medium">Mostrando 0 a 0 de 0 resultados</div>
+                    <div id="info-paginacao" class="font-medium">Mostrando 0 a 0 de 0 resultados</div>
                     <div class="flex gap-1">
-                        <button onclick="mudarPaginaSerralheria(-1)" id="btn-prev-serr" class="px-3 py-1.5 border border-slate-300 rounded bg-white hover:bg-slate-100 transition disabled:opacity-50 disabled:cursor-not-allowed">Anterior</button>
-                        <button onclick="mudarPaginaSerralheria(1)" id="btn-next-serr" class="px-3 py-1.5 border border-slate-300 rounded bg-white hover:bg-slate-100 transition disabled:opacity-50 disabled:cursor-not-allowed">Próxima</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABA: PENDÊNCIAS EXTERNAS (NOVA ABA) -->
-        <section id="externas" class="tab-content max-w-[1500px] mx-auto">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-slate-200 pb-3">
-                <div>
-                    <h2 class="text-2xl font-black text-brand-navy tracking-tight">Pendências Externas</h2>
-                    <p class="text-xs text-slate-500 mt-0.5 font-medium">Acompanhe as tratativas com Manutenção, Civil, Compras e Outros.</p>
-                </div>
-                
-                <div class="flex flex-col sm:flex-row gap-2 items-center w-full sm:w-auto">
-                    <div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0" id="botoes-filtro-externas">
-                        <button onclick="filtrarExternas('todos')" id="btn-filtro-ext-todos" class="pill-active px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><i class="ph ph-list-bullets"></i> Todas</button>
-                        <button onclick="filtrarExternas('sem_followup')" id="btn-filtro-ext-sem_followup" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1 text-indigo-600"><i class="ph ph-chat-circle-dots"></i> Sem Tratativa</button>
-                        <button onclick="filtrarExternas('atrasadas')" id="btn-filtro-ext-atrasadas" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Pendentes > 7 dias</button>
-                    </div>
-
-                    <button onclick="abrirModal('', 'MANUTENÇÃO')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md shadow-md font-bold flex items-center gap-2 transition text-sm border border-indigo-600 whitespace-nowrap shrink-0 w-full sm:w-auto justify-center">
-                        <i class="ph ph-plus-circle text-lg"></i> Nova Solicitação Ext.
-                    </button>
-                </div>
-            </div>
-
-            <div class="mb-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-3">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <div>
-                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-calendar-blank"></i> Mês da Atividade</label>
-                        <select id="filtro-mes-ext" onchange="resetarPaginas()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700"></select>
-                    </div>
-                    <div>
-                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-traffic-signal"></i> Status</label>
-                        <select id="filtro-status-ext" onchange="resetarPaginas()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700">
-                            <option value="TODOS">Todos</option><option value="NÃO INICIADO">Não Iniciado</option><option value="EM ANDAMENTO">Em Andamento</option><option value="REALIZADO">Realizado</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-wrench"></i> Máquina</label>
-                        <select id="filtro-maquina-ext" onchange="resetarPaginas()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700 uppercase"></select>
-                    </div>
-                    <div>
-                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-buildings"></i> Setor Destino</label>
-                        <select id="filtro-destino-ext" onchange="resetarPaginas()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700 uppercase">
-                            <option value="TODOS">Todos Externos</option><option value="MANUTENÇÃO">Manutenção</option><option value="CIVIL">Civil</option><option value="ELÉTRICA PREDIAL">Elétrica Predial</option><option value="INVESTIMENTO">Investimento</option><option value="COMPRA">Compra</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-100">
-                    <div class="flex items-center gap-2 w-full md:w-auto flex-1">
-                        <i class="ph ph-magnifying-glass text-brand-cyan text-xl"></i>
-                        <input type="text" id="filtro-busca-ext" onkeyup="resetarPaginas()" placeholder="Buscar por tarefa, solicitante, diretriz ou local..." class="border border-slate-300 rounded p-1.5 text-xs outline-none focus:border-brand-cyan w-full">
-                    </div>
-                    
-                    <button onclick="limparFiltrosExternas()" class="text-[10px] font-bold text-slate-400 hover:text-red-500 underline transition shrink-0 mr-2">Limpar Tudo</button>
-                    <button onclick="exportarExcel('EXTERNAS')" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow-sm text-xs font-bold flex items-center gap-1 transition">
-                        <i class="ph ph-download-simple text-base"></i> Exportar
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden border-t-2 border-t-indigo-500 flex flex-col min-h-[500px]">
-                <div class="w-full flex-1">
-                    <table class="w-full text-left border-collapse table-fixed">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-brand-navy uppercase text-[10px] font-bold tracking-wider">
-                                <th class="p-3 w-4/12">Detalhes da Atividade & Local</th>
-                                <th class="p-3 w-4/12">Destino & Acompanhamento</th>
-                                <th class="p-3 w-3/12">Ciclo de Vida (Status/Dias)</th>
-                                <th class="p-3 text-center w-1/12">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-externas" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                    <div id="empty-state-ext" class="hidden p-12 text-center text-slate-400">
-                        <i class="ph ph-buildings text-4xl mb-2 text-slate-300"></i>
-                        <p class="text-sm">Nenhuma atividade corresponde aos filtros aplicados.</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-50 border-t border-slate-200 p-3 flex justify-between items-center text-xs text-slate-600 mt-auto">
-                    <div id="info-paginacao-ext" class="font-medium">Mostrando 0 a 0 de 0 resultados</div>
-                    <div class="flex gap-1">
-                        <button onclick="mudarPaginaExternas(-1)" id="btn-prev-ext" class="px-3 py-1.5 border border-slate-300 rounded bg-white hover:bg-slate-100 transition disabled:opacity-50 disabled:cursor-not-allowed">Anterior</button>
-                        <button onclick="mudarPaginaExternas(1)" id="btn-next-ext" class="px-3 py-1.5 border border-slate-300 rounded bg-white hover:bg-slate-100 transition disabled:opacity-50 disabled:cursor-not-allowed">Próxima</button>
+                        <button onclick="mudarPagina(-1)" id="btn-prev" class="px-3 py-1.5 border border-slate-300 rounded bg-white hover:bg-slate-100 transition disabled:opacity-50 disabled:cursor-not-allowed">Anterior</button>
+                        <button onclick="mudarPagina(1)" id="btn-next" class="px-3 py-1.5 border border-slate-300 rounded bg-white hover:bg-slate-100 transition disabled:opacity-50 disabled:cursor-not-allowed">Próxima</button>
                     </div>
                 </div>
             </div>
@@ -433,9 +358,7 @@
         </section>
     </main>
 
-    <!-- !!! MODAIS CRÍTICOS RESTAURADOS !!! -->
-
-    <!-- MODAL DE SENHA -->
+    <!-- MODAIS DO SISTEMA -->
     <div id="modal-senha" class="modal-custom fixed inset-0 bg-brand-navy/90 backdrop-blur-sm z-[70] items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden p-6 text-center border-t-4 border-t-brand-cyan">
             <i class="ph ph-lock-key text-5xl text-brand-cyan mb-2"></i><h3 class="text-xl font-bold text-brand-navy mb-1">Acesso Restrito</h3>
@@ -448,11 +371,78 @@
         </div>
     </div>
 
-    <!-- MODAL DE FOTO -->
     <div id="modal-foto" class="modal-custom fixed inset-0 bg-brand-navy/90 backdrop-blur-md z-[80] items-center justify-center p-4" onclick="fecharModalFoto()">
         <div class="relative max-w-4xl w-full flex justify-center items-center">
             <button onclick="fecharModalFoto()" class="absolute -top-10 right-0 text-white hover:text-red-400 transition"><i class="ph ph-x-circle text-4xl"></i></button>
             <img id="imagem-ampliada" src="" class="max-h-[85vh] rounded-lg shadow-2xl border-4 border-white/20 object-contain">
+        </div>
+    </div>
+
+    <div id="modal-overlay" class="modal-custom fixed inset-0 bg-brand-navy/80 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-[fadeIn_0.2s_ease-out] flex flex-col max-h-[95vh] border border-slate-200 border-t-4 border-t-brand-cyan">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="text-lg font-bold text-brand-navy flex items-center gap-2" id="modal-title"><i class="ph ph-file-text text-brand-cyan"></i> Nova Solicitação</h3>
+                <button onclick="fecharModal()" class="text-slate-400 hover:text-red-500 transition bg-white rounded-full p-1.5 border shadow-sm hover:bg-red-50"><i class="ph ph-x text-base"></i></button>
+            </div>
+            
+            <form id="form-atividade" onsubmit="salvarAtividade(event)" class="p-5 space-y-4 overflow-y-auto">
+                <input type="hidden" id="task-id"><input type="hidden" id="task-cadastro"><input type="hidden" id="task-foto-base64">
+                
+                <div class="space-y-3">
+                    <div class="border-l-4 border-brand-cyan pl-2 mb-1 flex justify-between items-center"><h4 class="text-xs font-bold text-brand-navy uppercase tracking-wide">Dados da Solicitação</h4></div>
+                    <div id="alerta-erro" class="hidden bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2 rounded-lg mb-2 font-semibold"><i class="ph ph-warning-circle"></i> Preencha todos os campos obrigatórios (*).</div>
+                    <div><label class="block text-xs font-semibold text-slate-700 mb-1">Título da Atividade *</label><input type="text" id="task-desc" required placeholder="Ex: Fabricar peça" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan uppercase text-xs font-medium placeholder-slate-400"></div>
+                    <div><label class="block text-xs font-semibold text-slate-700 mb-1">Diretrizes / Instruções</label><textarea id="task-diretriz" rows="2" placeholder="Detalhes..." class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs resize-none placeholder-slate-400"></textarea></div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Evidência Fotográfica</label>
+                        <div class="flex items-center gap-3">
+                            <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-600 px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shrink-0"><i class="ph ph-camera text-base"></i> Anexar Foto<input type="file" id="input-foto" accept="image/*" class="hidden" onchange="processarImagem(event)"></label>
+                            <div id="preview-container" class="hidden relative h-10 w-10 border border-slate-300 rounded overflow-hidden"><img id="preview-foto" src="" class="w-full h-full object-cover"><button type="button" onclick="removerFoto()" class="absolute inset-0 bg-red-500/80 text-white opacity-0 hover:opacity-100 transition flex items-center justify-center backdrop-blur-sm"><i class="ph ph-trash text-lg"></i></button></div>
+                            <span id="nome-arquivo" class="text-[10px] text-slate-400 truncate max-w-[200px] italic">Sem foto</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Máquina *</label>
+                            <select id="task-maquina-form" required class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-white font-medium uppercase text-brand-navy"></select>
+                        </div>
+                        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Local da Máquina</label><input type="text" id="task-local" placeholder="Ex: Desenrolador" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan uppercase text-xs font-medium placeholder-slate-400"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Solicitante *</label><input type="text" id="task-solicitante" required placeholder="Nome do Solicitante" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan uppercase text-xs font-medium placeholder-slate-400"></div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Núcleo *</label>
+                            <select id="task-nucleo" required class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-white font-medium">
+                                <!-- Preenchido dinamicamente em ordem alfabética -->
+                            </select>
+                        </div>
+                    </div>
+                    <div><label class="block text-xs font-semibold text-slate-700 mb-1">Criticidade</label><select id="task-criticidade" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-white font-medium"><option value="Baixa">Baixa (Padrão)</option><option value="Média">Média (Atenção)</option><option value="Alta">Alta (Urgente)</option></select></div>
+                </div>
+
+                <div id="area-gestor" class="space-y-3 pt-3 border-t border-slate-200 mt-3 bg-orange-50/50 p-3 rounded-lg border border-orange-100">
+                    <div class="border-l-4 border-orange-500 pl-2 flex items-center gap-2 mb-1"><h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Planejamento</h4><span class="bg-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded font-bold tracking-wider">APENAS GESTOR</span></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Serralheiro Designado</label>
+                            <input type="text" id="task-responsavel" list="serralheiros-list" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 uppercase text-xs font-bold text-orange-700 placeholder-orange-300">
+                            <datalist id="serralheiros-list"><option value="DAMIÃO"></option><option value="ROBERTO"></option><option value="AMBOS"></option></datalist>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Status</label>
+                            <select id="task-status" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs font-bold text-slate-700"><option value="NÃO INICIADO">NÃO INICIADO</option><option value="EM ANDAMENTO">EM ANDAMENTO</option><option value="REALIZADO">REALIZADO (OK)</option></select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Data Início</label><input type="date" id="task-inicio" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs font-medium text-slate-600"></div>
+                        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Prazo / Conclusão</label><input type="date" id="task-fim" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs font-medium text-slate-600"></div>
+                    </div>
+                </div>
+                <div class="pt-3 flex justify-end gap-2 mt-3">
+                    <button type="button" onclick="fecharModal()" class="px-4 py-2 text-slate-600 font-bold hover:bg-slate-200 bg-slate-100 rounded-lg transition text-xs">Cancelar</button>
+                    <button type="submit" id="btn-submit-modal" class="px-5 py-2 bg-brand-navy hover:bg-brand-navy-dark text-white font-bold rounded-lg shadow-md transition flex items-center justify-center gap-2 text-xs w-[120px]"><i class="ph ph-floppy-disk text-base text-brand-cyan"></i> Guardar</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -468,106 +458,11 @@
         </div>
     </div>
 
-    <!-- MODAL DE CADASTRO/EDIÇÃO UNIFICADO -->
-    <div id="modal-overlay" class="modal-custom fixed inset-0 bg-brand-navy/80 backdrop-blur-sm z-50 items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-[fadeIn_0.2s_ease-out] flex flex-col border border-slate-200 border-t-4 border-t-brand-cyan my-auto">
-            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 shrink-0">
-                <h3 class="text-lg font-bold text-brand-navy flex items-center gap-2" id="modal-title"><i class="ph ph-file-text text-brand-cyan"></i> Nova Solicitação</h3>
-                <button type="button" onclick="fecharModal()" class="text-slate-400 hover:text-red-500 transition bg-white rounded-full p-1.5 border shadow-sm hover:bg-red-50"><i class="ph ph-x text-base"></i></button>
-            </div>
-            
-            <form id="form-atividade" onsubmit="salvarAtividade(event)" class="p-5 space-y-4 overflow-y-auto max-h-[75vh]">
-                <input type="hidden" id="task-id"><input type="hidden" id="task-cadastro"><input type="hidden" id="task-foto-base64">
-                
-                <div class="space-y-3">
-                    <div id="alerta-erro" class="hidden bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2 rounded-lg mb-2 font-semibold"><i class="ph ph-warning-circle"></i> Preencha todos os campos obrigatórios (*).</div>
-                    
-                    <div class="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
-                        <label class="block text-xs font-semibold text-brand-navy mb-1">Destino da Solicitação (Setor) *</label>
-                        <select id="task-destino" required onchange="toggleAreaGestor()" class="w-full border border-blue-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-brand-navy text-white font-bold uppercase shadow-sm cursor-pointer">
-                            <option value="SERRALHERIA">⚙️ SERRALHERIA INTERNA</option>
-                            <option value="MANUTENÇÃO">🔧 MANUTENÇÃO CENTRAL</option>
-                            <option value="CIVIL">🧱 INFRAESTRUTURA CIVIL</option>
-                            <option value="ELÉTRICA PREDIAL">⚡ ELÉTRICA PREDIAL</option>
-                            <option value="INVESTIMENTO">💰 INVESTIMENTO / PROJETOS</option>
-                            <option value="COMPRA">🛒 COMPRAS</option>
-                        </select>
-                    </div>
-
-                    <div class="border-l-4 border-brand-cyan pl-2 mb-1 mt-4 flex justify-between items-center"><h4 class="text-xs font-bold text-brand-navy uppercase tracking-wide">Dados da Solicitação</h4></div>
-                    <div><label class="block text-xs font-semibold text-slate-700 mb-1">Título da Atividade *</label><input type="text" id="task-desc" required placeholder="Ex: Fabricar peça" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan uppercase text-xs font-medium placeholder-slate-400"></div>
-                    <div><label class="block text-xs font-semibold text-slate-700 mb-1">Diretrizes / Instruções</label><textarea id="task-diretriz" rows="2" placeholder="Detalhes da execução ou motivo do pedido..." class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs resize-none placeholder-slate-400"></textarea></div>
-                    
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Evidência Fotográfica</label>
-                        <div class="flex items-center gap-3">
-                            <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-600 px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shrink-0"><i class="ph ph-camera text-base"></i> Anexar Foto<input type="file" id="input-foto" accept="image/*" class="hidden" onchange="processarImagem(event)"></label>
-                            <div id="preview-container" class="hidden relative h-10 w-10 border border-slate-300 rounded overflow-hidden"><img id="preview-foto" src="" class="w-full h-full object-cover"><button type="button" onclick="removerFoto()" class="absolute inset-0 bg-red-500/80 text-white opacity-0 hover:opacity-100 transition flex items-center justify-center backdrop-blur-sm"><i class="ph ph-trash text-lg"></i></button></div>
-                            <span id="nome-arquivo" class="text-[10px] text-slate-400 truncate max-w-[200px] italic">Sem foto</span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Máquina / Equipamento *</label>
-                            <select id="task-maquina-form" required class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-white font-medium uppercase text-brand-navy"></select>
-                        </div>
-                        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Local Exato</label><input type="text" id="task-local" placeholder="Ex: Rolo superior" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan uppercase text-xs font-medium placeholder-slate-400"></div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Solicitante *</label><input type="text" id="task-solicitante" required placeholder="Seu Nome" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan uppercase text-xs font-medium placeholder-slate-400"></div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Seu Núcleo *</label>
-                            <select id="task-nucleo" required class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-white font-medium">
-                                <!-- Preenchido dinamicamente -->
-                            </select>
-                        </div>
-                    </div>
-                    <div><label class="block text-xs font-semibold text-slate-700 mb-1">Criticidade da Solicitação</label><select id="task-criticidade" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-white font-medium"><option value="Baixa">Baixa (Padrão)</option><option value="Média">Média (Atenção)</option><option value="Alta">Alta (Urgente)</option></select></div>
-                </div>
-
-                <!-- ÁREA RESTRITA DO GESTOR -->
-                <div id="area-gestor" class="pt-3 border-t border-slate-200 mt-3 bg-orange-50/50 p-3 rounded-lg border border-orange-100">
-                    <div class="border-l-4 border-orange-500 pl-2 flex items-center gap-2 mb-3"><h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Planejamento & Acompanhamento</h4><span class="bg-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded font-bold tracking-wider">APENAS GESTOR</span></div>
-                    
-                    <div class="mb-3">
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Status da Solicitação</label>
-                        <select id="task-status" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs font-bold text-slate-700">
-                            <option value="NÃO INICIADO">NÃO INICIADO</option>
-                            <option value="EM ANDAMENTO">EM ANDAMENTO</option>
-                            <option value="REALIZADO">REALIZADO (OK)</option>
-                        </select>
-                    </div>
-
-                    <div id="area-gestor-serralheria" class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Serralheiro</label>
-                            <input type="text" id="task-responsavel" list="serralheiros-list" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 uppercase text-xs font-bold text-orange-700 placeholder-orange-300">
-                            <datalist id="serralheiros-list"><option value="DAMIÃO"></option><option value="ROBERTO"></option><option value="AMBOS"></option></datalist>
-                        </div>
-                        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Data Início</label><input type="date" id="task-inicio" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs font-medium text-slate-600"></div>
-                        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Prazo / Conclusão</label><input type="date" id="task-fim" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs font-medium text-slate-600"></div>
-                    </div>
-
-                    <div id="area-gestor-externo" class="hidden">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Follow-up / Histórico de Tratativa</label>
-                            <textarea id="task-followup" rows="3" placeholder="Ex: Ordem de serviço enviada para manutenção. Aguardando peça..." class="w-full border border-orange-300 rounded-lg p-2 outline-none focus:border-orange-500 text-xs resize-none text-slate-700 bg-white"></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-3 flex justify-end gap-2 mt-3 border-t border-slate-100 shrink-0">
-                    <button type="button" onclick="fecharModal()" class="px-4 py-2 text-slate-600 font-bold hover:bg-slate-200 bg-slate-100 rounded-lg transition text-xs">Cancelar</button>
-                    <button type="submit" id="btn-submit-modal" class="px-5 py-2 bg-brand-navy hover:bg-brand-navy-dark text-white font-bold rounded-lg shadow-md transition flex items-center justify-center gap-2 text-xs w-[120px]"><i class="ph ph-floppy-disk text-base text-brand-cyan"></i> Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- SCRIPTS CORE -->
+    <!-- ===================================== -->
+    <!-- SCRIPTS CORE E SUPABASE               -->
+    <!-- ===================================== -->
     <script>
+        // CONFIGURAÇÕES SUPABASE
         const supabaseUrl = 'https://heyydxkxclbxcdbttjbf.supabase.co'; 
         const supabaseKey = 'sb_publishable_cvQh4-2E_Sx5cvIdL0ncvg_egj1Qj8n'; 
         const db = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -577,13 +472,8 @@
         let atividades = [];
         let graficosCriados = {};
         let perfilAtual = 'supervisor';
-        
-        let paginaAtualSerralheria = 1;
-        let filtroBacklogSerralheriaAtivo = 'todos';
-        
-        let paginaAtualExternas = 1;
-        let filtroBacklogExternasAtivo = 'todos';
-        
+        let filtroBacklogAtivo = 'todos';
+        let paginaAtual = 1;
         const ITENS_POR_PAGINA = 20;
 
         let filaSincronizacao = JSON.parse(localStorage.getItem('filaSincronizacaoSerralheria')) || [];
@@ -600,11 +490,6 @@
             preencherDatasPadraoRelatorio();
             carregarCacheLocal();
             sincronizarTudoBackground();
-            
-            // Ouvinte de teclado blindado para rodar após carregamento da DOM
-            document.getElementById('input-senha').addEventListener('keypress', function(e) { 
-                if (e.key === 'Enter') confirmarSenha(); 
-            });
         });
 
         function obterDataReferencia(a) {
@@ -624,6 +509,7 @@
             select.innerHTML = html;
         }
 
+        // LÓGICA DE DETECÇÃO DE SIMILARIDADE
         function removerAcentos(str) { 
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
         }
@@ -638,17 +524,7 @@
             return intersecao.length / arr1.length;
         }
 
-        function toggleAreaGestor() {
-            const dest = document.getElementById('task-destino').value;
-            if (dest === 'SERRALHERIA') {
-                document.getElementById('area-gestor-serralheria').style.display = 'grid';
-                document.getElementById('area-gestor-externo').style.display = 'none';
-            } else {
-                document.getElementById('area-gestor-serralheria').style.display = 'none';
-                document.getElementById('area-gestor-externo').style.display = 'block';
-            }
-        }
-
+        // IMPORTAÇÃO DE EXCEL COM ID BLINDADO
         async function importarExcel(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -686,9 +562,7 @@
                             responsavel: String(row["Serralheiro"] || row["Responsável"] || "").toUpperCase(),
                             status: String(row["Status"] || "NÃO INICIADO").toUpperCase(),
                             datainicio: formatarDataExcel(row["Data Início"] || row["Inicio"]),
-                            datafim: formatarDataExcel(row["Prazo Conclusão"] || row["Fim"] || row["Prazo"]),
-                            destino: String(row["Destino"] || row["Setor"] || "SERRALHERIA").toUpperCase(),
-                            followup: String(row["Follow-up"] || row["Tratativa"] || "")
+                            datafim: formatarDataExcel(row["Prazo Conclusão"] || row["Fim"] || row["Prazo"])
                         };
 
                         filaSincronizacao.push(nova);
@@ -708,7 +582,7 @@
                     console.error(err);
                     alert("Erro ao ler o Excel: " + err.message);
                 } finally {
-                    event.target.value = ''; 
+                    document.getElementById('input-importar-excel').value = ''; 
                     document.getElementById('loading-overlay').style.display = 'none';
                     document.getElementById('loading-text').innerText = "A sincronizar com a nuvem...";
                 }
@@ -728,53 +602,40 @@
             return "";
         }
 
+        // ==========================================
+        // LÓGICA DE SINCRONIZAÇÃO E FILTROS DINÂMICOS
+        // ==========================================
         function popularFiltrosDinamicosBacklog() {
-            const mesesSerr = new Set(); const respsSerr = new Set();
-            const mesesExt = new Set(); const destsExt = new Set();
-            
+            const selectMes = document.getElementById('filtro-mes-backlog');
+            const valMesAtual = selectMes ? selectMes.value : 'TODOS';
+            const meses = new Set();
             atividades.forEach(a => {
                 let dataObj = obterDataReferencia(a);
                 let mm = String(dataObj.getMonth() + 1).padStart(2, '0');
                 let yyyy = dataObj.getFullYear();
-                
-                if (a.destino === 'SERRALHERIA' || !a.destino) {
-                    mesesSerr.add(`${mm}/${yyyy}`);
-                    if (a.responsavel) respsSerr.add(a.responsavel.toUpperCase());
-                } else {
-                    mesesExt.add(`${mm}/${yyyy}`);
-                    if (a.destino) destsExt.add(a.destino.toUpperCase());
-                }
+                meses.add(`${mm}/${yyyy}`);
             });
-
+            let htmlMes = '<option value="TODOS">Todos os Meses</option>';
             const nomeMeses = {"01":"Jan","02":"Fev","03":"Mar","04":"Abr","05":"Mai","06":"Jun","07":"Jul","08":"Ago","09":"Set","10":"Out","11":"Nov","12":"Dez"};
             
-            const renderMeses = (setMeses, idSelect) => {
-                const sel = document.getElementById(idSelect);
-                if(!sel) return;
-                const v = sel.value;
-                let h = '<option value="TODOS">Todos os Meses</option>';
-                Array.from(setMeses).sort((a, b) => { let [mA,yA]=a.split('/'); let [mB,yB]=b.split('/'); return yA!==yB ? parseInt(yB)-parseInt(yA) : parseInt(mB)-parseInt(mA); }).forEach(m => { let [mm, yyyy] = m.split('/'); h += `<option value="${m}">${nomeMeses[mm]}/${yyyy}</option>`; });
-                sel.innerHTML = h; if(Array.from(setMeses).includes(v)) sel.value = v;
-            };
+            Array.from(meses).sort((a, b) => {
+                let [mA, yA] = a.split('/');
+                let [mB, yB] = b.split('/');
+                return yA !== yB ? parseInt(yB) - parseInt(yA) : parseInt(mB) - parseInt(mA);
+            }).forEach(m => { 
+                let [mm, yyyy] = m.split('/');
+                htmlMes += `<option value="${m}">${nomeMeses[mm]}/${yyyy}</option>`; 
+            });
+            
+            if(selectMes) { selectMes.innerHTML = htmlMes; if(Array.from(meses).includes(valMesAtual)) selectMes.value = valMesAtual; }
 
-            renderMeses(mesesSerr, 'filtro-mes-serr');
-            renderMeses(mesesExt, 'filtro-mes-ext');
-
-            const selResp = document.getElementById('filtro-resp-serr');
-            if (selResp) {
-                const vR = selResp.value;
-                let hR = '<option value="TODOS">Todos os Serralheiros</option><option value="NAO_ATRIBUIDO">🚨 Sem Responsável</option>';
-                Array.from(respsSerr).sort().forEach(r => { hR += `<option value="${r}">${r}</option>`; });
-                selResp.innerHTML = hR; if(Array.from(respsSerr).includes(vR) || vR==='NAO_ATRIBUIDO') selResp.value = vR;
-            }
-
-            const selDest = document.getElementById('filtro-destino-ext');
-            if (selDest) {
-                const vD = selDest.value;
-                let hD = '<option value="TODOS">Todos Externos</option>';
-                Array.from(destsExt).sort().forEach(d => { hD += `<option value="${d}">${d}</option>`; });
-                selDest.innerHTML = hD; if(Array.from(destsExt).includes(vD)) selDest.value = vD;
-            }
+            const selectResp = document.getElementById('filtro-resp-backlog');
+            const valRespAtual = selectResp ? selectResp.value : 'TODOS';
+            const resps = new Set();
+            atividades.forEach(a => { if(a.responsavel) resps.add(a.responsavel.toUpperCase()); });
+            let htmlResp = '<option value="TODOS">Todos os Serralheiros</option><option value="NAO_ATRIBUIDO">🚨 Sem Responsável</option>';
+            Array.from(resps).sort().forEach(r => { htmlResp += `<option value="${r}">${r}</option>`; });
+            if(selectResp) { selectResp.innerHTML = htmlResp; if(Array.from(resps).includes(valRespAtual) || valRespAtual === 'NAO_ATRIBUIDO') selectResp.value = valRespAtual; }
         }
 
         function carregarCacheLocal() {
@@ -785,7 +646,7 @@
                 const idx = atividades.findIndex(a => a.id === pend.id);
                 if (idx !== -1) atividades[idx] = locObj; else atividades.unshift(locObj);
             });
-            popularFiltroAno(); popularFiltrosDinamicosBacklog(); resetarPaginas(); atualizarDashboard(); atualizarStatusSync();
+            popularFiltroAno(); popularFiltrosDinamicosBacklog(); resetarPaginaEAtualizar(); atualizarDashboard(); atualizarStatusSync();
         }
 
         function atualizarStatusSync() {
@@ -806,13 +667,7 @@
                 try { const { error } = await db.from('atividades').delete().eq('id', filaExclusao[i]); if (error) throw error; filaExclusao.splice(i, 1); localStorage.setItem('filaExclusaoSerralheria', JSON.stringify(filaExclusao)); } catch (e) { falhou = true; }
             }
             for (let i = filaSincronizacao.length - 1; i >= 0; i--) {
-                try { 
-                    let dbItem = { ...filaSincronizacao[i], setor_destino: filaSincronizacao[i].destino };
-                    delete dbItem.destino;
-                    const { error } = await db.from('atividades').upsert(dbItem); 
-                    if (error) throw error; 
-                    filaSincronizacao.splice(i, 1); localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao)); 
-                } catch (e) { falhou = true; }
+                try { const { error } = await db.from('atividades').upsert(filaSincronizacao[i]); if (error) throw error; filaSincronizacao.splice(i, 1); localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao)); } catch (e) { falhou = true; }
             }
             if (!falhou) {
                 try {
@@ -820,7 +675,7 @@
                     if (error) throw error;
                     atividades = data.map(converterDBParaLocal);
                     localStorage.setItem('dadosSerralheriaCache', JSON.stringify(atividades));
-                    popularFiltroAno(); popularFiltrosDinamicosBacklog(); resetarPaginas(); atualizarDashboard();
+                    popularFiltroAno(); popularFiltrosDinamicosBacklog(); resetarPaginaEAtualizar(); atualizarDashboard();
                 } catch (e) { falhou = true; }
             }
             atualizarStatusSync();
@@ -829,7 +684,7 @@
 
         function converterDBParaLocal(item) {
             return {
-                id: item.id, dataCadastro: item.datacadastro, descricao: item.descricao, diretriz: item.diretriz, maquina: item.maquina, local: item.local, solicitante: item.solicitante, nucleo: item.nucleo, criticidade: item.criticidade, fotoBase64: item.fotobase64, responsavel: item.responsavel, dataInicio: item.datainicio, dataFim: item.datafim, status: item.status, destino: item.setor_destino || 'SERRALHERIA', followup: item.followup || ''
+                id: item.id, dataCadastro: item.datacadastro, descricao: item.descricao, diretriz: item.diretriz, maquina: item.maquina, local: item.local, solicitante: item.solicitante, nucleo: item.nucleo, criticidade: item.criticidade, fotoBase64: item.fotobase64, responsavel: item.responsavel, dataInicio: item.datainicio, dataFim: item.datafim, status: item.status
             };
         }
 
@@ -842,12 +697,11 @@
             const maq = document.getElementById('task-maquina-form').value; 
             const sol = document.getElementById('task-solicitante').value.trim(); 
             const nuc = document.getElementById('task-nucleo').value;
-            const dest = document.getElementById('task-destino').value;
-
-            if (!desc || !maq || !sol || !nuc || !dest) { document.getElementById('alerta-erro').classList.remove('hidden'); document.getElementById('form-atividade').scrollTop = 0; return; }
+            if (!desc || !maq || !sol || !nuc) { document.getElementById('alerta-erro').classList.remove('hidden'); document.getElementById('form-atividade').scrollTop = 0; return; }
 
             const idForm = document.getElementById('task-id').value; 
             
+            // VERIFICAÇÃO DE SIMILARIDADE
             const pendentes = atividades.filter(a => a.maquina === maq && a.status !== 'REALIZADO' && a.id !== idForm);
             for (let p of pendentes) {
                 let sim = calcularSimilaridade(desc, p.descricao);
@@ -859,8 +713,6 @@
             }
 
             let atvAtual = idForm ? atividades.find(a => a.id === idForm) : {};
-            let isSerr = (dest === 'SERRALHERIA');
-
             const dbObj = {
                 id: idForm ? idForm : Date.now().toString() + "-" + Math.floor(Math.random()*100000),
                 datacadastro: document.getElementById('task-cadastro').value ? document.getElementById('task-cadastro').value : new Date().toISOString(),
@@ -868,12 +720,10 @@
                 maquina: maq.toUpperCase(), local: document.getElementById('task-local').value.toUpperCase(),
                 solicitante: sol.toUpperCase(), nucleo: nuc, criticidade: document.getElementById('task-criticidade').value,
                 fotobase64: document.getElementById('task-foto-base64').value,
-                responsavel: (perfilAtual === 'gestor' && isSerr) ? document.getElementById('task-responsavel').value.toUpperCase() : (atvAtual.responsavel || ''),
-                datainicio: (perfilAtual === 'gestor' && isSerr) ? document.getElementById('task-inicio').value : (atvAtual.dataInicio || ''),
-                datafim: (perfilAtual === 'gestor' && isSerr) ? document.getElementById('task-fim').value : (atvAtual.dataFim || ''),
-                status: perfilAtual === 'gestor' ? document.getElementById('task-status').value : (atvAtual.status || 'NÃO INICIADO'),
-                destino: dest,
-                followup: (perfilAtual === 'gestor' && !isSerr) ? document.getElementById('task-followup').value : (atvAtual.followup || '')
+                responsavel: perfilAtual === 'gestor' ? document.getElementById('task-responsavel').value.toUpperCase() : (atvAtual.responsavel || ''),
+                datainicio: perfilAtual === 'gestor' ? document.getElementById('task-inicio').value : (atvAtual.dataInicio || ''),
+                datafim: perfilAtual === 'gestor' ? document.getElementById('task-fim').value : (atvAtual.dataFim || ''),
+                status: perfilAtual === 'gestor' ? document.getElementById('task-status').value : (atvAtual.status || 'NÃO INICIADO')
             };
 
             filaSincronizacao = filaSincronizacao.filter(item => item.id !== dbObj.id);
@@ -895,8 +745,123 @@
         }
 
         // ==========================================
-        // DASHBOARD
+        // EXPORTAÇÃO EXCEL, FOTOS E UTILITÁRIOS
         // ==========================================
+        function exportarExcel() {
+            const filts = aplicarFiltrosBacklog();
+            if(filts.length === 0) { alert("Não há dados para exportar com os filtros atuais."); return; }
+            
+            const dadosExcel = filts.map(a => ({
+                "ID/Cadastro": new Date(isNaN(a.dataCadastro||a.id)?(a.dataCadastro||a.id):parseInt(a.dataCadastro||a.id)).toLocaleDateString('pt-BR'),
+                "Atividade": a.descricao, "Diretrizes": a.diretriz, "Máquina": a.maquina, "Local": a.local,
+                "Solicitante": a.solicitante, "Núcleo": a.nucleo, "Criticidade": a.criticidade,
+                "Serralheiro": a.responsavel || "Não Atribuído", "Status": a.status,
+                "Data Início": a.dataInicio ? a.dataInicio.split('-').reverse().join('/') : "",
+                "Prazo Conclusão": a.dataFim ? a.dataFim.split('-').reverse().join('/') : ""
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(dadosExcel);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Backlog");
+            XLSX.writeFile(wb, `Serralheria_Export_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function popularFiltroMaquinaBacklog() {
+            const sels = [document.getElementById('filtro-maquina-backlog'), document.getElementById('task-maquina-form')];
+            let htmlForm = '<option value="" disabled selected>Selecione a Máquina...</option>'; let htmlFiltro = '<option value="TODAS">Todas as Máquinas</option>';
+            LISTA_MAQUINAS.forEach(maq => { htmlForm += `<option value="${maq}">${maq}</option>`; htmlFiltro += `<option value="${maq}">${maq}</option>`; });
+            if(sels[0]) sels[0].innerHTML = htmlFiltro; if(sels[1]) sels[1].innerHTML = htmlForm;
+        }
+
+        function processarImagem(event) {
+            const file = event.target.files[0]; if (!file) return;
+            document.getElementById('nome-arquivo').innerText = "Processando...";
+            const leitor = new FileReader(); leitor.readAsDataURL(file);
+            leitor.onload = function(e) {
+                const img = new Image(); img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas'); const MAX_WIDTH = 800;
+                    let w = img.width; let h = img.height;
+                    if (w > MAX_WIDTH) { h *= MAX_WIDTH / w; w = MAX_WIDTH; }
+                    canvas.width = w; canvas.height = h;
+                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
+                    document.getElementById('task-foto-base64').value = dataUrl;
+                    document.getElementById('preview-foto').src = dataUrl; document.getElementById('preview-container').classList.remove('hidden');
+                    document.getElementById('nome-arquivo').innerText = "Anexado OK"; document.getElementById('nome-arquivo').classList.add('text-emerald-600', 'font-bold');
+                }
+            }
+        }
+        function removerFoto() { document.getElementById('input-foto').value = ''; document.getElementById('task-foto-base64').value = ''; document.getElementById('preview-foto').src = ''; document.getElementById('preview-container').classList.add('hidden'); document.getElementById('nome-arquivo').innerText = "Sem foto"; document.getElementById('nome-arquivo').classList.remove('text-emerald-600', 'font-bold'); }
+        function verFoto(imgSrc) { if(!imgSrc) return; document.getElementById('imagem-ampliada').src = imgSrc; document.getElementById('modal-foto').classList.add('active'); }
+        function fecharModalFoto() { document.getElementById('modal-foto').classList.remove('active'); setTimeout(() => { document.getElementById('imagem-ampliada').src = ""; }, 200); }
+
+        function mudarPerfil() { 
+            const sel = document.getElementById('perfil-usuario'); 
+            const btnImport = document.getElementById('btn-import-container');
+            
+            if (sel.value === 'gestor') { 
+                document.getElementById('modal-senha').classList.add('active'); 
+                document.getElementById('input-senha').value = ''; 
+                setTimeout(() => document.getElementById('input-senha').focus(), 100); 
+                sel.value = 'supervisor'; 
+            } else { 
+                perfilAtual = 'supervisor'; 
+                btnImport.classList.add('hidden');
+                resetarPaginaEAtualizar(); 
+            } 
+        }
+        
+        function confirmarSenha() { 
+            if (document.getElementById('input-senha').value === 'gac+000') { 
+                perfilAtual = 'gestor'; 
+                document.getElementById('perfil-usuario').value = 'gestor'; 
+                document.getElementById('btn-import-container').classList.remove('hidden'); 
+                resetarPaginaEAtualizar(); 
+                cancelarSenha(); 
+            } else { 
+                alert("Senha Incorreta!"); 
+                document.getElementById('input-senha').value = ''; 
+                document.getElementById('input-senha').focus(); 
+            } 
+        }
+        function cancelarSenha() { document.getElementById('modal-senha').classList.remove('active'); } document.getElementById('input-senha').addEventListener('keypress', function(e) { if (e.key === 'Enter') confirmarSenha(); });
+        
+        function changeTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(btn => { btn.classList.remove('bg-brand-cyan', 'text-white', 'font-bold', 'shadow-md'); btn.classList.add('hover:bg-white/10', 'text-slate-300'); btn.classList.remove('border-transparent'); });
+            document.getElementById(tabName).classList.add('active');
+            const btn = document.getElementById(`btn-${tabName}`);
+            if(btn) { btn.classList.add('bg-brand-cyan', 'text-white', 'font-bold', 'shadow-md'); btn.classList.remove('hover:bg-white/10', 'text-slate-300'); }
+            if(tabName === 'dashboard') atualizarDashboard();
+        }
+
+        function abrirModal(id = null) {
+            document.getElementById('modal-overlay').classList.add('active'); document.getElementById('alerta-erro').classList.add('hidden');
+            const form = document.getElementById('form-atividade'); document.getElementById('area-gestor').style.display = (perfilAtual === 'supervisor') ? 'none' : 'block'; removerFoto();
+
+            if (id) {
+                document.getElementById('modal-title').innerHTML = '<i class="ph ph-file-text text-brand-cyan"></i> Detalhes da Solicitação';
+                const t = atividades.find(a => a.id === id); if(!t) return;
+                document.getElementById('task-id').value = t.id; document.getElementById('task-cadastro').value = t.dataCadastro || t.id;
+                document.getElementById('task-desc').value = t.descricao || ''; document.getElementById('task-diretriz').value = t.diretriz || '';
+                document.getElementById('task-maquina-form').value = t.maquina || ''; document.getElementById('task-local').value = t.local || '';
+                document.getElementById('task-solicitante').value = t.solicitante || ''; document.getElementById('task-nucleo').value = t.nucleo || '';
+                document.getElementById('task-criticidade').value = t.criticidade || 'Baixa'; document.getElementById('task-responsavel').value = t.responsavel || '';
+                document.getElementById('task-inicio').value = t.dataInicio || ''; document.getElementById('task-fim').value = t.dataFim || ''; document.getElementById('task-status').value = t.status || 'NÃO INICIADO';
+                if (t.fotoBase64) { document.getElementById('task-foto-base64').value = t.fotoBase64; document.getElementById('preview-foto').src = t.fotoBase64; document.getElementById('preview-container').classList.remove('hidden'); document.getElementById('nome-arquivo').innerText = "Foto existente"; }
+            } else {
+                document.getElementById('modal-title').innerHTML = '<i class="ph ph-file-text text-brand-cyan"></i> Nova Solicitação';
+                if(form) form.reset();
+                document.getElementById('task-id').value = ''; document.getElementById('task-cadastro').value = ''; document.getElementById('task-status').value = 'NÃO INICIADO'; document.getElementById('task-criticidade').value = 'Baixa'; document.getElementById('task-nucleo').value = ''; document.getElementById('task-maquina-form').value = '';
+                if (perfilAtual === 'gestor') { const h = new Date(); h.setMinutes(h.getMinutes() - h.getTimezoneOffset()); document.getElementById('task-inicio').value = h.toISOString().split('T')[0]; }
+            }
+        }
+        function fecharModal() { document.getElementById('modal-overlay').classList.remove('active'); }
+        function abrirModalExclusao(id) { document.getElementById('id-para-excluir').value = id; document.getElementById('modal-exclusao').classList.add('active'); }
+        function fecharModalExclusao() { document.getElementById('modal-exclusao').classList.remove('active'); document.getElementById('id-para-excluir').value = ''; }
+
+        // DASHBOARD
         function popularFiltroAno() {
             const select = document.getElementById('filtro-ano'); const valAtual = select.value; const anos = new Set();
             atividades.forEach(a => { 
@@ -916,14 +881,12 @@
             const mDash = document.getElementById('filtro-mes-dash').value; 
             const sS = document.getElementById('filtro-status').value; 
             const cS = document.getElementById('filtro-criticidade').value;
-            const fDest = document.getElementById('filtro-dash-destino').value;
             
             const filts = atividades.filter(a => { 
                 let mS = (sS === 'Todos') || (a.status === sS); 
                 let mC = (cS === 'Todas') || (a.criticidade === cS); 
                 let mA = true; 
                 let mMes = true;
-                let mDest = true;
                 
                 let dataObj = obterDataReferencia(a);
 
@@ -933,10 +896,7 @@
                     if(mesStr !== mDash) mMes = false; 
                 }
                 
-                if (fDest === 'SERRALHERIA') mDest = (a.destino === 'SERRALHERIA' || !a.destino);
-                if (fDest === 'EXTERNOS') mDest = (a.destino && a.destino !== 'SERRALHERIA');
-
-                return mS && mC && mA && mMes && mDest; 
+                return mS && mC && mA && mMes; 
             });
 
             document.getElementById('card-total').innerText = filts.length; document.getElementById('card-concluidas').innerText = filts.filter(a => a.status === 'REALIZADO').length; document.getElementById('card-andamento').innerText = filts.filter(a => a.status === 'EM ANDAMENTO').length; document.getElementById('card-nao-iniciadas').innerText = filts.filter(a => a.status === 'NÃO INICIADO').length;
@@ -946,26 +906,17 @@
             const mkPie = (id, lbs, dat, bg) => new Chart(document.getElementById(id), { type: 'doughnut', data: { labels: lbs, datasets: [{ data: dat, backgroundColor: bg, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels:{boxWidth:10, font:{size:10}} }, datalabels: optsRosca } } });
             
             graficosCriados.status = mkPie('chartStatus', ['Realizado', 'Não Iniciado', 'Andamento'], [filts.filter(a=>a.status==='REALIZADO').length, filts.filter(a=>a.status==='NÃO INICIADO').length, filts.filter(a=>a.status==='EM ANDAMENTO').length], [CORES.green, CORES.navy, CORES.orange]);
-            
-            const filtsSerralheria = filts.filter(a => a.destino === 'SERRALHERIA' || !a.destino);
-            const agrS = (c, s=true) => { const ct={}; filtsSerralheria.forEach(a=>{ let v=a[c]||'NÃO INFORMADO'; if(!ct[v]) ct[v]=s?{r:0,p:0,t:0}:0; if(s){ if(a.status==='REALIZADO') ct[v].r++; else ct[v].p++; ct[v].t++; }else ct[v]++; }); return ct; };
-            const mS = agrS('responsavel', false); 
-            graficosCriados.serralheiros = mkPie('chartSerralheiro', Object.keys(mS).length?Object.keys(mS):['Vazio'], Object.keys(mS).length?Object.values(mS):[1], [CORES.cyan, '#84cc16', CORES.orange, '#94a3b8']);
-            
-            const agrC = (c, s=true) => { const ct={}; filts.forEach(a=>{ let v=a[c]||'NÃO INFORMADO'; if(!ct[v]) ct[v]=s?{r:0,p:0,t:0}:0; if(s){ if(a.status==='REALIZADO') ct[v].r++; else ct[v].p++; ct[v].t++; }else ct[v]++; }); return ct; };
-            const mP = agrC('criticidade', false); 
-            graficosCriados.prioridade = mkPie('chartPrioridade', ['Alta', 'Média', 'Baixa'], [mP['Alta']||0, mP['Média']||0, mP['Baixa']||0], [CORES.red, CORES.amber, CORES.cyan]);
+            const agr = (c, s=true) => { const ct={}; filts.forEach(a=>{ let v=a[c]||'NÃO INFORMADO'; if(!ct[v]) ct[v]=s?{r:0,p:0,t:0}:0; if(s){ if(a.status==='REALIZADO') ct[v].r++; else ct[v].p++; ct[v].t++; }else ct[v]++; }); return ct; };
+            const mS = agr('responsavel', false); graficosCriados.serralheiros = mkPie('chartSerralheiro', Object.keys(mS).length?Object.keys(mS):['Vazio'], Object.keys(mS).length?Object.values(mS):[1], [CORES.cyan, '#84cc16', CORES.orange, '#94a3b8']);
+            const mP = agr('criticidade', false); graficosCriados.prioridade = mkPie('chartPrioridade', ['Alta', 'Média', 'Baixa'], [mP['Alta']||0, mP['Média']||0, mP['Baixa']||0], [CORES.red, CORES.amber, CORES.cyan]);
 
             const mkBar = (id, b, l=null) => { let ar=Object.keys(b).map(k=>({n:k,...b[k]})).sort((x,y)=>y.t-x.t); if(ar.length>1) ar=ar.filter(i=>i.n!=='NÃO INFORMADO'); if(l) ar=ar.slice(0,l); return new Chart(document.getElementById(id), { type: 'bar', data: { labels: ar.map(i=>i.n), datasets: [{ label: 'Não Iniciado/Andamento', data: ar.map(i=>i.p), backgroundColor: CORES.navy, borderRadius:{topLeft:3, bottomLeft:3} }, { label: 'Realizado', data: ar.map(i=>i.r), backgroundColor: CORES.green, borderRadius:{topRight:3, bottomRight:3} }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x:{stacked:true, display:false}, y:{stacked:true, grid:{display:false}, ticks:{font:{size:10}}} }, plugins: { legend: { position: 'top', align: 'start', labels: { boxWidth: 8, usePointStyle: true, font: {size:10} } }, datalabels: { display: (c)=>c.dataset.data[c.dataIndex]>0, align: 'center', anchor: 'center' } } } }); };
-            graficosCriados.nucleo = mkBar('chartNucleo', agrC('nucleo', true)); graficosCriados.maquina = mkBar('chartMaquina', agrC('maquina', true), 10);
+            graficosCriados.nucleo = mkBar('chartNucleo', agr('nucleo', true)); graficosCriados.maquina = mkBar('chartMaquina', agr('maquina', true), 10);
 
+            // CORREÇÃO DO GRÁFICO HISTÓRICO: Puxar dataRef se a dataFim não existir para unificar visão
             const dadosM = new Array(12).fill(0);
             atividades.forEach(a => { 
-                let isDestOK = true;
-                if (fDest === 'SERRALHERIA') isDestOK = (a.destino === 'SERRALHERIA' || !a.destino);
-                if (fDest === 'EXTERNOS') isDestOK = (a.destino && a.destino !== 'SERRALHERIA');
-
-                if(a.status === 'REALIZADO' && ((cS === 'Todas') || (a.criticidade === cS)) && isDestOK) {
+                if(a.status === 'REALIZADO' && ((cS === 'Todas') || (a.criticidade === cS))) {
                     let anoCalc, mesCalc;
                     if (a.dataFim) {
                         anoCalc = a.dataFim.split('-')[0];
@@ -993,31 +944,20 @@
             }).catch(err => { alert("Erro na exportação."); btn.innerHTML = iconOriginal; btn.disabled = false; });
         }
 
-        // ==========================================
-        // TABELAS BACKLOG E FILTROS DINÂMICOS
-        // ==========================================
-        function resetarPaginas() { 
-            paginaAtualSerralheria = 1; 
-            paginaAtualExternas = 1; 
-            renderizarTabelaSerralheria(); 
-            renderizarTabelaExternas();
-        }
+        // TABELA BACKLOG E FILTROS DINÂMICOS
+        function filtrarBacklog(filtro) { filtroBacklogAtivo = filtro; document.querySelectorAll('#botoes-filtro-backlog button').forEach(b => b.classList.remove('pill-active')); document.getElementById('btn-filtro-' + filtro).classList.add('pill-active'); resetarPaginaEAtualizar(); }
+        function limparFiltrosBacklog() { document.getElementById('filtro-mes-backlog').value = 'TODOS'; document.getElementById('filtro-status-backlog').value = 'TODOS'; document.getElementById('filtro-maquina-backlog').value = 'TODAS'; document.getElementById('filtro-resp-backlog').value = 'TODOS'; document.getElementById('filtro-busca').value = ''; filtrarBacklog('todos'); }
+        function resetarPaginaEAtualizar() { paginaAtual = 1; renderizarTabela(); }
+        function mudarPagina(direcao) { paginaAtual += direcao; renderizarTabela(); }
 
-        // SERRALHERIA
-        function filtrarSerralheria(filtro) { filtroBacklogSerralheriaAtivo = filtro; document.querySelectorAll('#botoes-filtro-serralheria button').forEach(b => b.classList.remove('pill-active')); document.getElementById('btn-filtro-serr-' + filtro).classList.add('pill-active'); resetarPaginas(); }
-        function limparFiltrosSerralheria() { document.getElementById('filtro-mes-serr').value = 'TODOS'; document.getElementById('filtro-status-serr').value = 'TODOS'; document.getElementById('filtro-maquina-serr').value = 'TODAS'; document.getElementById('filtro-resp-serr').value = 'TODOS'; document.getElementById('filtro-busca-serr').value = ''; filtrarSerralheria('todos'); }
-        function mudarPaginaSerralheria(direcao) { paginaAtualSerralheria += direcao; renderizarTabelaSerralheria(); }
-
-        function aplicarFiltrosSerralheria() {
-            const fMaq = document.getElementById('filtro-maquina-serr') ? document.getElementById('filtro-maquina-serr').value : 'TODAS';
-            const fStatus = document.getElementById('filtro-status-serr') ? document.getElementById('filtro-status-serr').value : 'TODOS';
-            const fMes = document.getElementById('filtro-mes-serr') ? document.getElementById('filtro-mes-serr').value : 'TODOS';
-            const fResp = document.getElementById('filtro-resp-serr') ? document.getElementById('filtro-resp-serr').value : 'TODOS';
-            const termo = document.getElementById('filtro-busca-serr') ? document.getElementById('filtro-busca-serr').value.toUpperCase() : '';
+        function aplicarFiltrosBacklog() {
+            const fMaq = document.getElementById('filtro-maquina-backlog') ? document.getElementById('filtro-maquina-backlog').value : 'TODAS';
+            const fStatus = document.getElementById('filtro-status-backlog') ? document.getElementById('filtro-status-backlog').value : 'TODOS';
+            const fMes = document.getElementById('filtro-mes-backlog') ? document.getElementById('filtro-mes-backlog').value : 'TODOS';
+            const fResp = document.getElementById('filtro-resp-backlog') ? document.getElementById('filtro-resp-backlog').value : 'TODOS';
+            const termo = document.getElementById('filtro-busca') ? document.getElementById('filtro-busca').value.toUpperCase() : '';
             
             return atividades.filter(a => {
-                if (a.destino && a.destino !== 'SERRALHERIA') return false; 
-
                 if (fMaq !== 'TODAS' && a.maquina !== fMaq) return false;
                 if (fStatus !== 'TODOS' && a.status !== fStatus) return false;
                 if (fResp !== 'TODOS') {
@@ -1032,175 +972,57 @@
                 }
                 if (termo) { const str = Object.values(a).join(' ').toUpperCase(); if (!str.includes(termo)) return false; }
                 
-                if(filtroBacklogSerralheriaAtivo === 'todos') return true;
-                if(filtroBacklogSerralheriaAtivo === 'aguardando_gestor') return a.status !== 'REALIZADO' && (!a.responsavel || !a.dataInicio);
-                if(filtroBacklogSerralheriaAtivo === 'criticas_atrasadas') { 
+                if(filtroBacklogAtivo === 'todos') return true;
+                if(filtroBacklogAtivo === 'aguardando_gestor') return a.status !== 'REALIZADO' && (!a.responsavel || !a.dataInicio);
+                if(filtroBacklogAtivo === 'criticas_atrasadas') { 
                     if(a.status === 'REALIZADO') return false; 
                     if(a.criticidade === 'Alta') return true; 
                     let d = a.dataCadastro ? new Date(a.dataCadastro) : new Date(parseInt(a.id)); 
-                    return Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 7; 
+                    return Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5; 
                 }
                 return true;
             }).sort((a, b) => {
-                const sC = (i) => { if(i.status === 'REALIZADO') return -100; if(i.criticidade === 'Alta') return 50; let d = i.dataCadastro ? new Date(i.dataCadastro) : new Date(parseInt(i.id)); if(Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 7) return 40; if(!i.responsavel || !i.dataInicio) return 30; return 0; };
+                const sC = (i) => { if(i.status === 'REALIZADO') return -100; if(i.criticidade === 'Alta') return 50; let d = i.dataCadastro ? new Date(i.dataCadastro) : new Date(parseInt(i.id)); if(Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5) return 40; if(!i.responsavel || !i.dataInicio) return 30; return 0; };
                 return sC(b) - sC(a);
             });
         }
 
-        function renderizarTabelaSerralheria() {
-            const tbody = document.getElementById('tabela-serralheria'); if(!tbody) return; tbody.innerHTML = '';
-            const exibidas = aplicarFiltrosSerralheria();
-            const btnP = document.getElementById('btn-prev-serr'); const btnN = document.getElementById('btn-next-serr'); const inf = document.getElementById('info-paginacao-serr');
+        function renderizarTabela() {
+            const tbody = document.getElementById('tabela-atividades'); if(!tbody) return; tbody.innerHTML = '';
+            const exibidas = aplicarFiltrosBacklog();
             
-            if (exibidas.length === 0) { document.getElementById('empty-state-serr').classList.remove('hidden'); inf.innerText = "Mostrando 0 resultados"; btnP.disabled = true; btnN.disabled = true; return; } 
-            else document.getElementById('empty-state-serr').classList.add('hidden');
+            const btnP = document.getElementById('btn-prev'); const btnN = document.getElementById('btn-next'); const inf = document.getElementById('info-paginacao');
+            if (exibidas.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden'); inf.innerText = "Mostrando 0 resultados"; btnP.disabled = true; btnN.disabled = true; return;
+            } else document.getElementById('empty-state').classList.add('hidden');
 
             const totalPaginas = Math.ceil(exibidas.length / ITENS_POR_PAGINA);
-            if (paginaAtualSerralheria < 1) paginaAtualSerralheria = 1; if (paginaAtualSerralheria > totalPaginas) paginaAtualSerralheria = totalPaginas;
-            const idxInicio = (paginaAtualSerralheria - 1) * ITENS_POR_PAGINA; const idxFim = idxInicio + ITENS_POR_PAGINA;
+            if (paginaAtual < 1) paginaAtual = 1; if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+            const idxInicio = (paginaAtual - 1) * ITENS_POR_PAGINA; const idxFim = idxInicio + ITENS_POR_PAGINA;
             const itensPagina = exibidas.slice(idxInicio, idxFim);
 
             inf.innerText = `Mostrando ${idxInicio + 1} a ${Math.min(idxFim, exibidas.length)} de ${exibidas.length} resultados`;
-            btnP.disabled = paginaAtualSerralheria === 1; btnN.disabled = paginaAtualSerralheria === totalPaginas;
+            btnP.disabled = paginaAtual === 1; btnN.disabled = paginaAtual === totalPaginas;
 
-            itensPagina.forEach(t => renderLinhaComum(t, tbody, true));
-        }
+            itensPagina.forEach(t => {
+                let dCad = t.dataCadastro ? new Date(t.dataCadastro) : new Date(parseInt(t.id)); let dFmt = dCad.toLocaleDateString('pt-BR'); let bgDias = '';
+                if (t.status !== 'REALIZADO') { const dias = Math.floor(Math.abs(new Date().getTime() - dCad.getTime()) / (1000 * 60 * 60 * 24)); let cor = dias >= 7 ? 'bg-red-100 text-red-700 border-red-200' : (dias >= 3 ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-600 border-slate-200'); let tx = dias === 0 ? 'Cadastrado Hoje' : (dias === 1 ? 'Pendente 1 dia' : `Pendente ${dias} dias`); bgDias = `<span class="${cor} border text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-clock"></i> ${tx}</span>`; } else bgDias = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-check-circle"></i> Resolvido</span>`;
 
-        // EXTERNAS
-        function filtrarExternas(filtro) { filtroBacklogExternasAtivo = filtro; document.querySelectorAll('#botoes-filtro-externas button').forEach(b => b.classList.remove('pill-active')); document.getElementById('btn-filtro-ext-' + filtro).classList.add('pill-active'); resetarPaginas(); }
-        function limparFiltrosExternas() { document.getElementById('filtro-mes-ext').value = 'TODOS'; document.getElementById('filtro-status-ext').value = 'TODOS'; document.getElementById('filtro-maquina-ext').value = 'TODAS'; document.getElementById('filtro-destino-ext').value = 'TODOS'; document.getElementById('filtro-busca-ext').value = ''; filtrarExternas('todos'); }
-        function mudarPaginaExternas(direcao) { paginaAtualExternas += direcao; renderizarTabelaExternas(); }
+                let sCls = t.status === "REALIZADO" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : (t.status === "EM ANDAMENTO" ? "bg-orange-50 text-orange-700 border-orange-200" : "bg-[#002855]/10 text-[#002855] border-[#002855]/20");
+                let pStr = t.dataFim ? `Até ${t.dataFim.split('-')[2]}/${t.dataFim.split('-')[1]}` : 'Sem prazo definido'; let iStr = t.dataInicio ? `Início ${t.dataInicio.split('-')[2]}/${t.dataInicio.split('-')[1]}` : 'Sem início';
+                let cCls = t.criticidade === 'Alta' ? 'text-red-600 bg-red-50 border-red-200' : (t.criticidade === 'Média' ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-slate-400 bg-slate-100 border-slate-200'); let cIco = t.criticidade === 'Alta' ? 'ph-warning-circle' : (t.criticidade === 'Média' ? 'ph-warning' : 'ph-arrow-down');
+                let cHtml = `<span class="text-[9px] border font-bold px-1.5 py-0.5 rounded flex items-center gap-1 ${cCls}"><i class="ph ${cIco}"></i> ${t.criticidade || 'Baixa'}</span>`;
+                let btnFoto = t.fotoBase64 ? `<button onclick="verFoto('${t.fotoBase64}')" class="text-brand-cyan hover:text-brand-navy transition bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 text-[10px] font-bold flex items-center gap-1"><i class="ph ph-image text-sm"></i> Foto</button>` : '';
 
-        function aplicarFiltrosExternas() {
-            const fMaq = document.getElementById('filtro-maquina-ext') ? document.getElementById('filtro-maquina-ext').value : 'TODAS';
-            const fStatus = document.getElementById('filtro-status-ext') ? document.getElementById('filtro-status-ext').value : 'TODOS';
-            const fMes = document.getElementById('filtro-mes-ext') ? document.getElementById('filtro-mes-ext').value : 'TODOS';
-            const fDest = document.getElementById('filtro-destino-ext') ? document.getElementById('filtro-destino-ext').value : 'TODOS';
-            const termo = document.getElementById('filtro-busca-ext') ? document.getElementById('filtro-busca-ext').value.toUpperCase() : '';
-            
-            return atividades.filter(a => {
-                if (!a.destino || a.destino === 'SERRALHERIA') return false;
-
-                if (fMaq !== 'TODAS' && a.maquina !== fMaq) return false;
-                if (fStatus !== 'TODOS' && a.status !== fStatus) return false;
-                if (fDest !== 'TODOS' && a.destino !== fDest) return false;
-                if (fMes !== 'TODOS') {
-                    let dataObj = obterDataReferencia(a);
-                    let mm = String(dataObj.getMonth() + 1).padStart(2, '0');
-                    let yyyy = dataObj.getFullYear();
-                    if (`${mm}/${yyyy}` !== fMes) return false;
-                }
-                if (termo) { const str = Object.values(a).join(' ').toUpperCase(); if (!str.includes(termo)) return false; }
-                
-                if(filtroBacklogExternasAtivo === 'todos') return true;
-                if(filtroBacklogExternasAtivo === 'sem_followup') return a.status !== 'REALIZADO' && !a.followup;
-                if(filtroBacklogExternasAtivo === 'atrasadas') { 
-                    if(a.status === 'REALIZADO') return false; 
-                    let d = a.dataCadastro ? new Date(a.dataCadastro) : new Date(parseInt(a.id)); 
-                    return Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 7; 
-                }
-                return true;
-            }).sort((a, b) => {
-                const sC = (i) => { if(i.status === 'REALIZADO') return -100; let d = i.dataCadastro ? new Date(i.dataCadastro) : new Date(parseInt(i.id)); if(Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 7) return 40; if(!i.followup) return 30; return 0; };
-                return sC(b) - sC(a);
+                const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 transition group border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="p-3 align-top border-r border-slate-100"><div class="flex items-center gap-2 mb-1.5"><div class="text-[13px] font-bold text-brand-navy leading-tight">${t.descricao}</div>${cHtml}${btnFoto}</div><div class="flex items-center gap-3 text-[10px] text-slate-500 mb-1"><span class="flex items-center gap-1 font-semibold"><i class="ph ph-wrench text-brand-cyan"></i> ${t.maquina}</span><span class="flex items-center gap-1"><i class="ph ph-map-pin"></i> ${t.local || '-'}</span></div>${t.diretriz ? `<div class="text-[10px] text-slate-500 mt-2 bg-slate-50 p-1.5 rounded border border-slate-100 line-clamp-1 group-hover:line-clamp-none transition-all"><i class="ph ph-chat-text text-brand-cyan"></i> ${t.diretriz}</div>` : ''}</td>
+                    <td class="p-3 align-top border-r border-slate-100"><div class="text-xs font-bold text-brand-navy flex items-center gap-1.5 mb-2"><i class="ph ph-user-circle text-xl ${t.responsavel ? 'text-orange-500' : 'text-slate-300'}"></i> ${t.responsavel ? t.responsavel : '<span class="text-slate-400 italic font-normal text-[10px] bg-slate-100 px-2 py-0.5 rounded">🚨 Aguardando</span>'}</div><div class="text-[10px] text-slate-500 flex flex-col gap-1"><span class="font-medium">Por: ${t.solicitante}</span>${t.nucleo ? `<span class="font-bold text-brand-cyan bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 w-max">${t.nucleo}</span>` : ''}</div></td>
+                    <td class="p-3 align-top"><div class="flex flex-col gap-2"><span class="px-2 py-1 rounded-md text-[9px] font-bold tracking-widest flex w-max uppercase border ${sCls}">${t.status}</span><div class="flex flex-col gap-0.5 mt-0.5">${bgDias}<span class="text-[9px] text-slate-500 font-medium ml-1 mt-1"><i class="ph ph-calendar-plus"></i> Cadastro: ${dFmt}</span>${t.status !== 'NÃO INICIADO' ? `<span class="text-[9px] text-brand-navy font-bold ml-1"><i class="ph ph-play-circle"></i> ${iStr}</span>` : ''}${t.status !== 'REALIZADO' ? `<span class="text-[9px] text-orange-600 font-bold ml-1"><i class="ph ph-flag-checkered"></i> ${pStr}</span>` : ''}</div></div></td>
+                    <td class="p-3 text-center align-middle"><div class="flex flex-col items-center justify-center gap-2 opacity-30 group-hover:opacity-100 transition"><button onclick="abrirModal('${t.id}')" class="p-1.5 bg-white text-slate-600 border border-slate-200 rounded hover:bg-slate-100 hover:text-brand-cyan transition shadow-sm w-full flex justify-center" title="Editar"><i class="ph ph-pencil-simple text-lg"></i></button>${perfilAtual === 'gestor' ? `<button onclick="abrirModalExclusao('${t.id}')" class="p-1.5 bg-white text-slate-400 border border-slate-200 rounded hover:bg-red-50 hover:text-red-500 transition shadow-sm" title="Excluir"><i class="ph ph-trash text-lg"></i></button>` : ''}</div></td>
+                `;
+                tbody.appendChild(tr);
             });
-        }
-
-        function renderizarTabelaExternas() {
-            const tbody = document.getElementById('tabela-externas'); if(!tbody) return; tbody.innerHTML = '';
-            const exibidas = aplicarFiltrosExternas();
-            const btnP = document.getElementById('btn-prev-ext'); const btnN = document.getElementById('btn-next-ext'); const inf = document.getElementById('info-paginacao-ext');
-            
-            if (exibidas.length === 0) { document.getElementById('empty-state-ext').classList.remove('hidden'); inf.innerText = "Mostrando 0 resultados"; btnP.disabled = true; btnN.disabled = true; return; } 
-            else document.getElementById('empty-state-ext').classList.add('hidden');
-
-            const totalPaginas = Math.ceil(exibidas.length / ITENS_POR_PAGINA);
-            if (paginaAtualExternas < 1) paginaAtualExternas = 1; if (paginaAtualExternas > totalPaginas) paginaAtualExternas = totalPaginas;
-            const idxInicio = (paginaAtualExternas - 1) * ITENS_POR_PAGINA; const idxFim = idxInicio + ITENS_POR_PAGINA;
-            const itensPagina = exibidas.slice(idxInicio, idxFim);
-
-            inf.innerText = `Mostrando ${idxInicio + 1} a ${Math.min(idxFim, exibidas.length)} de ${exibidas.length} resultados`;
-            btnP.disabled = paginaAtualExternas === 1; btnN.disabled = paginaAtualExternas === totalPaginas;
-
-            itensPagina.forEach(t => renderLinhaComum(t, tbody, false));
-        }
-
-        // RENDERIZADOR COMUM DE LINHAS DA TABELA
-        function renderLinhaComum(t, tbody, isSerralheria) {
-            let dCad = t.dataCadastro ? new Date(t.dataCadastro) : new Date(parseInt(t.id)); let dFmt = dCad.toLocaleDateString('pt-BR'); let bgDias = '';
-            if (t.status !== 'REALIZADO') { const dias = Math.floor(Math.abs(new Date().getTime() - dCad.getTime()) / (1000 * 60 * 60 * 24)); let cor = dias >= 7 ? 'bg-red-100 text-red-700 border-red-200' : (dias >= 3 ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-600 border-slate-200'); let tx = dias === 0 ? 'Cadastrado Hoje' : (dias === 1 ? 'Pendente 1 dia' : `Pendente ${dias} dias`); bgDias = `<span class="${cor} border text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-clock"></i> ${tx}</span>`; } else bgDias = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-check-circle"></i> Resolvido</span>`;
-
-            let sCls = t.status === "REALIZADO" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : (t.status === "EM ANDAMENTO" ? "bg-orange-50 text-orange-700 border-orange-200" : "bg-[#002855]/10 text-[#002855] border-[#002855]/20");
-            let pStr = t.dataFim ? `Até ${t.dataFim.split('-')[2]}/${t.dataFim.split('-')[1]}` : 'Sem prazo definido'; let iStr = t.dataInicio ? `Início ${t.dataInicio.split('-')[2]}/${t.dataInicio.split('-')[1]}` : 'Sem início';
-            let cCls = t.criticidade === 'Alta' ? 'text-red-600 bg-red-50 border-red-200' : (t.criticidade === 'Média' ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-slate-400 bg-slate-100 border-slate-200'); let cIco = t.criticidade === 'Alta' ? 'ph-warning-circle' : (t.criticidade === 'Média' ? 'ph-warning' : 'ph-arrow-down');
-            let cHtml = `<span class="text-[9px] border font-bold px-1.5 py-0.5 rounded flex items-center gap-1 ${cCls}"><i class="ph ${cIco}"></i> ${t.criticidade || 'Baixa'}</span>`;
-            let btnFoto = t.fotoBase64 ? `<button onclick="verFoto('${t.fotoBase64}')" class="text-brand-cyan hover:text-brand-navy transition bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 text-[10px] font-bold flex items-center gap-1"><i class="ph ph-image text-sm"></i> Foto</button>` : '';
-
-            let colMeio = '';
-            if (isSerralheria) {
-                colMeio = `<div class="text-xs font-bold text-brand-navy flex items-center gap-1.5 mb-2"><i class="ph ph-user-circle text-xl ${t.responsavel ? 'text-orange-500' : 'text-slate-300'}"></i> ${t.responsavel ? t.responsavel : '<span class="text-slate-400 italic font-normal text-[10px] bg-slate-100 px-2 py-0.5 rounded">🚨 Aguardando Gestor</span>'}</div><div class="text-[10px] text-slate-500 flex flex-col gap-1"><span class="font-medium">Por: ${t.solicitante}</span>${t.nucleo ? `<span class="font-bold text-brand-cyan bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 w-max">${t.nucleo}</span>` : ''}</div>`;
-            } else {
-                colMeio = `
-                    <div class="text-xs font-bold text-indigo-700 flex items-center gap-1.5 mb-2 bg-indigo-50 px-2 py-1 rounded w-max border border-indigo-100"><i class="ph ph-buildings text-lg"></i> Destino: ${t.destino}</div>
-                    <div class="text-[10px] text-slate-500 mb-2"><span class="font-medium">Por: ${t.solicitante}</span> | <span class="font-bold text-brand-cyan">${t.nucleo}</span></div>
-                    <div class="bg-slate-50 border border-slate-200 p-2 rounded text-[10px] text-slate-600 line-clamp-2 hover:line-clamp-none transition-all">
-                        <span class="font-bold block mb-0.5 text-brand-navy"><i class="ph ph-chat-circle-dots"></i> Último Follow-up:</span>
-                        ${t.followup ? t.followup : '<span class="italic text-slate-400">Nenhum retorno ainda.</span>'}
-                    </div>`;
-            }
-
-            const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 transition group border-b border-slate-100";
-            tr.innerHTML = `
-                <td class="p-3 align-top border-r border-slate-100"><div class="flex items-center gap-2 mb-1.5"><div class="text-[13px] font-bold text-brand-navy leading-tight">${t.descricao}</div>${cHtml}${btnFoto}</div><div class="flex items-center gap-3 text-[10px] text-slate-500 mb-1"><span class="flex items-center gap-1 font-semibold"><i class="ph ph-wrench text-brand-cyan"></i> ${t.maquina}</span><span class="flex items-center gap-1"><i class="ph ph-map-pin"></i> ${t.local || '-'}</span></div>${t.diretriz ? `<div class="text-[10px] text-slate-500 mt-2 bg-slate-50 p-1.5 rounded border border-slate-100 line-clamp-1 group-hover:line-clamp-none transition-all"><i class="ph ph-chat-text text-brand-cyan"></i> ${t.diretriz}</div>` : ''}</td>
-                <td class="p-3 align-top border-r border-slate-100">${colMeio}</td>
-                <td class="p-3 align-top"><div class="flex flex-col gap-2"><span class="px-2 py-1 rounded-md text-[9px] font-bold tracking-widest flex w-max uppercase border ${sCls}">${t.status}</span><div class="flex flex-col gap-0.5 mt-0.5">${bgDias}<span class="text-[9px] text-slate-500 font-medium ml-1 mt-1"><i class="ph ph-calendar-plus"></i> Cadastro: ${dFmt}</span>${(isSerralheria && t.status !== 'NÃO INICIADO') ? `<span class="text-[9px] text-brand-navy font-bold ml-1"><i class="ph ph-play-circle"></i> ${iStr}</span>` : ''}${(isSerralheria && t.status !== 'REALIZADO') ? `<span class="text-[9px] text-orange-600 font-bold ml-1"><i class="ph ph-flag-checkered"></i> ${pStr}</span>` : ''}</div></div></td>
-                <td class="p-3 text-center align-middle"><div class="flex flex-col items-center justify-center gap-2 opacity-30 group-hover:opacity-100 transition"><button onclick="abrirModal('${t.id}')" class="p-1.5 bg-white text-slate-600 border border-slate-200 rounded hover:bg-slate-100 hover:text-brand-cyan transition shadow-sm w-full flex justify-center" title="Editar"><i class="ph ph-pencil-simple text-lg"></i></button>${perfilAtual === 'gestor' ? `<button onclick="abrirModalExclusao('${t.id}')" class="p-1.5 bg-white text-slate-400 border border-slate-200 rounded hover:bg-red-50 hover:text-red-500 transition shadow-sm" title="Excluir"><i class="ph ph-trash text-lg"></i></button>` : ''}</div></td>
-            `;
-            tbody.appendChild(tr);
-        }
-
-        function mudarPerfil() { 
-            const sel = document.getElementById('perfil-usuario'); 
-            const btnImportSerr = document.getElementById('btn-import-container-serr');
-            
-            if (sel.value === 'gestor') { 
-                document.getElementById('modal-senha').classList.add('active'); 
-                document.getElementById('input-senha').value = ''; 
-                setTimeout(() => document.getElementById('input-senha').focus(), 100); 
-                sel.value = 'supervisor'; 
-            } else { 
-                perfilAtual = 'supervisor'; 
-                if(btnImportSerr) btnImportSerr.classList.add('hidden');
-                resetarPaginas(); 
-            } 
-        }
-        
-        function confirmarSenha() { 
-            if (document.getElementById('input-senha').value === 'gac+000') { 
-                perfilAtual = 'gestor'; 
-                document.getElementById('perfil-usuario').value = 'gestor'; 
-                const btnImportSerr = document.getElementById('btn-import-container-serr');
-                if(btnImportSerr) btnImportSerr.classList.remove('hidden'); 
-                resetarPaginas(); 
-                document.getElementById('modal-senha').classList.remove('active'); 
-            } else { 
-                alert("Senha Incorreta!"); 
-                document.getElementById('input-senha').value = ''; 
-                document.getElementById('input-senha').focus(); 
-            } 
-        }
-
-        function cancelarSenha() { 
-            document.getElementById('modal-senha').classList.remove('active'); 
-        }
-        
-        function changeTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('nav button').forEach(btn => { btn.classList.remove('bg-brand-cyan', 'text-white', 'font-bold', 'shadow-md'); btn.classList.add('hover:bg-white/10', 'text-slate-300'); btn.classList.remove('border-transparent'); });
-            document.getElementById(tabName).classList.add('active');
-            const btn = document.getElementById(`btn-${tabName}`);
-            if(btn) { btn.classList.add('bg-brand-cyan', 'text-white', 'font-bold', 'shadow-md'); btn.classList.remove('hover:bg-white/10', 'text-slate-300'); }
-            if(tabName === 'dashboard') atualizarDashboard();
         }
 
         // RELATÓRIOS E-MAIL
@@ -1211,8 +1033,8 @@
 
         function gerarRelatorio() {
             const diP = document.getElementById('rel-passada-inicio').value; const dfP = document.getElementById('rel-passada-fim').value; const diA = document.getElementById('rel-atual-inicio').value; const dfA = document.getElementById('rel-atual-fim').value;
-            const aR = atividades.filter(a => a.status === 'REALIZADO' && a.dataFim && a.dataFim >= diP && a.dataFim <= dfP && (a.destino === 'SERRALHERIA' || !a.destino));
-            const aP = atividades.filter(a => a.status !== 'REALIZADO' && a.dataInicio && a.dataInicio >= diA && a.dataInicio <= dfA && (a.destino === 'SERRALHERIA' || !a.destino));
+            const aR = atividades.filter(a => a.status === 'REALIZADO' && a.dataFim && a.dataFim >= diP && a.dataFim <= dfP);
+            const aP = atividades.filter(a => a.status !== 'REALIZADO' && a.dataInicio && a.dataInicio >= diA && a.dataInicio <= dfA);
             let html = `<div style="font-family: Arial, sans-serif; font-size: 12px; color: #000;"><p>Boa tarde a todos.</p><p>Segue a programação da serralheria para esta semana, juntamente com as atividades realizadas na semana passada.</p><p>Caso surjam demandas urgentes, peço que nos informem para readequação.</p><br><p style="background-color: #00FF00; display: inline-block; font-weight: bold; margin-bottom: 2px;">ATIVIDADES REALIZADAS NA SEMANA PASSADA:</p><table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11px; margin-bottom: 20px;"><thead><tr style="background-color: #92D050; text-align: center; font-weight: bold;"><th style="border: 1px solid #000; padding: 4px;">ATIVIDADES</th><th style="border: 1px solid #000; padding: 4px;">LOCAL</th><th style="border: 1px solid #000; padding: 4px;">DATA INÍCIO</th><th style="border: 1px solid #000; padding: 4px;">DATA FIM</th></tr></thead><tbody>`;
             if (aR.length === 0) html += `<tr><td colspan="4" style="border: 1px solid #000; padding: 4px; text-align: center;">Nenhuma atividade finalizada no período.</td></tr>`; else aR.forEach(t => { html += `<tr><td style="border: 1px solid #000; padding: 4px;">${t.descricao}</td><td style="border: 1px solid #000; padding: 4px;">${t.maquina}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataInicio)}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataFim)}</td></tr>`; });
             html += `</tbody></table><br><p style="background-color: #FFFF00; display: inline-block; font-weight: bold; margin-bottom: 2px;">ATIVIDADES A SEREM REALIZADAS ESSA SEMANA:</p><table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11px;"><thead><tr style="background-color: #FFFF00; text-align: center; font-weight: bold;"><th style="border: 1px solid #000; padding: 4px;">ATIVIDADES</th><th style="border: 1px solid #000; padding: 4px;">LOCAL</th><th style="border: 1px solid #000; padding: 4px;">DATA INÍCIO</th><th style="border: 1px solid #000; padding: 4px;">DATA FIM</th></tr></thead><tbody>`;
