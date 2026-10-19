@@ -244,6 +244,8 @@
                 </div>
             </div>
 
+            <div id="painel-indicadores-outros" class="hidden mb-4 space-y-3"></div>
+
             <!-- FILTROS AVANÇADOS, BUSCA E EXCEL -->
             <div class="mb-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-3">
                 
@@ -356,6 +358,18 @@
                 </div>
             </div>
             <div id="resultado-relatorio" class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 hidden overflow-auto"></div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mt-8 mb-6">
+                <h3 class="text-sm font-bold text-brand-navy mb-3 flex items-center gap-2 border-b pb-2"><i class="ph ph-buildings text-brand-cyan"></i> Pendências de Outros Setores (semanal)</h3>
+                <div class="flex flex-col md:flex-row gap-4 md:items-end">
+                    <div class="flex-1"><label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Setor destino</label><select id="rel-outros-setor" class="w-full border border-slate-300 rounded p-1.5 text-xs outline-none"><option value="TODOS">Todos os setores</option><option value="MANUTENÇÃO">Manutenção</option><option value="MANUTENÇÃO CIVIL">Manutenção Civil</option><option value="ELÉTRICA PREDIAL">Elétrica Predial</option><option value="INVESTIMENTO/PROJETO">Investimento/Projeto</option><option value="COMPRA">Compra</option><option value="OUTROS">Outros</option></select></div>
+                    <div class="flex gap-3">
+                        <button onclick="gerarRelatorioOutros()" class="bg-brand-navy hover:bg-brand-navy-dark text-white px-6 py-2.5 rounded-lg shadow font-bold flex items-center gap-2 transition text-sm"><i class="ph ph-magic-wand text-brand-cyan text-lg"></i> Gerar Tabelas</button>
+                        <button onclick="copiarRelatorioOutros()" id="btn-copiar-outros" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2.5 rounded-lg shadow font-bold items-center gap-2 transition text-sm border border-emerald-600"><i class="ph ph-copy text-lg"></i> Copiar para E-mail</button>
+                    </div>
+                </div>
+            </div>
+            <div id="resultado-relatorio-outros" class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 hidden overflow-auto"></div>
         </section>
     </main>
 
@@ -428,7 +442,6 @@
                             </select>
                         </div>
                     </div>
-                    <div id="area-referencia" class="hidden"><label class="block text-xs font-semibold text-slate-700 mb-1">Nº da OS / SS / Pedido</label><input type="text" id="task-referencia" placeholder="Opcional" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs font-medium"></div>
                     <div><label class="block text-xs font-semibold text-slate-700 mb-1">Criticidade</label><select id="task-criticidade" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-white font-medium"><option value="Baixa">Baixa (Padrão)</option><option value="Média">Média (Atenção)</option><option value="Alta">Alta (Urgente)</option></select></div>
                 </div>
 
@@ -438,7 +451,7 @@
                     <div id="area-followup-gestor" class="hidden space-y-2 pt-2 border-t border-sky-100">
                         <span class="bg-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded font-bold tracking-wider">APENAS GESTOR</span>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Status da tratativa</label><select id="task-status-outros" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs font-bold text-slate-700"><option value="NÃO INICIADO">Aberto</option><option value="EM ANDAMENTO">Em tratativa</option><option value="REALIZADO">Concluído</option></select></div>
+                            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Status da tratativa</label><select id="task-status-outros" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs font-bold text-slate-700"><option value="NÃO INICIADO">Aberto</option><option value="EM ANDAMENTO">Em tratativa</option><option value="REALIZADO">Concluído</option><option value="CANCELADA">Cancelada</option></select></div>
                             <div><label class="block text-xs font-semibold text-slate-700 mb-1">Seu nome</label><input type="text" id="followup-autor" placeholder="Quem escreve" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 uppercase text-xs font-medium"></div>
                         </div>
                         <div><label class="block text-xs font-semibold text-slate-700 mb-1">Novo follow-up</label><textarea id="novo-followup" rows="2" placeholder="Como está a tratativa..." class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs resize-none"></textarea></div>
@@ -515,7 +528,7 @@
             'COMPRA': { rotulo: 'Compra', icone: 'ph-shopping-cart' },
             'OUTROS': { rotulo: 'Outros', icone: 'ph-dots-three-circle' }
         };
-        const ROTULO_STATUS_OUTROS = { 'NÃO INICIADO': 'Aberto', 'EM ANDAMENTO': 'Em tratativa', 'REALIZADO': 'Concluído' };
+        const ROTULO_STATUS_OUTROS = { 'NÃO INICIADO': 'Aberto', 'EM ANDAMENTO': 'Em tratativa', 'REALIZADO': 'Concluído', 'CANCELADA': 'Cancelada' };
         let contextoBacklog = 'serralheria';
         let contextoRenderizado = null;
         const setorDe = a => a.setor || SETOR_PADRAO;
@@ -554,25 +567,53 @@
             if (!selSetor.options.length) selSetor.innerHTML = '<option value="TODOS">Todos os Setores</option>' + Object.keys(SETORES).filter(k => k !== SETOR_PADRAO).map(k => `<option value="${k}">${SETORES[k].rotulo}</option>`).join('');
             selSetor.parentElement.classList.toggle('hidden', !outros);
             const st = document.getElementById('filtro-status-backlog'); const v = st.value;
-            st.innerHTML = outros ? '<option value="TODOS">Todos</option><option value="NÃO INICIADO">Aberto</option><option value="EM ANDAMENTO">Em tratativa</option><option value="REALIZADO">Concluído</option>' : '<option value="TODOS">Todos</option><option value="NÃO INICIADO">Não Iniciado</option><option value="EM ANDAMENTO">Em Andamento</option><option value="REALIZADO">Realizado</option>';
+            st.innerHTML = outros ? '<option value="TODOS">Todos</option><option value="NÃO INICIADO">Aberto</option><option value="EM ANDAMENTO">Em tratativa</option><option value="REALIZADO">Concluído</option><option value="CANCELADA">Cancelada</option>' : '<option value="TODOS">Todos</option><option value="NÃO INICIADO">Não Iniciado</option><option value="EM ANDAMENTO">Em Andamento</option><option value="REALIZADO">Realizado</option>';
             st.value = v;
             atualizarVisibilidadeImportacao();
             const mudou = contextoRenderizado !== contextoBacklog; contextoRenderizado = contextoBacklog;
             if (mudou) limparFiltrosBacklog(); else resetarPaginaEAtualizar();
         }
 
+        function renderizarIndicadoresOutros() {
+            const el = document.getElementById('painel-indicadores-outros'); if (!el) return;
+            el.classList.toggle('hidden', contextoBacklog !== 'outros'); if (contextoBacklog !== 'outros') return;
+            const outros = atividades.filter(a => !ehSerralheria(a));
+            const cad = a => a.dataCadastro ? new Date(a.dataCadastro) : new Date(parseInt(a.id));
+            const dias = (a, b) => (b - a) / 86400000;
+            const fechada = a => a.status === 'REALIZADO' || a.status === 'CANCELADA';
+            const temFU = a => a.followups && a.followups.length;
+            const media = arr => arr.length ? (arr.reduce((x, y) => x + y, 0) / arr.length).toFixed(1).replace('.', ',') + ' d' : '-';
+            const calc = lista => {
+                const ab = lista.filter(a => !fechada(a));
+                return { ab: ab.length, sem: ab.filter(a => !temFU(a)).length, crit: ab.filter(a => a.criticidade === 'Alta').length,
+                    velha: ab.length ? Math.max(...ab.map(a => Math.floor(dias(cad(a), new Date())))) : '-',
+                    pri: media(lista.filter(temFU).map(a => Math.max(0, dias(cad(a), new Date(a.followups[0].data))))),
+                    conc: media(lista.filter(a => a.status === 'REALIZADO' && a.dataFim).map(a => Math.max(0, dias(cad(a), new Date(a.dataFim + 'T12:00:00'))))),
+                    nConc: lista.filter(a => a.status === 'REALIZADO').length, nCanc: lista.filter(a => a.status === 'CANCELADA').length };
+            };
+            const t = calc(outros);
+            const card = (tit, val, cor) => `<div class="bg-white p-3 rounded-lg shadow-sm border border-slate-200 border-l-4 ${cor}"><h3 class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">${tit}</h3><p class="text-2xl font-black text-brand-navy mt-0.5">${val}</p></div>`;
+            const td = 'p-2 text-center'; 
+            const linhas = Object.keys(SETORES).filter(k => k !== SETOR_PADRAO).map(k => { const c = calc(outros.filter(a => setorDe(a) === k));
+                return `<tr class="border-b border-slate-100"><td class="p-2 font-bold text-brand-navy">${SETORES[k].rotulo}</td><td class="${td}">${c.ab}</td><td class="${td} ${c.sem ? 'text-orange-600 font-bold' : ''}">${c.sem}</td><td class="${td} ${c.crit ? 'text-red-600 font-bold' : ''}">${c.crit}</td><td class="${td}">${c.velha}${c.velha === '-' ? '' : ' d'}</td><td class="${td}">${c.pri}</td><td class="${td}">${c.conc}</td><td class="${td}">${c.nConc}</td><td class="${td}">${c.nCanc}</td></tr>`; }).join('');
+            const th = 'p-2 text-center';
+            el.innerHTML = `<div class="grid grid-cols-2 lg:grid-cols-5 gap-3">${card('Em aberto', t.ab, 'border-l-[#009FE3]')}${card('Sem tratativa', t.sem, 'border-l-orange-500')}${card('Críticas abertas', t.crit, 'border-l-red-500')}${card('Tempo até 1º follow-up', t.pri, 'border-l-[#002855]')}${card('Tempo até concluir', t.conc, 'border-l-emerald-500')}</div>
+                <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-x-auto"><table class="w-full text-xs"><thead><tr class="bg-slate-50 border-b border-slate-200 text-brand-navy uppercase text-[10px] font-bold tracking-wider"><th class="p-2 text-left">Setor destino</th><th class="${th}">Em aberto</th><th class="${th}">Sem tratativa</th><th class="${th}">Críticas</th><th class="${th}">Mais antiga</th><th class="${th}">Tempo até 1º follow-up</th><th class="${th}">Tempo até concluir</th><th class="${th}">Concluídas</th><th class="${th}">Canceladas</th></tr></thead><tbody>${linhas}</tbody></table></div>`;
+        }
+
         function montarLinhaOutros(t) {
             const dCad = t.dataCadastro ? new Date(t.dataCadastro) : new Date(parseInt(t.id));
             let dias = ''; 
-            if (t.status !== 'REALIZADO') { const n = Math.floor(Math.abs(Date.now() - dCad.getTime()) / 86400000); const cor = n >= 7 ? 'bg-red-100 text-red-700 border-red-200' : (n >= 3 ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-600 border-slate-200'); dias = `<span class="${cor} border text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-clock"></i> ${n === 0 ? 'Aberto hoje' : 'Aberto há ' + n + (n === 1 ? ' dia' : ' dias')}</span>`; }
+            if (t.status !== 'REALIZADO' && t.status !== 'CANCELADA') { const n = Math.floor(Math.abs(Date.now() - dCad.getTime()) / 86400000); const cor = n >= 7 ? 'bg-red-100 text-red-700 border-red-200' : (n >= 3 ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-600 border-slate-200'); dias = `<span class="${cor} border text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-clock"></i> ${n === 0 ? 'Aberto hoje' : 'Aberto há ' + n + (n === 1 ? ' dia' : ' dias')}</span>`; }
+            else if (t.status === 'CANCELADA') dias = '<span class="bg-slate-100 text-slate-500 border border-slate-200 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-prohibit"></i> Cancelada</span>';
             else dias = '<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-check-circle"></i> Concluído</span>';
-            const sCls = t.status === 'REALIZADO' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : (t.status === 'EM ANDAMENTO' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-[#002855]/10 text-[#002855] border-[#002855]/20');
+            const sCls = t.status === 'CANCELADA' ? 'bg-slate-100 text-slate-500 border-slate-200' : t.status === 'REALIZADO' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : (t.status === 'EM ANDAMENTO' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-[#002855]/10 text-[#002855] border-[#002855]/20');
             const cCls = t.criticidade === 'Alta' ? 'text-red-600 bg-red-50 border-red-200' : (t.criticidade === 'Média' ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-slate-400 bg-slate-100 border-slate-200');
             const fus = t.followups || []; const ult = fus[fus.length - 1];
-            const fuHtml = ult ? `<div class="mt-2 text-[10px] bg-sky-50 border border-sky-100 rounded p-1.5"><div class="font-bold text-brand-navy mb-0.5"><i class="ph ph-chat-circle-text text-brand-cyan"></i> ${esc(ult.autor || 'GESTOR')} em ${fmtDataHora(ult.data)}</div><div class="text-slate-600 line-clamp-2 group-hover:line-clamp-none">${esc(ult.texto)}</div></div>` : (t.status !== 'REALIZADO' ? '<div class="mt-2 text-[10px] text-amber-600 italic"><i class="ph ph-hourglass"></i> Aguardando o primeiro follow-up</div>' : '');
+            const fuHtml = ult ? `<div class="mt-2 text-[10px] bg-sky-50 border border-sky-100 rounded p-1.5"><div class="font-bold text-brand-navy mb-0.5"><i class="ph ph-chat-circle-text text-brand-cyan"></i> ${esc(ult.autor || 'GESTOR')} em ${fmtDataHora(ult.data)}</div><div class="text-slate-600 line-clamp-2 group-hover:line-clamp-none">${esc(ult.texto)}</div></div>` : (t.status !== 'REALIZADO' && t.status !== 'CANCELADA' ? '<div class="mt-2 text-[10px] text-amber-600 italic"><i class="ph ph-hourglass"></i> Aguardando o primeiro follow-up</div>' : '');
             const tr = document.createElement('tr'); tr.className = 'hover:bg-slate-50 transition group border-b border-slate-100';
             tr.innerHTML = `
-                <td class="p-3 align-top border-r border-slate-100"><div class="flex items-center gap-2 mb-1.5 flex-wrap"><div class="text-[13px] font-bold text-brand-navy leading-tight">${esc(t.descricao)}</div><span class="text-[9px] border font-bold px-1.5 py-0.5 rounded ${cCls}">${esc(t.criticidade || 'Baixa')}</span>${t.fotoBase64 ? `<button onclick="verFotoPorId('${t.id}')" class="text-brand-cyan bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 text-[10px] font-bold flex items-center gap-1"><i class="ph ph-image text-sm"></i> Foto</button>` : ''}</div><div class="flex items-center gap-3 text-[10px] text-slate-500 flex-wrap"><span class="flex items-center gap-1 font-semibold"><i class="ph ph-wrench text-brand-cyan"></i> ${esc(t.maquina)}</span><span class="flex items-center gap-1"><i class="ph ph-map-pin"></i> ${esc(t.local || '-')}</span>${t.referencia ? `<span class="font-bold text-brand-navy bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">Ref: ${esc(t.referencia)}</span>` : ''}</div>${t.diretriz ? `<div class="text-[10px] text-slate-500 mt-2 bg-slate-50 p-1.5 rounded border border-slate-100 line-clamp-1 group-hover:line-clamp-none"><i class="ph ph-chat-text text-brand-cyan"></i> ${esc(t.diretriz)}</div>` : ''}${fuHtml}</td>
+                <td class="p-3 align-top border-r border-slate-100"><div class="flex items-center gap-2 mb-1.5 flex-wrap"><div class="text-[13px] font-bold text-brand-navy leading-tight">${esc(t.descricao)}</div><span class="text-[9px] border font-bold px-1.5 py-0.5 rounded ${cCls}">${esc(t.criticidade || 'Baixa')}</span>${t.fotoBase64 ? `<button onclick="verFotoPorId('${t.id}')" class="text-brand-cyan bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 text-[10px] font-bold flex items-center gap-1"><i class="ph ph-image text-sm"></i> Foto</button>` : ''}</div><div class="flex items-center gap-3 text-[10px] text-slate-500 flex-wrap"><span class="flex items-center gap-1 font-semibold"><i class="ph ph-wrench text-brand-cyan"></i> ${esc(t.maquina)}</span><span class="flex items-center gap-1"><i class="ph ph-map-pin"></i> ${esc(t.local || '-')}</span></div>${t.diretriz ? `<div class="text-[10px] text-slate-500 mt-2 bg-slate-50 p-1.5 rounded border border-slate-100 line-clamp-1 group-hover:line-clamp-none"><i class="ph ph-chat-text text-brand-cyan"></i> ${esc(t.diretriz)}</div>` : ''}${fuHtml}</td>
                 <td class="p-3 align-top border-r border-slate-100"><div class="text-xs font-bold text-brand-navy mb-2">${esc(t.solicitante)}</div><div class="flex flex-col gap-1 text-[10px]"><span class="font-bold text-brand-cyan bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 w-max">${esc(setorDe(t))}</span>${t.nucleo ? `<span class="text-slate-500">${esc(t.nucleo)}</span>` : ''}</div></td>
                 <td class="p-3 align-top"><div class="flex flex-col gap-2"><span class="px-2 py-1 rounded-md text-[9px] font-bold tracking-widest flex w-max uppercase border ${sCls}">${ROTULO_STATUS_OUTROS[t.status] || esc(t.status)}</span>${dias}<span class="text-[9px] text-slate-500 font-medium"><i class="ph ph-calendar-plus"></i> Cadastro: ${dCad.toLocaleDateString('pt-BR')}</span><span class="text-[9px] text-slate-500 font-medium"><i class="ph ph-chat-circle-text"></i> ${fus.length} follow-up(s)</span></div></td>
                 <td class="p-3 text-center align-middle"><div class="flex flex-col items-center justify-center gap-2 opacity-30 group-hover:opacity-100 transition"><button onclick="abrirModal('${t.id}')" class="p-1.5 bg-white text-slate-600 border border-slate-200 rounded hover:bg-slate-100 hover:text-brand-cyan transition shadow-sm w-full flex justify-center" title="${perfilAtual === 'gestor' ? 'Acompanhar / Editar' : 'Ver / Editar'}"><i class="ph ph-pencil-simple text-lg"></i></button>${perfilAtual === 'gestor' ? `<button onclick="abrirModalExclusao('${t.id}')" class="p-1.5 bg-white text-slate-400 border border-slate-200 rounded hover:bg-red-50 hover:text-red-500 transition shadow-sm" title="Excluir"><i class="ph ph-trash text-lg"></i></button>` : ''}</div></td>`;
@@ -802,7 +843,7 @@
             
             // VERIFICAÇÃO DE SIMILARIDADE
             const setor = document.getElementById('task-setor').value || SETOR_PADRAO; const ehSerr = setor === SETOR_PADRAO;
-            const pendentes = atividades.filter(a => a.maquina === maq && a.status !== 'REALIZADO' && a.id !== idForm && setorDe(a) === setor);
+            const pendentes = atividades.filter(a => a.maquina === maq && a.status !== 'REALIZADO' && a.status !== 'CANCELADA' && a.id !== idForm && setorDe(a) === setor);
             for (let p of pendentes) {
                 let sim = calcularSimilaridade(desc, p.descricao);
                 if (sim >= 0.6) {
@@ -827,9 +868,10 @@
                 datainicio: (perfilAtual === 'gestor' && ehSerr) ? document.getElementById('task-inicio').value : (atvAtual.dataInicio || ''),
                 datafim: (perfilAtual === 'gestor' && ehSerr) ? document.getElementById('task-fim').value : (atvAtual.dataFim || ''),
                 status: perfilAtual === 'gestor' ? (ehSerr ? document.getElementById('task-status').value : document.getElementById('task-status-outros').value) : (atvAtual.status || 'NÃO INICIADO'),
-                setor: setor, referencia: ehSerr ? '' : document.getElementById('task-referencia').value.trim().toUpperCase(), followups: followups
+                setor: setor, followups: followups
             };
 
+            if (!ehSerr) { const fim = dbObj.status === 'REALIZADO' || dbObj.status === 'CANCELADA'; const hj = new Date(); hj.setMinutes(hj.getMinutes() - hj.getTimezoneOffset()); dbObj.datafim = fim ? (atvAtual.dataFim || hj.toISOString().split('T')[0]) : ''; }
             filaSincronizacao = filaSincronizacao.filter(item => item.id !== dbObj.id);
             filaSincronizacao.push(dbObj);
             localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao));
@@ -859,7 +901,7 @@
                 "ID/Cadastro": new Date(isNaN(a.dataCadastro||a.id)?(a.dataCadastro||a.id):parseInt(a.dataCadastro||a.id)).toLocaleDateString('pt-BR'),
                 "Atividade": a.descricao, "Diretrizes": a.diretriz, "Máquina": a.maquina, "Local": a.local,
                 "Solicitante": a.solicitante, "Núcleo": a.nucleo, "Criticidade": a.criticidade,
-                "Setor": setorDe(a), "Referência": a.referencia || "", "Serralheiro": a.responsavel || (ehSerralheria(a) ? "Não Atribuído" : ""), "Status": ehSerralheria(a) ? a.status : (ROTULO_STATUS_OUTROS[a.status] || a.status), "Follow-ups": (a.followups || []).map(f => `${fmtDataHora(f.data)} - ${f.autor}: ${f.texto}`).join(' | '),
+                "Setor": setorDe(a), "Serralheiro": a.responsavel || (ehSerralheria(a) ? "Não Atribuído" : ""), "Status": ehSerralheria(a) ? a.status : (ROTULO_STATUS_OUTROS[a.status] || a.status), "Follow-ups": (a.followups || []).map(f => `${fmtDataHora(f.data)} - ${f.autor}: ${f.texto}`).join(' | '),
                 "Data Início": a.dataInicio ? a.dataInicio.split('-').reverse().join('/') : "",
                 "Prazo Conclusão": a.dataFim ? a.dataFim.split('-').reverse().join('/') : ""
             }));
@@ -950,12 +992,11 @@
             if (!t) form.reset();
             document.getElementById('task-setor').value = setor;
             document.getElementById('area-gestor').style.display = (gestor && ehSerr) ? 'block' : 'none';
-            document.getElementById('area-referencia').classList.toggle('hidden', ehSerr);
-            document.getElementById('area-followup').classList.toggle('hidden', ehSerr || !t);
+                        document.getElementById('area-followup').classList.toggle('hidden', ehSerr || !t);
             document.getElementById('area-followup-gestor').classList.toggle('hidden', !gestor);
             const badge = ehSerr ? '' : `<span class="ml-2 text-[10px] font-bold bg-[#009FE3]/10 text-brand-cyan border border-[#009FE3]/20 px-2 py-0.5 rounded">${esc(setor)}</span>`;
             document.getElementById('modal-title').innerHTML = `<i class="ph ${SETORES[setor] ? SETORES[setor].icone : 'ph-file-text'} text-brand-cyan"></i> ${t ? 'Detalhes da Solicitação' : 'Nova Solicitação'}${badge}`;
-            document.getElementById('novo-followup').value = ''; document.getElementById('task-referencia').value = t ? (t.referencia || '') : '';
+            document.getElementById('novo-followup').value = '';
             try { document.getElementById('followup-autor').value = localStorage.getItem('autorFollowupGestor') || ''; } catch (e) {}
             if (t) {
                 document.getElementById('task-id').value = t.id; document.getElementById('task-cadastro').value = t.dataCadastro || t.id;
@@ -1019,8 +1060,8 @@
             Chart.defaults.plugins.datalabels.color = '#fff'; Chart.defaults.plugins.datalabels.font = { weight: 'bold', size: 10 }; const optsRosca = { formatter: (v, ctx) => { let s = ctx.dataset.data.reduce((a,b)=>a+b,0); return v > 0 ? ((v*100)/s).toFixed(0)+'%' : ''; } };
             const mkPie = (id, lbs, dat, bg) => new Chart(document.getElementById(id), { type: 'doughnut', data: { labels: lbs, datasets: [{ data: dat, backgroundColor: bg, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels:{boxWidth:10, font:{size:10}} }, datalabels: optsRosca } } });
             
-            graficosCriados.status = mkPie('chartStatus', ['Realizado', 'Não Iniciado', 'Andamento'], [filts.filter(a=>a.status==='REALIZADO').length, filts.filter(a=>a.status==='NÃO INICIADO').length, filts.filter(a=>a.status==='EM ANDAMENTO').length], [CORES.green, CORES.navy, CORES.orange]);
-            const agr = (c, s=true, src=filts) => { const ct={}; src.forEach(a=>{ let v=a[c]||'NÃO INFORMADO'; if(!ct[v]) ct[v]=s?{r:0,p:0,t:0}:0; if(s){ if(a.status==='REALIZADO') ct[v].r++; else ct[v].p++; ct[v].t++; }else ct[v]++; }); return ct; };
+            graficosCriados.status = mkPie('chartStatus', ['Realizado', 'Não Iniciado', 'Andamento', 'Cancelada'], [filts.filter(a=>a.status==='REALIZADO').length, filts.filter(a=>a.status==='NÃO INICIADO').length, filts.filter(a=>a.status==='EM ANDAMENTO').length, filts.filter(a=>a.status==='CANCELADA').length], [CORES.green, CORES.navy, CORES.orange, '#94a3b8']);
+            const agr = (c, s=true, src=filts) => { const ct={}; src.forEach(a=>{ let v=a[c]||'NÃO INFORMADO'; if(!ct[v]) ct[v]=s?{r:0,p:0,t:0}:0; if(s){ if(a.status==='REALIZADO') ct[v].r++; else if(a.status!=='CANCELADA') ct[v].p++; ct[v].t++; }else ct[v]++; }); return ct; };
             const mS = agr('responsavel', false, filts.filter(ehSerralheria)); graficosCriados.serralheiros = mkPie('chartSerralheiro', Object.keys(mS).length?Object.keys(mS):['Vazio'], Object.keys(mS).length?Object.values(mS):[1], [CORES.cyan, '#84cc16', CORES.orange, '#94a3b8']);
             const mP = agr('criticidade', false); graficosCriados.prioridade = mkPie('chartPrioridade', ['Alta', 'Média', 'Baixa'], [mP['Alta']||0, mP['Média']||0, mP['Baixa']||0], [CORES.red, CORES.amber, CORES.cyan]);
 
@@ -1090,23 +1131,23 @@
                 if (termo) { const str = (Object.values(a).join(' ') + ' ' + (a.followups || []).map(f => f.texto).join(' ')).toUpperCase(); if (!str.includes(termo)) return false; }
                 
                 if(filtroBacklogAtivo === 'todos') return true;
-                if(filtroBacklogAtivo === 'sem_tratativa') return a.status !== 'REALIZADO' && !(a.followups && a.followups.length);
+                if(filtroBacklogAtivo === 'sem_tratativa') return a.status !== 'REALIZADO' && a.status !== 'CANCELADA' && !(a.followups && a.followups.length);
                 if(filtroBacklogAtivo === 'aguardando_gestor') return a.status !== 'REALIZADO' && (!a.responsavel || !a.dataInicio);
                 if(filtroBacklogAtivo === 'criticas_atrasadas') { 
-                    if(a.status === 'REALIZADO') return false; 
+                    if(a.status === 'REALIZADO' || a.status === 'CANCELADA') return false; 
                     if(a.criticidade === 'Alta') return true; 
                     let d = a.dataCadastro ? new Date(a.dataCadastro) : new Date(parseInt(a.id)); 
                     return Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5; 
                 }
                 return true;
             }).sort((a, b) => {
-                const sC = (i) => { if(i.status === 'REALIZADO') return -100; if(i.criticidade === 'Alta') return 50; let d = i.dataCadastro ? new Date(i.dataCadastro) : new Date(parseInt(i.id)); if(Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5) return 40; if(ehSerralheria(i) ? (!i.responsavel || !i.dataInicio) : !(i.followups && i.followups.length)) return 30; return 0; };
+                const sC = (i) => { if(i.status === 'REALIZADO' || i.status === 'CANCELADA') return -100; if(i.criticidade === 'Alta') return 50; let d = i.dataCadastro ? new Date(i.dataCadastro) : new Date(parseInt(i.id)); if(Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5) return 40; if(ehSerralheria(i) ? (!i.responsavel || !i.dataInicio) : !(i.followups && i.followups.length)) return 30; return 0; };
                 return sC(b) - sC(a);
             });
         }
 
         function renderizarTabela() {
-            const tbody = document.getElementById('tabela-atividades'); if(!tbody) return; tbody.innerHTML = '';
+            const tbody = document.getElementById('tabela-atividades'); if(!tbody) return; tbody.innerHTML = ''; renderizarIndicadoresOutros();
             const exibidas = aplicarFiltrosBacklog();
             
             const btnP = document.getElementById('btn-prev'); const btnN = document.getElementById('btn-next'); const inf = document.getElementById('info-paginacao');
@@ -1161,6 +1202,30 @@
             html += `</tbody></table></div>`;
             document.getElementById('resultado-relatorio').innerHTML = html; document.getElementById('resultado-relatorio').classList.remove('hidden'); document.getElementById('btn-copiar-email').classList.remove('hidden'); document.getElementById('btn-copiar-email').classList.add('flex');
         }
+        function gerarRelatorioOutros() {
+            const fSet = document.getElementById('rel-outros-setor').value;
+            const idade = a => Math.floor((Date.now() - (a.dataCadastro ? new Date(a.dataCadastro) : new Date(parseInt(a.id))).getTime()) / 86400000);
+            const abertas = atividades.filter(a => !ehSerralheria(a) && a.status !== 'REALIZADO' && a.status !== 'CANCELADA' && (fSet === 'TODOS' || setorDe(a) === fSet));
+            const peso = { 'Alta': 0, 'Média': 1, 'Baixa': 2 };
+            const c = 'border: 1px solid #000; padding: 4px;';
+            const cab = (cor, cols) => `<thead><tr style="background-color: ${cor}; text-align: center; font-weight: bold;">${cols.map(x => `<th style="${c}">${x}</th>`).join('')}</tr></thead>`;
+            const chaves = Object.keys(SETORES).filter(k => k !== SETOR_PADRAO && (fSet === 'TODOS' || k === fSet));
+            const semFU = a => !(a.followups && a.followups.length);
+            let html = `<div style="font-family: Arial, sans-serif; font-size: 12px; color: #000;"><p>Boa tarde a todos.</p><p>Segue o acompanhamento semanal das pendências em aberto com os setores, posição de ${new Date().toLocaleDateString('pt-BR')}.</p><p>Pedimos que os setores informem a situação das tratativas para atualização do controle.</p><br>`;
+            html += `<p style="background-color: #00B0F0; display: inline-block; font-weight: bold; margin-bottom: 2px;">RESUMO POR SETOR:</p><table style="border-collapse: collapse; width: 100%; font-size: 11px; margin-bottom: 20px;">${cab('#BDD7EE', ['SETOR', 'EM ABERTO', 'SEM TRATATIVA', 'CRÍTICAS', 'MAIS ANTIGA (DIAS)'])}<tbody>`;
+            chaves.forEach(k => { const l = abertas.filter(a => setorDe(a) === k); html += `<tr><td style="${c}">${SETORES[k].rotulo}</td><td style="${c} text-align: center;">${l.length}</td><td style="${c} text-align: center;">${l.filter(semFU).length}</td><td style="${c} text-align: center;">${l.filter(a => a.criticidade === 'Alta').length}</td><td style="${c} text-align: center;">${l.length ? Math.max(...l.map(idade)) : '-'}</td></tr>`; });
+            html += '</tbody></table>';
+            chaves.forEach(k => {
+                const l = abertas.filter(a => setorDe(a) === k).sort((a, b) => (peso[a.criticidade] ?? 2) - (peso[b.criticidade] ?? 2) || idade(b) - idade(a)); if (!l.length) return;
+                html += `<p style="background-color: #FFFF00; display: inline-block; font-weight: bold; margin-bottom: 2px;">${SETORES[k].rotulo.toUpperCase()} (${l.length}):</p><table style="border-collapse: collapse; width: 100%; font-size: 11px; margin-bottom: 20px;">${cab('#FFFF00', ['ATIVIDADE', 'LOCAL', 'SOLICITANTE', 'CRITICIDADE', 'STATUS', 'ABERTA HÁ (DIAS)', 'ÚLTIMO FOLLOW-UP'])}<tbody>`;
+                html += l.map(a => { const u = (a.followups || []).slice(-1)[0]; return `<tr><td style="${c}">${esc(a.descricao)}</td><td style="${c}">${esc(a.maquina)}${a.local ? ' - ' + esc(a.local) : ''}</td><td style="${c}">${esc(a.solicitante)}</td><td style="${c} text-align: center;">${esc(a.criticidade || 'Baixa')}</td><td style="${c} text-align: center;">${ROTULO_STATUS_OUTROS[a.status] || ''}</td><td style="${c} text-align: center;">${idade(a)}</td><td style="${c}">${u ? new Date(u.data).toLocaleDateString('pt-BR') + ' - ' + esc(u.autor) + ': ' + esc(u.texto) : '<b style="color: #C00000;">Sem tratativa</b>'}</td></tr>`; }).join('');
+                html += '</tbody></table>';
+            });
+            if (!abertas.length) html += '<p>Nenhuma pendência em aberto para o setor selecionado.</p>';
+            html += '</div>';
+            const out = document.getElementById('resultado-relatorio-outros'); out.innerHTML = html; out.classList.remove('hidden'); document.getElementById('btn-copiar-outros').classList.remove('hidden'); document.getElementById('btn-copiar-outros').classList.add('flex');
+        }
+        function copiarRelatorioOutros() { const range = document.createRange(); range.selectNode(document.getElementById('resultado-relatorio-outros')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); try { document.execCommand('copy'); const b = document.getElementById('btn-copiar-outros'); const o = b.innerHTML; b.innerHTML = '<i class="ph ph-check text-lg"></i> Copiado!'; setTimeout(() => { b.innerHTML = o; }, 2500); } catch (err) { alert('Falha ao copiar.'); } window.getSelection().removeAllRanges(); }
         function copiarTabelasParaEmail() { const range = document.createRange(); range.selectNode(document.getElementById('resultado-relatorio')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); try { document.execCommand('copy'); const btn = document.getElementById('btn-copiar-email'); const h = btn.innerHTML; btn.innerHTML = '<i class="ph ph-check text-lg"></i> Copiado!'; btn.classList.replace('bg-emerald-500', 'bg-emerald-700'); setTimeout(() => { btn.innerHTML = h; btn.classList.replace('bg-emerald-700', 'bg-emerald-500'); }, 2500); } catch (err) { alert('Falha ao copiar.'); } window.getSelection().removeAllRanges(); }
     </script>
 </body>
