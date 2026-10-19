@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão da Serralheria</title>
+    <title>Gestão de Melhorias</title>
     
     <!-- Link para o Favicon -->
     <link rel="icon" type="image/jpeg" href="favicon.jpg">
@@ -52,8 +52,8 @@
 
     <aside class="w-64 bg-brand-navy text-white flex flex-col h-full shadow-2xl z-10 shrink-0">
         <div class="p-5 text-center border-b border-white/10 bg-brand-navy-dark">
-            <h1 class="text-xl font-bold text-white flex items-center justify-center gap-2">
-                <i class="ph ph-wrench text-2xl text-brand-cyan"></i> Serralheria
+            <h1 class="text-lg font-bold text-white flex items-center justify-center gap-2">
+                <i class="ph ph-kanban text-2xl text-brand-cyan"></i> Gestão de Melhorias
             </h1>
             <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-semibold">Produção Área 02</p>
         </div>
@@ -75,11 +75,11 @@
                 </li>
                 <li>
                     <button onclick="changeTab('atividades')" id="btn-atividades" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover:bg-white/10 text-slate-300 transition font-medium text-sm">
-                        <i class="ph ph-list-checks text-lg"></i> Backlog & Cadastro
+                        <i class="ph ph-list-checks text-lg"></i> Pendências Serralheria
                     </button>
                 </li>
                 <li>
-                    <button onclick="changeTab('relatorios')" id="btn-relatorios" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover:bg-white/10 text-slate-300 transition font-medium text-sm border border-transparent">
+                    <button onclick="changeTab('outros')" id="btn-outros" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover:bg-white/10 text-slate-300 transition font-medium text-sm"><i class="ph ph-buildings text-lg"></i> Pendências Outros Setores</button></li><li><button onclick="changeTab('relatorios')" id="btn-relatorios" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-left hover:bg-white/10 text-slate-300 transition font-medium text-sm border border-transparent">
                         <i class="ph ph-envelope-simple text-lg"></i> Relatórios & E-mail
                     </button>
                 </li>
@@ -101,13 +101,13 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-slate-200 pb-3 mb-4 gap-4">
                 <div>
                     <h2 class="text-2xl font-black text-brand-navy tracking-tight">Gestão de Melhorias</h2>
-                    <p class="text-xs text-slate-500 mt-0.5 font-medium">Indicadores de desempenho e carga da Serralheria</p>
+                    <p class="text-xs text-slate-500 mt-0.5 font-medium">Indicadores de desempenho e carga das pendências</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="exportarParaPPT()" id="btn-exportar" class="bg-white hover:bg-slate-50 text-brand-navy px-3 py-1.5 rounded-md shadow-sm flex items-center gap-2 transition text-xs font-bold border border-slate-200">
                         <i class="ph ph-camera text-base text-brand-cyan"></i> Exportar Imagem
                     </button>
-                    <button onclick="changeTab('atividades'); abrirModal();" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-md shadow-md font-bold flex items-center gap-2 transition text-xs border border-orange-500">
+                    <button onclick="abrirSelecaoSetor()" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-md shadow-md font-bold flex items-center gap-2 transition text-xs border border-orange-500">
                         <i class="ph ph-plus-circle text-base"></i> Nova Solicitação
                     </button>
                 </div>
@@ -143,7 +143,7 @@
                     </div>
 
                     <div class="flex-1 min-w-[120px]">
-                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Status Geral</label>
+                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Setor</label><select id="filtro-setor-dash" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent"><option value="SERRALHERIA">Serralheria</option><option value="TODOS">Todos os Setores</option><option value="MANUTENÇÃO">Manutenção</option><option value="MANUTENÇÃO CIVIL">Manutenção Civil</option><option value="ELÉTRICA PREDIAL">Elétrica Predial</option><option value="INVESTIMENTO/PROJETO">Investimento/Projeto</option><option value="COMPRA">Compra</option><option value="OUTROS">Outros</option></select></div><div class="flex-1 min-w-[120px]"><label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Status Geral</label>
                         <select id="filtro-status" onchange="atualizarDashboard()" class="w-full text-sm font-semibold outline-none border-b border-slate-300 pb-1 text-slate-700 bg-transparent">
                             <option value="Todos">Todos os Status</option>
                             <option value="NÃO INICIADO">Não Iniciado</option>
@@ -225,8 +225,8 @@
         <section id="atividades" class="tab-content max-w-[1500px] mx-auto">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-slate-200 pb-3">
                 <div>
-                    <h2 class="text-2xl font-black text-brand-navy tracking-tight">Backlog de Atividades</h2>
-                    <p class="text-xs text-slate-500 mt-0.5 font-medium">Gerencie as solicitações, métricas e ordens de serviço</p>
+                    <h2 id="backlog-titulo" class="text-2xl font-black text-brand-navy tracking-tight">Pendências da Serralheria</h2>
+                    <p id="backlog-subtitulo" class="text-xs text-slate-500 mt-0.5 font-medium">Gerencie as solicitações, métricas e ordens de serviço</p>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-2 items-center w-full sm:w-auto">
@@ -235,9 +235,10 @@
                         <button onclick="filtrarBacklog('todos')" id="btn-filtro-todos" class="pill-active px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><i class="ph ph-list-bullets"></i> Todas</button>
                         <button onclick="filtrarBacklog('aguardando_gestor')" id="btn-filtro-aguardando_gestor" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1 text-orange-600"><i class="ph ph-warning"></i> Aguardando Gestor</button>
                         <button onclick="filtrarBacklog('criticas_atrasadas')" id="btn-filtro-criticas_atrasadas" class="px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Críticas / Atrasadas</button>
+                        <button onclick="filtrarBacklog('sem_tratativa')" id="btn-filtro-sem_tratativa" class="hidden px-3 py-1.5 rounded-full border border-slate-300 text-[10px] font-bold text-slate-600 whitespace-nowrap transition bg-white hover:bg-slate-100 shadow-sm flex items-center gap-1 text-orange-600"><i class="ph ph-warning"></i> Sem tratativa</button>
                     </div>
 
-                    <button onclick="abrirModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md shadow-md font-bold flex items-center gap-2 transition text-sm border border-orange-500 whitespace-nowrap shrink-0 w-full sm:w-auto justify-center">
+                    <button onclick="abrirSelecaoSetor()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md shadow-md font-bold flex items-center gap-2 transition text-sm border border-orange-500 whitespace-nowrap shrink-0 w-full sm:w-auto justify-center">
                         <i class="ph ph-plus-circle text-lg"></i> Nova Solicitação
                     </button>
                 </div>
@@ -265,7 +266,7 @@
                         <select id="filtro-maquina-backlog" onchange="resetarPaginaEAtualizar()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700 uppercase"></select>
                     </div>
                     <div>
-                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-users"></i> Responsável</label>
+                        <label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-buildings"></i> Setor Destino</label><select id="filtro-setor-backlog" onchange="resetarPaginaEAtualizar()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700 uppercase"></select></div><div><label class="text-[9px] uppercase font-bold text-slate-400 block mb-0.5"><i class="ph ph-users"></i> Responsável</label>
                         <select id="filtro-resp-backlog" onchange="resetarPaginaEAtualizar()" class="w-full text-xs font-semibold outline-none border border-slate-300 rounded p-1.5 focus:border-brand-cyan bg-slate-50 text-slate-700 uppercase"></select>
                     </div>
                 </div>
@@ -297,9 +298,9 @@
                     <table class="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-brand-navy uppercase text-[10px] font-bold tracking-wider">
-                                <th class="p-3 w-5/12">Detalhes da Atividade & Local</th>
-                                <th class="p-3 w-3/12">Envolvidos & Núcleo</th>
-                                <th class="p-3 w-3/12">Ciclo de Vida (Prazos/Status)</th>
+                                <th id="th-1" class="p-3 w-5/12">Detalhes da Atividade & Local</th>
+                                <th id="th-2" class="p-3 w-3/12">Envolvidos & Núcleo</th>
+                                <th id="th-3" class="p-3 w-3/12">Ciclo de Vida (Prazos/Status)</th>
                                 <th class="p-3 text-center w-1/12">Ações</th>
                             </tr>
                         </thead>
@@ -371,6 +372,16 @@
         </div>
     </div>
 
+    <div id="modal-setor" class="modal-custom fixed inset-0 bg-brand-navy/80 backdrop-blur-sm z-[55] items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border-t-4 border-t-brand-cyan">
+            <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h3 class="text-lg font-bold text-brand-navy">Para qual setor é a solicitação?</h3>
+                <button onclick="fecharSelecaoSetor()" class="text-slate-400 hover:text-red-500 transition bg-white rounded-full p-1.5 border shadow-sm"><i class="ph ph-x text-base"></i></button>
+            </div>
+            <div id="grid-setores" class="p-4 grid grid-cols-2 gap-3"></div>
+        </div>
+    </div>
+
     <div id="modal-foto" class="modal-custom fixed inset-0 bg-brand-navy/90 backdrop-blur-md z-[80] items-center justify-center p-4" onclick="fecharModalFoto()">
         <div class="relative max-w-4xl w-full flex justify-center items-center">
             <button onclick="fecharModalFoto()" class="absolute -top-10 right-0 text-white hover:text-red-400 transition"><i class="ph ph-x-circle text-4xl"></i></button>
@@ -386,7 +397,7 @@
             </div>
             
             <form id="form-atividade" onsubmit="salvarAtividade(event)" class="p-5 space-y-4 overflow-y-auto">
-                <input type="hidden" id="task-id"><input type="hidden" id="task-cadastro"><input type="hidden" id="task-foto-base64">
+                <input type="hidden" id="task-setor" value="SERRALHERIA"><input type="hidden" id="task-id"><input type="hidden" id="task-cadastro"><input type="hidden" id="task-foto-base64">
                 
                 <div class="space-y-3">
                     <div class="border-l-4 border-brand-cyan pl-2 mb-1 flex justify-between items-center"><h4 class="text-xs font-bold text-brand-navy uppercase tracking-wide">Dados da Solicitação</h4></div>
@@ -417,9 +428,22 @@
                             </select>
                         </div>
                     </div>
+                    <div id="area-referencia" class="hidden"><label class="block text-xs font-semibold text-slate-700 mb-1">Nº da OS / SS / Pedido</label><input type="text" id="task-referencia" placeholder="Opcional" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs font-medium"></div>
                     <div><label class="block text-xs font-semibold text-slate-700 mb-1">Criticidade</label><select id="task-criticidade" class="w-full border border-slate-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-white font-medium"><option value="Baixa">Baixa (Padrão)</option><option value="Média">Média (Atenção)</option><option value="Alta">Alta (Urgente)</option></select></div>
                 </div>
 
+                <div id="area-followup" class="hidden space-y-3 pt-3 border-t border-slate-200 mt-3 bg-sky-50/60 p-3 rounded-lg border border-sky-100">
+                    <div class="border-l-4 border-brand-cyan pl-2"><h4 class="text-xs font-bold text-brand-navy uppercase tracking-wide">Acompanhamento da tratativa</h4></div>
+                    <div id="lista-followups" class="space-y-2 max-h-48 overflow-y-auto"></div>
+                    <div id="area-followup-gestor" class="hidden space-y-2 pt-2 border-t border-sky-100">
+                        <span class="bg-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded font-bold tracking-wider">APENAS GESTOR</span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Status da tratativa</label><select id="task-status-outros" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs font-bold text-slate-700"><option value="NÃO INICIADO">Aberto</option><option value="EM ANDAMENTO">Em tratativa</option><option value="REALIZADO">Concluído</option></select></div>
+                            <div><label class="block text-xs font-semibold text-slate-700 mb-1">Seu nome</label><input type="text" id="followup-autor" placeholder="Quem escreve" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 uppercase text-xs font-medium"></div>
+                        </div>
+                        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Novo follow-up</label><textarea id="novo-followup" rows="2" placeholder="Como está a tratativa..." class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs resize-none"></textarea></div>
+                    </div>
+                </div>
                 <div id="area-gestor" class="space-y-3 pt-3 border-t border-slate-200 mt-3 bg-orange-50/50 p-3 rounded-lg border border-orange-100">
                     <div class="border-l-4 border-orange-500 pl-2 flex items-center gap-2 mb-1"><h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Planejamento</h4><span class="bg-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded font-bold tracking-wider">APENAS GESTOR</span></div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -481,6 +505,80 @@
 
         const LISTA_MAQUINAS = ["ARTICULADA 01", "ARTICULADA 02", "ARTICULADA 03", "ARTICULADAS", "BOBININHA 01", "BOBININHA 02", "BOBININHA 03", "CAIXILHO 02", "CAIXILHO 03", "CARPINTARIA", "EMBALAGEM", "ESTOQUE/BERÇO", "RECLASSIFICADOS", "ROLINHOS", "SERRALHERIA", "SLITTER 01", "SLITTER 02", "SLITTER 03", "SLITTER 04", "TRANSVERSAL 01", "TRANSVERSAL 02", "TRANSVERSAL 03", "TRANSVERSAL 04", "TRANSVERSAL 05", "OUTRO"];
         const LISTA_NUCLEOS = ["ATC", "CORRETIVA", "DTO", "GIGA", "HORA DA SEGURANÇA", "INSPEÇÃO DE SEGURANÇA", "MELHORIA", "OCORRÊNCIA DE SEGURANÇA", "OST", "OST PRIORITÁRIA", "OUTROS"];
+        const SETOR_PADRAO = 'SERRALHERIA';
+        const SETORES = {
+            'SERRALHERIA': { rotulo: 'Serralheria', icone: 'ph-wrench' },
+            'MANUTENÇÃO': { rotulo: 'Manutenção', icone: 'ph-gear' },
+            'MANUTENÇÃO CIVIL': { rotulo: 'Manutenção Civil', icone: 'ph-hard-hat' },
+            'ELÉTRICA PREDIAL': { rotulo: 'Elétrica Predial', icone: 'ph-lightning' },
+            'INVESTIMENTO/PROJETO': { rotulo: 'Investimento/Projeto', icone: 'ph-chart-line-up' },
+            'COMPRA': { rotulo: 'Compra', icone: 'ph-shopping-cart' },
+            'OUTROS': { rotulo: 'Outros', icone: 'ph-dots-three-circle' }
+        };
+        const ROTULO_STATUS_OUTROS = { 'NÃO INICIADO': 'Aberto', 'EM ANDAMENTO': 'Em tratativa', 'REALIZADO': 'Concluído' };
+        let contextoBacklog = 'serralheria';
+        let contextoRenderizado = null;
+        const setorDe = a => a.setor || SETOR_PADRAO;
+        const ehSerralheria = a => setorDe(a) === SETOR_PADRAO;
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        function fmtDataHora(iso) { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
+        function verFotoPorId(id) { const a = atividades.find(x => x.id === id); if (a) verFoto(a.fotoBase64); }
+
+        function abrirSelecaoSetor() {
+            document.getElementById('grid-setores').innerHTML = Object.entries(SETORES).map(([k, s]) =>
+                `<button type="button" onclick="escolherSetor('${k}')" class="flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-200 hover:border-brand-cyan hover:bg-[#009FE3]/5 transition text-sm font-bold text-brand-navy ${k === SETOR_PADRAO ? 'col-span-2 bg-slate-50' : ''}"><i class="ph ${s.icone} text-2xl text-brand-cyan"></i>${s.rotulo}</button>`).join('');
+            document.getElementById('modal-setor').classList.add('active');
+        }
+        function fecharSelecaoSetor() { document.getElementById('modal-setor').classList.remove('active'); }
+        function escolherSetor(k) { fecharSelecaoSetor(); abrirModal(null, k); }
+
+        function renderizarFollowups(lista) {
+            const el = document.getElementById('lista-followups');
+            if (!lista || !lista.length) { el.innerHTML = '<p class="text-[11px] text-slate-400 italic">Nenhum follow-up registrado ainda.</p>'; return; }
+            el.innerHTML = lista.slice().reverse().map(f => `<div class="bg-white border border-sky-100 rounded-lg p-2"><div class="flex justify-between text-[10px] text-slate-500 mb-1"><span class="font-bold text-brand-navy"><i class="ph ph-user-circle"></i> ${esc(f.autor || 'GESTOR')}</span><span>${fmtDataHora(f.data)}</span></div><div class="text-xs text-slate-700 whitespace-pre-line">${esc(f.texto)}</div></div>`).join('');
+        }
+
+        function atualizarVisibilidadeImportacao() { document.getElementById('btn-import-container').classList.toggle('hidden', !(perfilAtual === 'gestor' && contextoBacklog === 'serralheria')); }
+
+        function prepararContextoBacklog() {
+            const outros = contextoBacklog === 'outros';
+            document.getElementById('backlog-titulo').innerText = outros ? 'Pendências de Outros Setores' : 'Pendências da Serralheria';
+            document.getElementById('backlog-subtitulo').innerText = outros ? 'Pendências solicitadas a Manutenção, Civil, Elétrica Predial, Investimento/Projeto e Compra' : 'Gerencie as solicitações, métricas e ordens de serviço';
+            document.getElementById('th-1').innerText = outros ? 'Solicitação & Último Follow-up' : 'Detalhes da Atividade & Local';
+            document.getElementById('th-2').innerText = outros ? 'Solicitante & Setor' : 'Envolvidos & Núcleo';
+            document.getElementById('th-3').innerText = outros ? 'Status da Tratativa' : 'Ciclo de Vida (Prazos/Status)';
+            document.getElementById('btn-filtro-aguardando_gestor').classList.toggle('hidden', outros);
+            document.getElementById('btn-filtro-sem_tratativa').classList.toggle('hidden', !outros);
+            document.getElementById('filtro-resp-backlog').parentElement.classList.toggle('hidden', outros);
+            const selSetor = document.getElementById('filtro-setor-backlog');
+            if (!selSetor.options.length) selSetor.innerHTML = '<option value="TODOS">Todos os Setores</option>' + Object.keys(SETORES).filter(k => k !== SETOR_PADRAO).map(k => `<option value="${k}">${SETORES[k].rotulo}</option>`).join('');
+            selSetor.parentElement.classList.toggle('hidden', !outros);
+            const st = document.getElementById('filtro-status-backlog'); const v = st.value;
+            st.innerHTML = outros ? '<option value="TODOS">Todos</option><option value="NÃO INICIADO">Aberto</option><option value="EM ANDAMENTO">Em tratativa</option><option value="REALIZADO">Concluído</option>' : '<option value="TODOS">Todos</option><option value="NÃO INICIADO">Não Iniciado</option><option value="EM ANDAMENTO">Em Andamento</option><option value="REALIZADO">Realizado</option>';
+            st.value = v;
+            atualizarVisibilidadeImportacao();
+            const mudou = contextoRenderizado !== contextoBacklog; contextoRenderizado = contextoBacklog;
+            if (mudou) limparFiltrosBacklog(); else resetarPaginaEAtualizar();
+        }
+
+        function montarLinhaOutros(t) {
+            const dCad = t.dataCadastro ? new Date(t.dataCadastro) : new Date(parseInt(t.id));
+            let dias = ''; 
+            if (t.status !== 'REALIZADO') { const n = Math.floor(Math.abs(Date.now() - dCad.getTime()) / 86400000); const cor = n >= 7 ? 'bg-red-100 text-red-700 border-red-200' : (n >= 3 ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-600 border-slate-200'); dias = `<span class="${cor} border text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-clock"></i> ${n === 0 ? 'Aberto hoje' : 'Aberto há ' + n + (n === 1 ? ' dia' : ' dias')}</span>`; }
+            else dias = '<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-check-circle"></i> Concluído</span>';
+            const sCls = t.status === 'REALIZADO' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : (t.status === 'EM ANDAMENTO' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-[#002855]/10 text-[#002855] border-[#002855]/20');
+            const cCls = t.criticidade === 'Alta' ? 'text-red-600 bg-red-50 border-red-200' : (t.criticidade === 'Média' ? 'text-amber-600 bg-amber-50 border-amber-200' : 'text-slate-400 bg-slate-100 border-slate-200');
+            const fus = t.followups || []; const ult = fus[fus.length - 1];
+            const fuHtml = ult ? `<div class="mt-2 text-[10px] bg-sky-50 border border-sky-100 rounded p-1.5"><div class="font-bold text-brand-navy mb-0.5"><i class="ph ph-chat-circle-text text-brand-cyan"></i> ${esc(ult.autor || 'GESTOR')} em ${fmtDataHora(ult.data)}</div><div class="text-slate-600 line-clamp-2 group-hover:line-clamp-none">${esc(ult.texto)}</div></div>` : (t.status !== 'REALIZADO' ? '<div class="mt-2 text-[10px] text-amber-600 italic"><i class="ph ph-hourglass"></i> Aguardando o primeiro follow-up</div>' : '');
+            const tr = document.createElement('tr'); tr.className = 'hover:bg-slate-50 transition group border-b border-slate-100';
+            tr.innerHTML = `
+                <td class="p-3 align-top border-r border-slate-100"><div class="flex items-center gap-2 mb-1.5 flex-wrap"><div class="text-[13px] font-bold text-brand-navy leading-tight">${esc(t.descricao)}</div><span class="text-[9px] border font-bold px-1.5 py-0.5 rounded ${cCls}">${esc(t.criticidade || 'Baixa')}</span>${t.fotoBase64 ? `<button onclick="verFotoPorId('${t.id}')" class="text-brand-cyan bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 text-[10px] font-bold flex items-center gap-1"><i class="ph ph-image text-sm"></i> Foto</button>` : ''}</div><div class="flex items-center gap-3 text-[10px] text-slate-500 flex-wrap"><span class="flex items-center gap-1 font-semibold"><i class="ph ph-wrench text-brand-cyan"></i> ${esc(t.maquina)}</span><span class="flex items-center gap-1"><i class="ph ph-map-pin"></i> ${esc(t.local || '-')}</span>${t.referencia ? `<span class="font-bold text-brand-navy bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">Ref: ${esc(t.referencia)}</span>` : ''}</div>${t.diretriz ? `<div class="text-[10px] text-slate-500 mt-2 bg-slate-50 p-1.5 rounded border border-slate-100 line-clamp-1 group-hover:line-clamp-none"><i class="ph ph-chat-text text-brand-cyan"></i> ${esc(t.diretriz)}</div>` : ''}${fuHtml}</td>
+                <td class="p-3 align-top border-r border-slate-100"><div class="text-xs font-bold text-brand-navy mb-2">${esc(t.solicitante)}</div><div class="flex flex-col gap-1 text-[10px]"><span class="font-bold text-brand-cyan bg-[#009FE3]/10 px-1.5 py-0.5 rounded border border-[#009FE3]/20 w-max">${esc(setorDe(t))}</span>${t.nucleo ? `<span class="text-slate-500">${esc(t.nucleo)}</span>` : ''}</div></td>
+                <td class="p-3 align-top"><div class="flex flex-col gap-2"><span class="px-2 py-1 rounded-md text-[9px] font-bold tracking-widest flex w-max uppercase border ${sCls}">${ROTULO_STATUS_OUTROS[t.status] || esc(t.status)}</span>${dias}<span class="text-[9px] text-slate-500 font-medium"><i class="ph ph-calendar-plus"></i> Cadastro: ${dCad.toLocaleDateString('pt-BR')}</span><span class="text-[9px] text-slate-500 font-medium"><i class="ph ph-chat-circle-text"></i> ${fus.length} follow-up(s)</span></div></td>
+                <td class="p-3 text-center align-middle"><div class="flex flex-col items-center justify-center gap-2 opacity-30 group-hover:opacity-100 transition"><button onclick="abrirModal('${t.id}')" class="p-1.5 bg-white text-slate-600 border border-slate-200 rounded hover:bg-slate-100 hover:text-brand-cyan transition shadow-sm w-full flex justify-center" title="${perfilAtual === 'gestor' ? 'Acompanhar / Editar' : 'Ver / Editar'}"><i class="ph ph-pencil-simple text-lg"></i></button>${perfilAtual === 'gestor' ? `<button onclick="abrirModalExclusao('${t.id}')" class="p-1.5 bg-white text-slate-400 border border-slate-200 rounded hover:bg-red-50 hover:text-red-500 transition shadow-sm" title="Excluir"><i class="ph ph-trash text-lg"></i></button>` : ''}</div></td>`;
+            return tr;
+        }
+
         const CORES = { navy: '#002855', cyan: '#009FE3', orange: '#f97316', green: '#10b981', red: '#ef4444', amber: '#facc15' };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -488,6 +586,7 @@
             popularFiltroMaquinaBacklog();
             popularSelectNucleos();
             preencherDatasPadraoRelatorio();
+            prepararContextoBacklog();
             carregarCacheLocal();
             sincronizarTudoBackground();
         });
@@ -558,7 +657,7 @@
                             solicitante: String(row["Solicitante"] || "NÃO INFORMADO").toUpperCase(),
                             nucleo: String(row["Núcleo"] || row["Nucleo"] || "OUTROS").toUpperCase(),
                             criticidade: String(row["Criticidade"] || "Baixa"),
-                            fotobase64: "", 
+                            fotobase64: "", setor: 'SERRALHERIA', referencia: '', followups: [], 
                             responsavel: String(row["Serralheiro"] || row["Responsável"] || "").toUpperCase(),
                             status: String(row["Status"] || "NÃO INICIADO").toUpperCase(),
                             datainicio: formatarDataExcel(row["Data Início"] || row["Inicio"]),
@@ -684,7 +783,7 @@
 
         function converterDBParaLocal(item) {
             return {
-                id: item.id, dataCadastro: item.datacadastro, descricao: item.descricao, diretriz: item.diretriz, maquina: item.maquina, local: item.local, solicitante: item.solicitante, nucleo: item.nucleo, criticidade: item.criticidade, fotoBase64: item.fotobase64, responsavel: item.responsavel, dataInicio: item.datainicio, dataFim: item.datafim, status: item.status
+                id: item.id, dataCadastro: item.datacadastro, descricao: item.descricao, diretriz: item.diretriz, maquina: item.maquina, local: item.local, solicitante: item.solicitante, nucleo: item.nucleo, criticidade: item.criticidade, fotoBase64: item.fotobase64, responsavel: item.responsavel, dataInicio: item.datainicio, dataFim: item.datafim, status: item.status, setor: item.setor || SETOR_PADRAO, referencia: item.referencia || '', followups: Array.isArray(item.followups) ? item.followups : []
             };
         }
 
@@ -702,7 +801,8 @@
             const idForm = document.getElementById('task-id').value; 
             
             // VERIFICAÇÃO DE SIMILARIDADE
-            const pendentes = atividades.filter(a => a.maquina === maq && a.status !== 'REALIZADO' && a.id !== idForm);
+            const setor = document.getElementById('task-setor').value || SETOR_PADRAO; const ehSerr = setor === SETOR_PADRAO;
+            const pendentes = atividades.filter(a => a.maquina === maq && a.status !== 'REALIZADO' && a.id !== idForm && setorDe(a) === setor);
             for (let p of pendentes) {
                 let sim = calcularSimilaridade(desc, p.descricao);
                 if (sim >= 0.6) {
@@ -712,7 +812,10 @@
                 }
             }
 
-            let atvAtual = idForm ? atividades.find(a => a.id === idForm) : {};
+            let atvAtual = idForm ? (atividades.find(a => a.id === idForm) || {}) : {};
+            let followups = Array.isArray(atvAtual.followups) ? atvAtual.followups.slice() : [];
+            const textoFU = (perfilAtual === 'gestor' && !ehSerr) ? document.getElementById('novo-followup').value.trim() : '';
+            if (textoFU) { const autorFU = (document.getElementById('followup-autor').value.trim() || 'GESTOR').toUpperCase(); try { localStorage.setItem('autorFollowupGestor', autorFU); } catch (e) {} followups.push({ data: new Date().toISOString(), autor: autorFU, texto: textoFU }); }
             const dbObj = {
                 id: idForm ? idForm : Date.now().toString() + "-" + Math.floor(Math.random()*100000),
                 datacadastro: document.getElementById('task-cadastro').value ? document.getElementById('task-cadastro').value : new Date().toISOString(),
@@ -720,17 +823,18 @@
                 maquina: maq.toUpperCase(), local: document.getElementById('task-local').value.toUpperCase(),
                 solicitante: sol.toUpperCase(), nucleo: nuc, criticidade: document.getElementById('task-criticidade').value,
                 fotobase64: document.getElementById('task-foto-base64').value,
-                responsavel: perfilAtual === 'gestor' ? document.getElementById('task-responsavel').value.toUpperCase() : (atvAtual.responsavel || ''),
-                datainicio: perfilAtual === 'gestor' ? document.getElementById('task-inicio').value : (atvAtual.dataInicio || ''),
-                datafim: perfilAtual === 'gestor' ? document.getElementById('task-fim').value : (atvAtual.dataFim || ''),
-                status: perfilAtual === 'gestor' ? document.getElementById('task-status').value : (atvAtual.status || 'NÃO INICIADO')
+                responsavel: (perfilAtual === 'gestor' && ehSerr) ? document.getElementById('task-responsavel').value.toUpperCase() : (atvAtual.responsavel || ''),
+                datainicio: (perfilAtual === 'gestor' && ehSerr) ? document.getElementById('task-inicio').value : (atvAtual.dataInicio || ''),
+                datafim: (perfilAtual === 'gestor' && ehSerr) ? document.getElementById('task-fim').value : (atvAtual.dataFim || ''),
+                status: perfilAtual === 'gestor' ? (ehSerr ? document.getElementById('task-status').value : document.getElementById('task-status-outros').value) : (atvAtual.status || 'NÃO INICIADO'),
+                setor: setor, referencia: ehSerr ? '' : document.getElementById('task-referencia').value.trim().toUpperCase(), followups: followups
             };
 
             filaSincronizacao = filaSincronizacao.filter(item => item.id !== dbObj.id);
             filaSincronizacao.push(dbObj);
             localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao));
             
-            fecharModal(); carregarCacheLocal(); sincronizarTudoBackground();
+            fecharModal(); if (!idForm) changeTab(ehSerr ? 'atividades' : 'outros'); carregarCacheLocal(); sincronizarTudoBackground();
         }
 
         async function confirmarExclusao() {
@@ -755,7 +859,7 @@
                 "ID/Cadastro": new Date(isNaN(a.dataCadastro||a.id)?(a.dataCadastro||a.id):parseInt(a.dataCadastro||a.id)).toLocaleDateString('pt-BR'),
                 "Atividade": a.descricao, "Diretrizes": a.diretriz, "Máquina": a.maquina, "Local": a.local,
                 "Solicitante": a.solicitante, "Núcleo": a.nucleo, "Criticidade": a.criticidade,
-                "Serralheiro": a.responsavel || "Não Atribuído", "Status": a.status,
+                "Setor": setorDe(a), "Referência": a.referencia || "", "Serralheiro": a.responsavel || (ehSerralheria(a) ? "Não Atribuído" : ""), "Status": ehSerralheria(a) ? a.status : (ROTULO_STATUS_OUTROS[a.status] || a.status), "Follow-ups": (a.followups || []).map(f => `${fmtDataHora(f.data)} - ${f.autor}: ${f.texto}`).join(' | '),
                 "Data Início": a.dataInicio ? a.dataInicio.split('-').reverse().join('/') : "",
                 "Prazo Conclusão": a.dataFim ? a.dataFim.split('-').reverse().join('/') : ""
             }));
@@ -816,7 +920,7 @@
             if (document.getElementById('input-senha').value === 'gac+000') { 
                 perfilAtual = 'gestor'; 
                 document.getElementById('perfil-usuario').value = 'gestor'; 
-                document.getElementById('btn-import-container').classList.remove('hidden'); 
+                atualizarVisibilidadeImportacao(); 
                 resetarPaginaEAtualizar(); 
                 cancelarSenha(); 
             } else { 
@@ -828,33 +932,43 @@
         function cancelarSenha() { document.getElementById('modal-senha').classList.remove('active'); } document.getElementById('input-senha').addEventListener('keypress', function(e) { if (e.key === 'Enter') confirmarSenha(); });
         
         function changeTab(tabName) {
+            const secao = tabName === 'outros' ? 'atividades' : tabName;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('nav button').forEach(btn => { btn.classList.remove('bg-brand-cyan', 'text-white', 'font-bold', 'shadow-md'); btn.classList.add('hover:bg-white/10', 'text-slate-300'); btn.classList.remove('border-transparent'); });
-            document.getElementById(tabName).classList.add('active');
+            document.getElementById(secao).classList.add('active');
             const btn = document.getElementById(`btn-${tabName}`);
             if(btn) { btn.classList.add('bg-brand-cyan', 'text-white', 'font-bold', 'shadow-md'); btn.classList.remove('hover:bg-white/10', 'text-slate-300'); }
+            if (tabName === 'atividades' || tabName === 'outros') { contextoBacklog = tabName === 'outros' ? 'outros' : 'serralheria'; prepararContextoBacklog(); }
             if(tabName === 'dashboard') atualizarDashboard();
         }
 
-        function abrirModal(id = null) {
+        function abrirModal(id = null, setorNovo = null) {
             document.getElementById('modal-overlay').classList.add('active'); document.getElementById('alerta-erro').classList.add('hidden');
-            const form = document.getElementById('form-atividade'); document.getElementById('area-gestor').style.display = (perfilAtual === 'supervisor') ? 'none' : 'block'; removerFoto();
-
-            if (id) {
-                document.getElementById('modal-title').innerHTML = '<i class="ph ph-file-text text-brand-cyan"></i> Detalhes da Solicitação';
-                const t = atividades.find(a => a.id === id); if(!t) return;
+            const form = document.getElementById('form-atividade'); removerFoto();
+            let t = null; if (id) { t = atividades.find(a => a.id === id); if (!t) return; }
+            const setor = t ? setorDe(t) : (setorNovo || SETOR_PADRAO); const ehSerr = setor === SETOR_PADRAO; const gestor = perfilAtual === 'gestor';
+            if (!t) form.reset();
+            document.getElementById('task-setor').value = setor;
+            document.getElementById('area-gestor').style.display = (gestor && ehSerr) ? 'block' : 'none';
+            document.getElementById('area-referencia').classList.toggle('hidden', ehSerr);
+            document.getElementById('area-followup').classList.toggle('hidden', ehSerr || !t);
+            document.getElementById('area-followup-gestor').classList.toggle('hidden', !gestor);
+            const badge = ehSerr ? '' : `<span class="ml-2 text-[10px] font-bold bg-[#009FE3]/10 text-brand-cyan border border-[#009FE3]/20 px-2 py-0.5 rounded">${esc(setor)}</span>`;
+            document.getElementById('modal-title').innerHTML = `<i class="ph ${SETORES[setor] ? SETORES[setor].icone : 'ph-file-text'} text-brand-cyan"></i> ${t ? 'Detalhes da Solicitação' : 'Nova Solicitação'}${badge}`;
+            document.getElementById('novo-followup').value = ''; document.getElementById('task-referencia').value = t ? (t.referencia || '') : '';
+            try { document.getElementById('followup-autor').value = localStorage.getItem('autorFollowupGestor') || ''; } catch (e) {}
+            if (t) {
                 document.getElementById('task-id').value = t.id; document.getElementById('task-cadastro').value = t.dataCadastro || t.id;
                 document.getElementById('task-desc').value = t.descricao || ''; document.getElementById('task-diretriz').value = t.diretriz || '';
                 document.getElementById('task-maquina-form').value = t.maquina || ''; document.getElementById('task-local').value = t.local || '';
                 document.getElementById('task-solicitante').value = t.solicitante || ''; document.getElementById('task-nucleo').value = t.nucleo || '';
                 document.getElementById('task-criticidade').value = t.criticidade || 'Baixa'; document.getElementById('task-responsavel').value = t.responsavel || '';
                 document.getElementById('task-inicio').value = t.dataInicio || ''; document.getElementById('task-fim').value = t.dataFim || ''; document.getElementById('task-status').value = t.status || 'NÃO INICIADO';
+                document.getElementById('task-status-outros').value = t.status || 'NÃO INICIADO'; renderizarFollowups(t.followups);
                 if (t.fotoBase64) { document.getElementById('task-foto-base64').value = t.fotoBase64; document.getElementById('preview-foto').src = t.fotoBase64; document.getElementById('preview-container').classList.remove('hidden'); document.getElementById('nome-arquivo').innerText = "Foto existente"; }
             } else {
-                document.getElementById('modal-title').innerHTML = '<i class="ph ph-file-text text-brand-cyan"></i> Nova Solicitação';
-                if(form) form.reset();
-                document.getElementById('task-id').value = ''; document.getElementById('task-cadastro').value = ''; document.getElementById('task-status').value = 'NÃO INICIADO'; document.getElementById('task-criticidade').value = 'Baixa'; document.getElementById('task-nucleo').value = ''; document.getElementById('task-maquina-form').value = '';
-                if (perfilAtual === 'gestor') { const h = new Date(); h.setMinutes(h.getMinutes() - h.getTimezoneOffset()); document.getElementById('task-inicio').value = h.toISOString().split('T')[0]; }
+                document.getElementById('task-id').value = ''; document.getElementById('task-cadastro').value = ''; document.getElementById('task-status').value = 'NÃO INICIADO'; document.getElementById('task-status-outros').value = 'NÃO INICIADO'; document.getElementById('task-criticidade').value = 'Baixa'; document.getElementById('task-nucleo').value = ''; document.getElementById('task-maquina-form').value = '';
+                if (gestor && ehSerr) { const h = new Date(); h.setMinutes(h.getMinutes() - h.getTimezoneOffset()); document.getElementById('task-inicio').value = h.toISOString().split('T')[0]; }
             }
         }
         function fecharModal() { document.getElementById('modal-overlay').classList.remove('active'); }
@@ -880,10 +994,10 @@
             const aS = document.getElementById('filtro-ano').value; 
             const mDash = document.getElementById('filtro-mes-dash').value; 
             const sS = document.getElementById('filtro-status').value; 
-            const cS = document.getElementById('filtro-criticidade').value;
+            const cS = document.getElementById('filtro-criticidade').value; const stS = document.getElementById('filtro-setor-dash').value;
             
             const filts = atividades.filter(a => { 
-                let mS = (sS === 'Todos') || (a.status === sS); 
+                let mS = (sS === 'Todos') || (a.status === sS); let mSet = (stS === 'TODOS') || (setorDe(a) === stS); 
                 let mC = (cS === 'Todas') || (a.criticidade === cS); 
                 let mA = true; 
                 let mMes = true;
@@ -896,7 +1010,7 @@
                     if(mesStr !== mDash) mMes = false; 
                 }
                 
-                return mS && mC && mA && mMes; 
+                return mS && mC && mA && mMes && mSet; 
             });
 
             document.getElementById('card-total').innerText = filts.length; document.getElementById('card-concluidas').innerText = filts.filter(a => a.status === 'REALIZADO').length; document.getElementById('card-andamento').innerText = filts.filter(a => a.status === 'EM ANDAMENTO').length; document.getElementById('card-nao-iniciadas').innerText = filts.filter(a => a.status === 'NÃO INICIADO').length;
@@ -906,8 +1020,8 @@
             const mkPie = (id, lbs, dat, bg) => new Chart(document.getElementById(id), { type: 'doughnut', data: { labels: lbs, datasets: [{ data: dat, backgroundColor: bg, borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels:{boxWidth:10, font:{size:10}} }, datalabels: optsRosca } } });
             
             graficosCriados.status = mkPie('chartStatus', ['Realizado', 'Não Iniciado', 'Andamento'], [filts.filter(a=>a.status==='REALIZADO').length, filts.filter(a=>a.status==='NÃO INICIADO').length, filts.filter(a=>a.status==='EM ANDAMENTO').length], [CORES.green, CORES.navy, CORES.orange]);
-            const agr = (c, s=true) => { const ct={}; filts.forEach(a=>{ let v=a[c]||'NÃO INFORMADO'; if(!ct[v]) ct[v]=s?{r:0,p:0,t:0}:0; if(s){ if(a.status==='REALIZADO') ct[v].r++; else ct[v].p++; ct[v].t++; }else ct[v]++; }); return ct; };
-            const mS = agr('responsavel', false); graficosCriados.serralheiros = mkPie('chartSerralheiro', Object.keys(mS).length?Object.keys(mS):['Vazio'], Object.keys(mS).length?Object.values(mS):[1], [CORES.cyan, '#84cc16', CORES.orange, '#94a3b8']);
+            const agr = (c, s=true, src=filts) => { const ct={}; src.forEach(a=>{ let v=a[c]||'NÃO INFORMADO'; if(!ct[v]) ct[v]=s?{r:0,p:0,t:0}:0; if(s){ if(a.status==='REALIZADO') ct[v].r++; else ct[v].p++; ct[v].t++; }else ct[v]++; }); return ct; };
+            const mS = agr('responsavel', false, filts.filter(ehSerralheria)); graficosCriados.serralheiros = mkPie('chartSerralheiro', Object.keys(mS).length?Object.keys(mS):['Vazio'], Object.keys(mS).length?Object.values(mS):[1], [CORES.cyan, '#84cc16', CORES.orange, '#94a3b8']);
             const mP = agr('criticidade', false); graficosCriados.prioridade = mkPie('chartPrioridade', ['Alta', 'Média', 'Baixa'], [mP['Alta']||0, mP['Média']||0, mP['Baixa']||0], [CORES.red, CORES.amber, CORES.cyan]);
 
             const mkBar = (id, b, l=null) => { let ar=Object.keys(b).map(k=>({n:k,...b[k]})).sort((x,y)=>y.t-x.t); if(ar.length>1) ar=ar.filter(i=>i.n!=='NÃO INFORMADO'); if(l) ar=ar.slice(0,l); return new Chart(document.getElementById(id), { type: 'bar', data: { labels: ar.map(i=>i.n), datasets: [{ label: 'Não Iniciado/Andamento', data: ar.map(i=>i.p), backgroundColor: CORES.navy, borderRadius:{topLeft:3, bottomLeft:3} }, { label: 'Realizado', data: ar.map(i=>i.r), backgroundColor: CORES.green, borderRadius:{topRight:3, bottomRight:3} }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x:{stacked:true, display:false}, y:{stacked:true, grid:{display:false}, ticks:{font:{size:10}}} }, plugins: { legend: { position: 'top', align: 'start', labels: { boxWidth: 8, usePointStyle: true, font: {size:10} } }, datalabels: { display: (c)=>c.dataset.data[c.dataIndex]>0, align: 'center', anchor: 'center' } } } }); };
@@ -916,7 +1030,7 @@
             // CORREÇÃO DO GRÁFICO HISTÓRICO: Puxar dataRef se a dataFim não existir para unificar visão
             const dadosM = new Array(12).fill(0);
             atividades.forEach(a => { 
-                if(a.status === 'REALIZADO' && ((cS === 'Todas') || (a.criticidade === cS))) {
+                if(a.status === 'REALIZADO' && ((cS === 'Todas') || (a.criticidade === cS)) && (stS === 'TODOS' || setorDe(a) === stS)) {
                     let anoCalc, mesCalc;
                     if (a.dataFim) {
                         anoCalc = a.dataFim.split('-')[0];
@@ -946,7 +1060,7 @@
 
         // TABELA BACKLOG E FILTROS DINÂMICOS
         function filtrarBacklog(filtro) { filtroBacklogAtivo = filtro; document.querySelectorAll('#botoes-filtro-backlog button').forEach(b => b.classList.remove('pill-active')); document.getElementById('btn-filtro-' + filtro).classList.add('pill-active'); resetarPaginaEAtualizar(); }
-        function limparFiltrosBacklog() { document.getElementById('filtro-mes-backlog').value = 'TODOS'; document.getElementById('filtro-status-backlog').value = 'TODOS'; document.getElementById('filtro-maquina-backlog').value = 'TODAS'; document.getElementById('filtro-resp-backlog').value = 'TODOS'; document.getElementById('filtro-busca').value = ''; filtrarBacklog('todos'); }
+        function limparFiltrosBacklog() { document.getElementById('filtro-mes-backlog').value = 'TODOS'; document.getElementById('filtro-status-backlog').value = 'TODOS'; document.getElementById('filtro-maquina-backlog').value = 'TODAS'; document.getElementById('filtro-resp-backlog').value = 'TODOS'; document.getElementById('filtro-setor-backlog').value = 'TODOS'; document.getElementById('filtro-busca').value = ''; filtrarBacklog('todos'); }
         function resetarPaginaEAtualizar() { paginaAtual = 1; renderizarTabela(); }
         function mudarPagina(direcao) { paginaAtual += direcao; renderizarTabela(); }
 
@@ -955,9 +1069,12 @@
             const fStatus = document.getElementById('filtro-status-backlog') ? document.getElementById('filtro-status-backlog').value : 'TODOS';
             const fMes = document.getElementById('filtro-mes-backlog') ? document.getElementById('filtro-mes-backlog').value : 'TODOS';
             const fResp = document.getElementById('filtro-resp-backlog') ? document.getElementById('filtro-resp-backlog').value : 'TODOS';
+            const fSetorB = document.getElementById('filtro-setor-backlog') ? document.getElementById('filtro-setor-backlog').value : 'TODOS';
             const termo = document.getElementById('filtro-busca') ? document.getElementById('filtro-busca').value.toUpperCase() : '';
             
             return atividades.filter(a => {
+                if ((contextoBacklog === 'outros') === ehSerralheria(a)) return false;
+                if (contextoBacklog === 'outros' && fSetorB !== 'TODOS' && setorDe(a) !== fSetorB) return false;
                 if (fMaq !== 'TODAS' && a.maquina !== fMaq) return false;
                 if (fStatus !== 'TODOS' && a.status !== fStatus) return false;
                 if (fResp !== 'TODOS') {
@@ -970,9 +1087,10 @@
                     let yyyy = dataObj.getFullYear();
                     if (`${mm}/${yyyy}` !== fMes) return false;
                 }
-                if (termo) { const str = Object.values(a).join(' ').toUpperCase(); if (!str.includes(termo)) return false; }
+                if (termo) { const str = (Object.values(a).join(' ') + ' ' + (a.followups || []).map(f => f.texto).join(' ')).toUpperCase(); if (!str.includes(termo)) return false; }
                 
                 if(filtroBacklogAtivo === 'todos') return true;
+                if(filtroBacklogAtivo === 'sem_tratativa') return a.status !== 'REALIZADO' && !(a.followups && a.followups.length);
                 if(filtroBacklogAtivo === 'aguardando_gestor') return a.status !== 'REALIZADO' && (!a.responsavel || !a.dataInicio);
                 if(filtroBacklogAtivo === 'criticas_atrasadas') { 
                     if(a.status === 'REALIZADO') return false; 
@@ -982,7 +1100,7 @@
                 }
                 return true;
             }).sort((a, b) => {
-                const sC = (i) => { if(i.status === 'REALIZADO') return -100; if(i.criticidade === 'Alta') return 50; let d = i.dataCadastro ? new Date(i.dataCadastro) : new Date(parseInt(i.id)); if(Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5) return 40; if(!i.responsavel || !i.dataInicio) return 30; return 0; };
+                const sC = (i) => { if(i.status === 'REALIZADO') return -100; if(i.criticidade === 'Alta') return 50; let d = i.dataCadastro ? new Date(i.dataCadastro) : new Date(parseInt(i.id)); if(Math.floor(Math.abs(new Date().getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) >= 5) return 40; if(ehSerralheria(i) ? (!i.responsavel || !i.dataInicio) : !(i.followups && i.followups.length)) return 30; return 0; };
                 return sC(b) - sC(a);
             });
         }
@@ -1005,6 +1123,7 @@
             btnP.disabled = paginaAtual === 1; btnN.disabled = paginaAtual === totalPaginas;
 
             itensPagina.forEach(t => {
+                if (contextoBacklog === 'outros') { tbody.appendChild(montarLinhaOutros(t)); return; }
                 let dCad = t.dataCadastro ? new Date(t.dataCadastro) : new Date(parseInt(t.id)); let dFmt = dCad.toLocaleDateString('pt-BR'); let bgDias = '';
                 if (t.status !== 'REALIZADO') { const dias = Math.floor(Math.abs(new Date().getTime() - dCad.getTime()) / (1000 * 60 * 60 * 24)); let cor = dias >= 7 ? 'bg-red-100 text-red-700 border-red-200' : (dias >= 3 ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-600 border-slate-200'); let tx = dias === 0 ? 'Cadastrado Hoje' : (dias === 1 ? 'Pendente 1 dia' : `Pendente ${dias} dias`); bgDias = `<span class="${cor} border text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-clock"></i> ${tx}</span>`; } else bgDias = `<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 w-max"><i class="ph ph-check-circle"></i> Resolvido</span>`;
 
@@ -1033,8 +1152,8 @@
 
         function gerarRelatorio() {
             const diP = document.getElementById('rel-passada-inicio').value; const dfP = document.getElementById('rel-passada-fim').value; const diA = document.getElementById('rel-atual-inicio').value; const dfA = document.getElementById('rel-atual-fim').value;
-            const aR = atividades.filter(a => a.status === 'REALIZADO' && a.dataFim && a.dataFim >= diP && a.dataFim <= dfP);
-            const aP = atividades.filter(a => a.status !== 'REALIZADO' && a.dataInicio && a.dataInicio >= diA && a.dataInicio <= dfA);
+            const aR = atividades.filter(a => ehSerralheria(a) && a.status === 'REALIZADO' && a.dataFim && a.dataFim >= diP && a.dataFim <= dfP);
+            const aP = atividades.filter(a => ehSerralheria(a) && a.status !== 'REALIZADO' && a.dataInicio && a.dataInicio >= diA && a.dataInicio <= dfA);
             let html = `<div style="font-family: Arial, sans-serif; font-size: 12px; color: #000;"><p>Boa tarde a todos.</p><p>Segue a programação da serralheria para esta semana, juntamente com as atividades realizadas na semana passada.</p><p>Caso surjam demandas urgentes, peço que nos informem para readequação.</p><br><p style="background-color: #00FF00; display: inline-block; font-weight: bold; margin-bottom: 2px;">ATIVIDADES REALIZADAS NA SEMANA PASSADA:</p><table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11px; margin-bottom: 20px;"><thead><tr style="background-color: #92D050; text-align: center; font-weight: bold;"><th style="border: 1px solid #000; padding: 4px;">ATIVIDADES</th><th style="border: 1px solid #000; padding: 4px;">LOCAL</th><th style="border: 1px solid #000; padding: 4px;">DATA INÍCIO</th><th style="border: 1px solid #000; padding: 4px;">DATA FIM</th></tr></thead><tbody>`;
             if (aR.length === 0) html += `<tr><td colspan="4" style="border: 1px solid #000; padding: 4px; text-align: center;">Nenhuma atividade finalizada no período.</td></tr>`; else aR.forEach(t => { html += `<tr><td style="border: 1px solid #000; padding: 4px;">${t.descricao}</td><td style="border: 1px solid #000; padding: 4px;">${t.maquina}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataInicio)}</td><td style="border: 1px solid #000; padding: 4px; text-align: center;">${formataDataBr(t.dataFim)}</td></tr>`; });
             html += `</tbody></table><br><p style="background-color: #FFFF00; display: inline-block; font-weight: bold; margin-bottom: 2px;">ATIVIDADES A SEREM REALIZADAS ESSA SEMANA:</p><table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 11px;"><thead><tr style="background-color: #FFFF00; text-align: center; font-weight: bold;"><th style="border: 1px solid #000; padding: 4px;">ATIVIDADES</th><th style="border: 1px solid #000; padding: 4px;">LOCAL</th><th style="border: 1px solid #000; padding: 4px;">DATA INÍCIO</th><th style="border: 1px solid #000; padding: 4px;">DATA FIM</th></tr></thead><tbody>`;
