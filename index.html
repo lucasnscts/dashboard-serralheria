@@ -433,6 +433,41 @@
         </section>
     </main>
 
+    <!-- !!! MODAIS CRÍTICOS RESTAURADOS !!! -->
+
+    <!-- MODAL DE SENHA -->
+    <div id="modal-senha" class="modal-custom fixed inset-0 bg-brand-navy/90 backdrop-blur-sm z-[70] items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden p-6 text-center border-t-4 border-t-brand-cyan">
+            <i class="ph ph-lock-key text-5xl text-brand-cyan mb-2"></i><h3 class="text-xl font-bold text-brand-navy mb-1">Acesso Restrito</h3>
+            <p class="text-xs text-slate-500 mb-5">Insira a senha para acessar as funções de gestor.</p>
+            <input type="password" id="input-senha" placeholder="••••••••" class="w-full border border-slate-300 rounded-lg p-3 mb-5 text-center text-xl tracking-[0.3em] outline-none focus:border-brand-cyan bg-slate-50 transition shadow-inner">
+            <div class="flex gap-2 justify-center">
+                <button onclick="cancelarSenha()" class="px-4 py-2.5 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg w-full text-sm font-bold transition">Cancelar</button>
+                <button onclick="confirmarSenha()" class="px-4 py-2.5 text-white bg-orange-500 hover:bg-orange-600 rounded-lg w-full text-sm font-bold shadow transition"><i class="ph ph-key inline-block"></i> Acessar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE FOTO -->
+    <div id="modal-foto" class="modal-custom fixed inset-0 bg-brand-navy/90 backdrop-blur-md z-[80] items-center justify-center p-4" onclick="fecharModalFoto()">
+        <div class="relative max-w-4xl w-full flex justify-center items-center">
+            <button onclick="fecharModalFoto()" class="absolute -top-10 right-0 text-white hover:text-red-400 transition"><i class="ph ph-x-circle text-4xl"></i></button>
+            <img id="imagem-ampliada" src="" class="max-h-[85vh] rounded-lg shadow-2xl border-4 border-white/20 object-contain">
+        </div>
+    </div>
+
+    <!-- MODAL DE EXCLUSÃO -->
+    <div id="modal-exclusao" class="modal-custom fixed inset-0 bg-brand-navy/80 backdrop-blur-sm z-[60] items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden p-6 text-center border-t-4 border-red-500">
+            <div class="w-14 h-14 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3"><i class="ph ph-warning-circle text-3xl"></i></div>
+            <h3 class="text-lg font-bold text-brand-navy mb-1">Excluir Atividade?</h3><p class="text-slate-500 text-xs mb-5">Esta ação não pode ser desfeita.</p><input type="hidden" id="id-para-excluir">
+            <div class="flex gap-2 justify-center">
+                <button onclick="fecharModalExclusao()" class="px-4 py-2 font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition w-full text-sm">Cancelar</button>
+                <button onclick="confirmarExclusao()" class="px-4 py-2 font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition shadow w-full text-sm">Sim, excluir</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL DE CADASTRO/EDIÇÃO UNIFICADO -->
     <div id="modal-overlay" class="modal-custom fixed inset-0 bg-brand-navy/80 backdrop-blur-sm z-50 items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-[fadeIn_0.2s_ease-out] flex flex-col border border-slate-200 border-t-4 border-t-brand-cyan my-auto">
@@ -447,7 +482,6 @@
                 <div class="space-y-3">
                     <div id="alerta-erro" class="hidden bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2 rounded-lg mb-2 font-semibold"><i class="ph ph-warning-circle"></i> Preencha todos os campos obrigatórios (*).</div>
                     
-                    <!-- NOVO: Destino da Solicitação -->
                     <div class="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
                         <label class="block text-xs font-semibold text-brand-navy mb-1">Destino da Solicitação (Setor) *</label>
                         <select id="task-destino" required onchange="toggleAreaGestor()" class="w-full border border-blue-300 rounded-lg p-2 outline-none focus:border-brand-cyan text-xs bg-brand-navy text-white font-bold uppercase shadow-sm cursor-pointer">
@@ -497,7 +531,6 @@
                 <div id="area-gestor" class="pt-3 border-t border-slate-200 mt-3 bg-orange-50/50 p-3 rounded-lg border border-orange-100">
                     <div class="border-l-4 border-orange-500 pl-2 flex items-center gap-2 mb-3"><h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Planejamento & Acompanhamento</h4><span class="bg-orange-500 text-white text-[9px] px-1.5 py-0.5 rounded font-bold tracking-wider">APENAS GESTOR</span></div>
                     
-                    <!-- Campo Comum: STATUS -->
                     <div class="mb-3">
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Status da Solicitação</label>
                         <select id="task-status" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs font-bold text-slate-700">
@@ -507,7 +540,6 @@
                         </select>
                     </div>
 
-                    <!-- Lógica 1: Se for Serralheria -->
                     <div id="area-gestor-serralheria" class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Serralheiro</label>
@@ -518,7 +550,6 @@
                         <div><label class="block text-xs font-semibold text-slate-700 mb-1">Prazo / Conclusão</label><input type="date" id="task-fim" class="w-full border border-orange-300 bg-white rounded-lg p-2 outline-none focus:border-orange-500 text-xs font-medium text-slate-600"></div>
                     </div>
 
-                    <!-- Lógica 2: Se for Terceiros (Externo) -->
                     <div id="area-gestor-externo" class="hidden">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Follow-up / Histórico de Tratativa</label>
@@ -532,18 +563,6 @@
                     <button type="submit" id="btn-submit-modal" class="px-5 py-2 bg-brand-navy hover:bg-brand-navy-dark text-white font-bold rounded-lg shadow-md transition flex items-center justify-center gap-2 text-xs w-[120px]"><i class="ph ph-floppy-disk text-base text-brand-cyan"></i> Guardar</button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <!-- MODAL DE EXCLUSÃO -->
-    <div id="modal-exclusao" class="modal-custom fixed inset-0 bg-brand-navy/80 backdrop-blur-sm z-[60] items-center justify-center p-4">
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden p-6 text-center border-t-4 border-red-500">
-            <div class="w-14 h-14 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-3"><i class="ph ph-warning-circle text-3xl"></i></div>
-            <h3 class="text-lg font-bold text-brand-navy mb-1">Excluir Atividade?</h3><p class="text-slate-500 text-xs mb-5">Esta ação não pode ser desfeita.</p><input type="hidden" id="id-para-excluir">
-            <div class="flex gap-2 justify-center">
-                <button onclick="fecharModalExclusao()" class="px-4 py-2 font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition w-full text-sm">Cancelar</button>
-                <button onclick="confirmarExclusao()" class="px-4 py-2 font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition shadow w-full text-sm">Sim, excluir</button>
-            </div>
         </div>
     </div>
 
@@ -1140,90 +1159,6 @@
             tbody.appendChild(tr);
         }
 
-        // ==========================================
-        // UTILITÁRIOS 
-        // ==========================================
-        function abrirModal(id = null, defaultDest = 'SERRALHERIA') {
-            document.getElementById('modal-overlay').classList.add('active'); document.getElementById('alerta-erro').classList.add('hidden');
-            const form = document.getElementById('form-atividade'); document.getElementById('area-gestor').style.display = (perfilAtual === 'supervisor') ? 'none' : 'block'; removerFoto();
-
-            if (id) {
-                document.getElementById('modal-title').innerHTML = '<i class="ph ph-file-text text-brand-cyan"></i> Detalhes da Solicitação';
-                const t = atividades.find(a => a.id === id); if(!t) return;
-                document.getElementById('task-id').value = t.id; document.getElementById('task-cadastro').value = t.dataCadastro || t.id;
-                document.getElementById('task-destino').value = t.destino || 'SERRALHERIA';
-                document.getElementById('task-desc').value = t.descricao || ''; document.getElementById('task-diretriz').value = t.diretriz || '';
-                document.getElementById('task-maquina-form').value = t.maquina || ''; document.getElementById('task-local').value = t.local || '';
-                document.getElementById('task-solicitante').value = t.solicitante || ''; document.getElementById('task-nucleo').value = t.nucleo || '';
-                document.getElementById('task-criticidade').value = t.criticidade || 'Baixa'; document.getElementById('task-responsavel').value = t.responsavel || '';
-                document.getElementById('task-inicio').value = t.dataInicio || ''; document.getElementById('task-fim').value = t.dataFim || ''; document.getElementById('task-status').value = t.status || 'NÃO INICIADO';
-                document.getElementById('task-followup').value = t.followup || '';
-                if (t.fotoBase64) { document.getElementById('task-foto-base64').value = t.fotoBase64; document.getElementById('preview-foto').src = t.fotoBase64; document.getElementById('preview-container').classList.remove('hidden'); document.getElementById('nome-arquivo').innerText = "Foto existente"; }
-            } else {
-                document.getElementById('modal-title').innerHTML = '<i class="ph ph-file-text text-brand-cyan"></i> Nova Solicitação';
-                if(form) form.reset();
-                document.getElementById('task-id').value = ''; document.getElementById('task-cadastro').value = ''; document.getElementById('task-status').value = 'NÃO INICIADO'; document.getElementById('task-criticidade').value = 'Baixa'; document.getElementById('task-nucleo').value = ''; document.getElementById('task-maquina-form').value = '';
-                document.getElementById('task-destino').value = defaultDest; document.getElementById('task-followup').value = '';
-                if (perfilAtual === 'gestor') { const h = new Date(); h.setMinutes(h.getMinutes() - h.getTimezoneOffset()); document.getElementById('task-inicio').value = h.toISOString().split('T')[0]; }
-            }
-            toggleAreaGestor();
-        }
-
-        function fecharModal() { document.getElementById('modal-overlay').classList.remove('active'); }
-        function abrirModalExclusao(id) { document.getElementById('id-para-excluir').value = id; document.getElementById('modal-exclusao').classList.add('active'); }
-        function fecharModalExclusao() { document.getElementById('modal-exclusao').classList.remove('active'); document.getElementById('id-para-excluir').value = ''; }
-
-        function exportarExcel(aba) {
-            const filts = (aba === 'SERRALHERIA') ? aplicarFiltrosSerralheria() : aplicarFiltrosExternas();
-            if(filts.length === 0) { alert("Não há dados para exportar com os filtros atuais."); return; }
-            
-            const dadosExcel = filts.map(a => ({
-                "Cadastro": new Date(isNaN(a.dataCadastro||a.id)?(a.dataCadastro||a.id):parseInt(a.dataCadastro||a.id)).toLocaleDateString('pt-BR'),
-                "Setor Destino": a.destino || "SERRALHERIA",
-                "Atividade": a.descricao, "Diretrizes": a.diretriz, "Máquina": a.maquina, "Local": a.local,
-                "Solicitante": a.solicitante, "Núcleo": a.nucleo, "Criticidade": a.criticidade, "Status": a.status,
-                "Serralheiro/Responsável": a.responsavel || "-",
-                "Início Planejado": a.dataInicio ? a.dataInicio.split('-').reverse().join('/') : "-",
-                "Prazo Conclusão": a.dataFim ? a.dataFim.split('-').reverse().join('/') : "-",
-                "Follow-up Externo": a.followup || "-"
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(dadosExcel);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, aba);
-            XLSX.writeFile(wb, `Exportacao_${aba}_${new Date().toISOString().slice(0,10)}.xlsx`);
-        }
-
-        function popularFiltroMaquinaBacklog() {
-            const sels = [document.getElementById('filtro-maquina-serr'), document.getElementById('filtro-maquina-ext'), document.getElementById('task-maquina-form')];
-            let htmlForm = '<option value="" disabled selected>Selecione a Máquina...</option>'; let htmlFiltro = '<option value="TODAS">Todas as Máquinas</option>';
-            LISTA_MAQUINAS.forEach(maq => { htmlForm += `<option value="${maq}">${maq}</option>`; htmlFiltro += `<option value="${maq}">${maq}</option>`; });
-            if(sels[0]) sels[0].innerHTML = htmlFiltro; if(sels[1]) sels[1].innerHTML = htmlFiltro; if(sels[2]) sels[2].innerHTML = htmlForm;
-        }
-
-        function processarImagem(event) {
-            const file = event.target.files[0]; if (!file) return;
-            document.getElementById('nome-arquivo').innerText = "Processando...";
-            const leitor = new FileReader(); leitor.readAsDataURL(file);
-            leitor.onload = function(e) {
-                const img = new Image(); img.src = e.target.result;
-                img.onload = function() {
-                    const canvas = document.createElement('canvas'); const MAX_WIDTH = 800;
-                    let w = img.width; let h = img.height;
-                    if (w > MAX_WIDTH) { h *= MAX_WIDTH / w; w = MAX_WIDTH; }
-                    canvas.width = w; canvas.height = h;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
-                    document.getElementById('task-foto-base64').value = dataUrl;
-                    document.getElementById('preview-foto').src = dataUrl; document.getElementById('preview-container').classList.remove('hidden');
-                    document.getElementById('nome-arquivo').innerText = "Anexado OK"; document.getElementById('nome-arquivo').classList.add('text-emerald-600', 'font-bold');
-                }
-            }
-        }
-        function removerFoto() { document.getElementById('input-foto').value = ''; document.getElementById('task-foto-base64').value = ''; document.getElementById('preview-foto').src = ''; document.getElementById('preview-container').classList.add('hidden'); document.getElementById('nome-arquivo').innerText = "Sem foto"; document.getElementById('nome-arquivo').classList.remove('text-emerald-600', 'font-bold'); }
-        function verFoto(imgSrc) { if(!imgSrc) return; document.getElementById('imagem-ampliada').src = imgSrc; document.getElementById('modal-foto').classList.add('active'); }
-        function fecharModalFoto() { document.getElementById('modal-foto').classList.remove('active'); setTimeout(() => { document.getElementById('imagem-ampliada').src = ""; }, 200); }
-
         function mudarPerfil() { 
             const sel = document.getElementById('perfil-usuario'); 
             const btnImportSerr = document.getElementById('btn-import-container-serr');
@@ -1268,9 +1203,7 @@
             if(tabName === 'dashboard') atualizarDashboard();
         }
 
-        // ==========================================
         // RELATÓRIOS E-MAIL
-        // ==========================================
         function getSegundaSextaPassada() { let h = new Date(); let ds = h.getDay(); let dv = (ds === 0) ? 6 : ds - 1; let sA = new Date(h); sA.setDate(h.getDate() - dv); let sP = new Date(sA); sP.setDate(sA.getDate() - 3); let seP = new Date(sP); seP.setDate(sP.getDate() - 4); return { inc: seP.toISOString().split('T')[0], f: sP.toISOString().split('T')[0] }; }
         function getSegundaSextaAtual() { let h = new Date(); let ds = h.getDay(); let dv = (ds === 0) ? 6 : ds - 1; let sA = new Date(h); sA.setDate(h.getDate() - dv); let sAtual = new Date(sA); sAtual.setDate(sA.getDate() + 4); return { inc: sA.toISOString().split('T')[0], f: sAtual.toISOString().split('T')[0] }; }
         function preencherDatasPadraoRelatorio() { const p = getSegundaSextaPassada(); document.getElementById('rel-passada-inicio').value = p.inc; document.getElementById('rel-passada-fim').value = p.f; const a = getSegundaSextaAtual(); document.getElementById('rel-atual-inicio').value = a.inc; document.getElementById('rel-atual-fim').value = a.f; }
