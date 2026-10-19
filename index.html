@@ -1186,9 +1186,10 @@
         }
 
         // RELATÓRIOS E-MAIL
-        function getSegundaSextaPassada() { let h = new Date(); let ds = h.getDay(); let dv = (ds === 0) ? 6 : ds - 1; let sA = new Date(h); sA.setDate(h.getDate() - dv); let sP = new Date(sA); sP.setDate(sA.getDate() - 3); let seP = new Date(sP); seP.setDate(sP.getDate() - 4); return { inc: seP.toISOString().split('T')[0], f: sP.toISOString().split('T')[0] }; }
-        function getSegundaSextaAtual() { let h = new Date(); let ds = h.getDay(); let dv = (ds === 0) ? 6 : ds - 1; let sA = new Date(h); sA.setDate(h.getDate() - dv); let sAtual = new Date(sA); sAtual.setDate(sA.getDate() + 4); return { inc: sA.toISOString().split('T')[0], f: sAtual.toISOString().split('T')[0] }; }
-        function preencherDatasPadraoRelatorio() { const p = getSegundaSextaPassada(); document.getElementById('rel-passada-inicio').value = p.inc; document.getElementById('rel-passada-fim').value = p.f; const a = getSegundaSextaAtual(); document.getElementById('rel-atual-inicio').value = a.inc; document.getElementById('rel-atual-fim').value = a.f; }
+        function dataLocalISO(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+        // Semana de segunda a domingo, calculada com a data local. deslocamento: 0 = semana atual, -1 = semana passada
+        function getSemana(deslocamento, base = new Date()) { const seg = new Date(base.getFullYear(), base.getMonth(), base.getDate()); seg.setDate(seg.getDate() - ((base.getDay() + 6) % 7) + deslocamento * 7); const dom = new Date(seg); dom.setDate(seg.getDate() + 6); return { inc: dataLocalISO(seg), f: dataLocalISO(dom) }; }
+        function preencherDatasPadraoRelatorio() { const p = getSemana(-1); document.getElementById('rel-passada-inicio').value = p.inc; document.getElementById('rel-passada-fim').value = p.f; const a = getSemana(0); document.getElementById('rel-atual-inicio').value = a.inc; document.getElementById('rel-atual-fim').value = a.f; }
         function formataDataBr(dataISO) { if(!dataISO) return '-'; const p = dataISO.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
 
         function gerarRelatorio() {
