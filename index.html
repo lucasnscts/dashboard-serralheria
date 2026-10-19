@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão de Melhorias</title>
+    <script>
+        (function () {
+            try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); }
+            catch (e) {
+                var mem = {};
+                var shim = { getItem: function (k) { return k in mem ? mem[k] : null; }, setItem: function (k, v) { mem[k] = String(v); }, removeItem: function (k) { delete mem[k]; }, clear: function () { mem = {}; } };
+                try { Object.defineProperty(window, 'localStorage', { value: shim, configurable: true }); } catch (e2) { window.localStorage = shim; }
+                window.__semArmazenamento = true;
+            }
+            window.addEventListener('error', function (ev) {
+                try {
+                    var o = document.getElementById('loading-overlay'); if (o) o.style.display = 'none';
+                    var b = document.getElementById('banner-erro-js');
+                    if (!b) { b = document.createElement('div'); b.id = 'banner-erro-js'; b.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:200;background:#7f1d1d;color:#fff;font:12px sans-serif;padding:8px'; document.body.appendChild(b); }
+                    b.textContent = 'Erro: ' + (ev.message || 'desconhecido');
+                } catch (e) {}
+            });
+        })();
+    </script>
     
     <!-- Link para o Favicon -->
     <link rel="icon" type="image/jpeg" href="favicon.jpg">
@@ -15,8 +34,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Biblioteca de Exportação e Importação Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <!-- Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     
     <style>
         .tab-content { display: none; }
@@ -40,6 +61,21 @@
         ::placeholder { color: #94a3b8; opacity: 1; font-weight: normal; text-transform: none;}
         :-ms-input-placeholder { color: #94a3b8; font-weight: normal; text-transform: none;}
         ::-ms-input-placeholder { color: #94a3b8; font-weight: normal; text-transform: none;}
+    
+        @supports (height: 100dvh) { body.h-screen { height: 100dvh; } }
+        @media (max-width: 767px) {
+            #modal-overlay { padding: .5rem; }
+            #modal-overlay > div { max-height: 96dvh; }
+            /* tabela do backlog vira lista de cartões */
+            #tabela-backlog, #tabela-backlog tbody { display: block; width: 100%; }
+            #tabela-backlog thead { display: none; }
+            #tabela-atividades tr { display: block; margin: .5rem; border: 1px solid #e2e8f0; border-radius: .75rem; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); overflow: hidden; }
+            #tabela-atividades td { display: block; width: 100% !important; border-right: 0 !important; padding: .6rem .75rem !important; }
+            #tabela-atividades td + td { border-top: 1px solid #f1f5f9; }
+            #tabela-atividades .opacity-30 { opacity: 1 !important; }
+            #tabela-atividades td:last-child { background: #f8fafc; }
+            #tabela-atividades td:last-child > div { flex-direction: row !important; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex overflow-hidden">
@@ -50,7 +86,13 @@
         <p class="text-sm font-bold text-brand-navy" id="loading-text">A sincronizar com a nuvem...</p>
     </div>
 
-    <aside class="w-64 bg-brand-navy text-white flex flex-col h-full shadow-2xl z-10 shrink-0">
+    <header class="md:hidden fixed top-0 inset-x-0 h-12 bg-brand-navy text-white flex items-center gap-3 px-3 z-30 shadow-lg">
+        <button onclick="abrirMenu()" class="p-1.5 rounded-lg hover:bg-white/10" aria-label="Abrir menu"><i class="ph ph-list text-2xl"></i></button>
+        <span class="font-bold text-sm flex items-center gap-2"><i class="ph ph-kanban text-xl text-brand-cyan"></i> Gestão de Melhorias</span>
+    </header>
+    <div id="menu-backdrop" class="hidden fixed inset-0 bg-black/50 z-30 md:hidden" onclick="fecharMenu()"></div>
+
+    <aside id="sidebar" class="w-64 bg-brand-navy text-white flex flex-col h-full shadow-2xl z-40 shrink-0 fixed inset-y-0 left-0 -translate-x-full transition-transform duration-200 md:static md:translate-x-0 overflow-y-auto">
         <div class="p-5 text-center border-b border-white/10 bg-brand-navy-dark">
             <h1 class="text-lg font-bold text-white flex items-center justify-center gap-2">
                 <i class="ph ph-kanban text-2xl text-brand-cyan"></i> Gestão de Melhorias
@@ -94,7 +136,7 @@
         </div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto p-4 relative w-full">
+    <main class="flex-1 overflow-y-auto p-3 pt-16 md:p-4 relative w-full min-w-0">
         
         <!-- ABA: DASHBOARD -->
         <section id="dashboard" class="tab-content active max-w-[1500px] mx-auto">
@@ -297,7 +339,7 @@
 
             <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden border-t-2 border-t-brand-cyan flex flex-col min-h-[500px]">
                 <div class="w-full flex-1">
-                    <table class="w-full text-left border-collapse table-fixed">
+                    <table id="tabela-backlog" class="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-brand-navy uppercase text-[10px] font-bold tracking-wider">
                                 <th id="th-1" class="p-3 w-5/12">Detalhes da Atividade & Local</th>
@@ -496,13 +538,35 @@
     </div>
 
     <!-- ===================================== -->
-    <!-- SCRIPTS CORE E SUPABASE               -->
+    <!-- SCRIPTS CORE E FIREBASE               -->
     <!-- ===================================== -->
     <script>
-        // CONFIGURAÇÕES SUPABASE
-        const supabaseUrl = 'https://heyydxkxclbxcdbttjbf.supabase.co'; 
-        const supabaseKey = 'sb_publishable_cvQh4-2E_Sx5cvIdL0ncvg_egj1Qj8n'; 
-        const db = window.supabase.createClient(supabaseUrl, supabaseKey);
+        // CONFIGURAÇÃO FIREBASE (Firestore)
+        const firebaseConfig = {
+            apiKey: "AIzaSyA81FJ8DVpBKS3ExdrtK4-3vcrDGIud-mA",
+            authDomain: "gestao-melhorias-prd2.firebaseapp.com",
+            projectId: "gestao-melhorias-prd2",
+            storageBucket: "gestao-melhorias-prd2.firebasestorage.app",
+            messagingSenderId: "799310250175",
+            appId: "1:799310250175:web:e19e8c3eebd236500f860a"
+        };
+        let fs = null, fsAuth = null, erroInitNuvem = '';
+        try {
+            firebase.initializeApp(firebaseConfig);
+            fsAuth = firebase.auth(); fs = firebase.firestore();
+            if (window.__semArmazenamento) { try { fsAuth.setPersistence(firebase.auth.Auth.Persistence.NONE).catch(function () {}); } catch (e) {} }
+            fs.settings({ experimentalForceLongPolling: true, merge: true });
+        } catch (e) { erroInitNuvem = e.message || String(e); }
+        const comTimeout = (p, ms, etapa) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('Tempo esgotado em: ' + etapa)), ms))]);
+        async function garantirLogin() {
+            if (!fs) throw new Error('Firebase não carregou: ' + erroInitNuvem);
+            if (!fsAuth.currentUser) await comTimeout(fsAuth.signInAnonymously(), 15000, 'login anônimo (Authentication)');
+        }
+        const nuvemExcluir = async id => { await garantirLogin(); await comTimeout(fs.collection('atividades').doc(String(id)).delete(), 20000, 'exclusão no Firestore'); };
+        const nuvemSalvar = async obj => { await garantirLogin(); await comTimeout(fs.collection('atividades').doc(String(obj.id)).set(JSON.parse(JSON.stringify(obj))), 20000, 'gravação no Firestore'); };
+        const nuvemListar = async () => { await garantirLogin(); const s = await comTimeout(fs.collection('atividades').get(), 20000, 'leitura do Firestore'); return s.docs.map(d => d.data()); };
+        let ultimoErroSync = '';
+        function registrarErroSync(e) { console.error('Erro de sincronização:', e); ultimoErroSync = (e && e.message) ? e.message : String(e); }
 
         Chart.defaults.font.family = "'Inter', 'sans-serif'"; Chart.defaults.color = '#64748b'; Chart.register(ChartDataLabels);
         
@@ -551,7 +615,7 @@
             el.innerHTML = lista.slice().reverse().map(f => `<div class="bg-white border border-sky-100 rounded-lg p-2"><div class="flex justify-between text-[10px] text-slate-500 mb-1"><span class="font-bold text-brand-navy"><i class="ph ph-user-circle"></i> ${esc(f.autor || 'GESTOR')}</span><span>${fmtDataHora(f.data)}</span></div><div class="text-xs text-slate-700 whitespace-pre-line">${esc(f.texto)}</div></div>`).join('');
         }
 
-        function atualizarVisibilidadeImportacao() { document.getElementById('btn-import-container').classList.toggle('hidden', !(perfilAtual === 'gestor' && contextoBacklog === 'serralheria')); }
+        function atualizarVisibilidadeImportacao() {  document.getElementById('btn-import-container').classList.toggle('hidden', !(perfilAtual === 'gestor' && contextoBacklog === 'serralheria')); }
 
         function prepararContextoBacklog() {
             const outros = contextoBacklog === 'outros';
@@ -793,30 +857,28 @@
             const statusDiv = document.getElementById('sync-status');
             const pendentes = filaSincronizacao.length + filaExclusao.length;
             if (pendentes > 0) {
-                statusDiv.innerHTML = `<button onclick="sincronizarTudoBackground()" class="flex items-center justify-center gap-1 text-orange-400 hover:text-orange-300 w-full p-2 bg-orange-400/10 rounded border border-orange-400/20 transition cursor-pointer"><i class="ph ph-cloud-warning text-lg animate-pulse"></i> <span>${pendentes} Edições offline. Enviar?</span></button>`;
+                statusDiv.innerHTML = `<button onclick="sincronizarTudoBackground()" class="flex items-center justify-center gap-1 text-orange-400 hover:text-orange-300 w-full p-2 bg-orange-400/10 rounded border border-orange-400/20 transition cursor-pointer"><i class="ph ph-cloud-warning text-lg animate-pulse"></i> <span>${pendentes} Edições offline. Enviar?</span></button>${ultimoErroSync ? `<div class="text-[9px] text-red-300 mt-1 break-words">${esc(ultimoErroSync)}</div>` : ''}`;
             } else {
-                statusDiv.innerHTML = `<div class="flex items-center justify-center gap-1 text-emerald-400 p-2"><i class="ph ph-cloud-check text-lg"></i> <span>Nuvem Sincronizada</span></div>`;
+                statusDiv.innerHTML = ultimoErroSync ? `<button onclick="sincronizarTudoBackground()" class="flex items-center justify-center gap-1 text-red-300 w-full p-2 bg-red-400/10 rounded border border-red-400/20"><i class="ph ph-cloud-slash text-lg"></i> <span>Sem conexão. Tentar de novo</span></button><div class="text-[9px] text-red-300 mt-1 break-words">${esc(ultimoErroSync)}</div>` : `<div class="flex items-center justify-center gap-1 text-emerald-400 p-2"><i class="ph ph-cloud-check text-lg"></i> <span>Nuvem Sincronizada</span></div>`;
             }
         }
 
         async function sincronizarTudoBackground() {
             document.getElementById('sync-status').innerHTML = `<div class="flex items-center justify-center gap-1 text-brand-cyan p-2"><i class="ph ph-spinner animate-spin text-lg"></i> Conectando à nuvem...</div>`;
-            let falhou = false;
+            let falhou = false; ultimoErroSync = '';
 
             for (let i = filaExclusao.length - 1; i >= 0; i--) {
-                try { const { error } = await db.from('atividades').delete().eq('id', filaExclusao[i]); if (error) throw error; filaExclusao.splice(i, 1); localStorage.setItem('filaExclusaoSerralheria', JSON.stringify(filaExclusao)); } catch (e) { falhou = true; }
+                try { await nuvemExcluir(filaExclusao[i]); filaExclusao.splice(i, 1); localStorage.setItem('filaExclusaoSerralheria', JSON.stringify(filaExclusao)); } catch (e) { falhou = true; registrarErroSync(e); }
             }
             for (let i = filaSincronizacao.length - 1; i >= 0; i--) {
-                try { const { error } = await db.from('atividades').upsert(filaSincronizacao[i]); if (error) throw error; filaSincronizacao.splice(i, 1); localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao)); } catch (e) { falhou = true; }
+                try { await nuvemSalvar(filaSincronizacao[i]); filaSincronizacao.splice(i, 1); localStorage.setItem('filaSincronizacaoSerralheria', JSON.stringify(filaSincronizacao)); } catch (e) { falhou = true; registrarErroSync(e); }
             }
             if (!falhou) {
                 try {
-                    const { data, error } = await db.from('atividades').select('*');
-                    if (error) throw error;
-                    atividades = data.map(converterDBParaLocal);
+                    const data = await nuvemListar(); atividades = data.map(converterDBParaLocal);
                     localStorage.setItem('dadosSerralheriaCache', JSON.stringify(atividades));
                     popularFiltroAno(); popularFiltrosDinamicosBacklog(); resetarPaginaEAtualizar(); atualizarDashboard();
-                } catch (e) { falhou = true; }
+                } catch (e) { falhou = true; registrarErroSync(e); }
             }
             atualizarStatusSync();
             setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
@@ -973,7 +1035,11 @@
         }
         function cancelarSenha() { document.getElementById('modal-senha').classList.remove('active'); } document.getElementById('input-senha').addEventListener('keypress', function(e) { if (e.key === 'Enter') confirmarSenha(); });
         
+        function abrirMenu() { const s = document.getElementById('sidebar'); s.classList.remove('-translate-x-full'); s.classList.add('translate-x-0'); document.getElementById('menu-backdrop').classList.remove('hidden'); }
+        function fecharMenu() { const s = document.getElementById('sidebar'); if (!s) return; s.classList.add('-translate-x-full'); s.classList.remove('translate-x-0'); document.getElementById('menu-backdrop').classList.add('hidden'); }
+
         function changeTab(tabName) {
+            fecharMenu();
             const secao = tabName === 'outros' ? 'atividades' : tabName;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('nav button').forEach(btn => { btn.classList.remove('bg-brand-cyan', 'text-white', 'font-bold', 'shadow-md'); btn.classList.add('hover:bg-white/10', 'text-slate-300'); btn.classList.remove('border-transparent'); });
@@ -1228,6 +1294,10 @@
         }
         function copiarRelatorioOutros() { const range = document.createRange(); range.selectNode(document.getElementById('resultado-relatorio-outros')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); try { document.execCommand('copy'); const b = document.getElementById('btn-copiar-outros'); const o = b.innerHTML; b.innerHTML = '<i class="ph ph-check text-lg"></i> Copiado!'; setTimeout(() => { b.innerHTML = o; }, 2500); } catch (err) { alert('Falha ao copiar.'); } window.getSelection().removeAllRanges(); }
         function copiarTabelasParaEmail() { const range = document.createRange(); range.selectNode(document.getElementById('resultado-relatorio')); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); try { document.execCommand('copy'); const btn = document.getElementById('btn-copiar-email'); const h = btn.innerHTML; btn.innerHTML = '<i class="ph ph-check text-lg"></i> Copiado!'; btn.classList.replace('bg-emerald-500', 'bg-emerald-700'); setTimeout(() => { btn.innerHTML = h; btn.classList.replace('bg-emerald-700', 'bg-emerald-500'); }, 2500); } catch (err) { alert('Falha ao copiar.'); } window.getSelection().removeAllRanges(); }
+    </script>
+<script>
+        setTimeout(function () { var o = document.getElementById('loading-overlay'); if (o) o.style.display = 'none'; }, 15000);
+        if (window.__semArmazenamento) { var m = document.querySelector('main'); if (m) m.insertAdjacentHTML('afterbegin', '<div class="mb-3 p-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">Este navegador bloqueou o armazenamento local (comum ao abrir o arquivo direto pelo WhatsApp). O sistema funciona, mas edições feitas sem internet não ficam guardadas.</div>'); }
     </script>
 </body>
 </html>
